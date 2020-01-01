@@ -49,6 +49,9 @@ modularize:
 
 -introduce real modules to c++
 
+-strip - removes debug info
+-strings - shows strings within executable
+
 [](http://clang.llvm.org/extra/modularize.html)<http://clang.llvm.org/extra/modularize.html>
 
   
