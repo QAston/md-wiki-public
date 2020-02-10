@@ -39,7 +39,7 @@
             "useAcrylic" : false
         },
 ```
-
+msys2 bat:
 ```
 @echo off
 
@@ -61,7 +61,7 @@ if NOT EXIST "%WD%msys-2.0.dll" set "WD=%~dp0usr\bin\"
 set MSYSCON=
 "%WD%bash" %*
 ```
-
+cygwin.bat:
 ```
 @echo off
 

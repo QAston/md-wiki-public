@@ -1,8 +1,6 @@
 Dockerizing Applications
 ================
 
-[[_TOC_]]
-
 ## Introduction
 
 This document details the process of converting an application to use docker.  This may be necessary when converting applications to use Nautillus deployment (the full process for which is detailed on the [Nautillus](/infrastructure/nautilus) page).

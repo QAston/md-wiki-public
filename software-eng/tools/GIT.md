@@ -14,9 +14,12 @@ gitignore:
 
 files without given / are ignored on every directory level
 
-# change chmod:
+# commands
 
-`git update-index --chmod=+x <your_file>`
+* `git update-index --chmod=+x <your_file>` make executable
+* `git config submodule.recurse true` download submodules
+* `git config --global mergetool.keepBackup false` disable orig files generation
+
 
 ## links
 

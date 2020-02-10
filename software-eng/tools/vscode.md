@@ -41,3 +41,15 @@ Preview: RMB -> open in preview
 - on the vscode level remap all ctrl bindings:
     - leave regular mapping for `vim.mode != 'Insert'
     - add ctrl-; `<key>` mapping for insert (or all) modes so that they don't conflict with defaults
+
+## c++
+
+- [aether](https://github.com/hadeaninc/aether/blob/develop/EDITORS.md#vscode)
+
+### vscode-ccls
+
+- outline, call-hierarchy, member-hierarchy - very useful views
+- 
+
+
+
