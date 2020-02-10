@@ -14,12 +14,21 @@ gitignore:
 
 files without given / are ignored on every directory level
 
+## setup
+
+* `git config --global mergetool.keepBackup false` disable orig files generation
+* set up always ignored files:
+```
+touch ~/.gitignore_global
+git config --global core.excludesfile ~/.gitignore_global
+echo "*-gitignore" > ~/.gitignore_global
+```
+
 # commands
 
 * `git update-index --chmod=+x <your_file>` make executable
 * `git config submodule.recurse true` download submodules
 * `git config --global mergetool.keepBackup false` disable orig files generation
-
 
 ## links
 
