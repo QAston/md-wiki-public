@@ -49,7 +49,8 @@ Preview: RMB -> open in preview
 ### vscode-ccls
 
 - outline, call-hierarchy, member-hierarchy - very useful views
-- 
 
+## wsl
 
+- make sure to run code.sh from windows path for starting windows wsl integration or linux path with windows path removed to guarantee linux startup
 

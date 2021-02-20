@@ -50,6 +50,8 @@
     * `:t <expr>`     Describe result of evaluation
     * `:u <expr>`     Build derivation, then start nix-shell
  * `nix show-derivation` - pretty print a .drv file
+ * `nix-channel --update` - update packages to use latest
+ * https://nixos.org/manual/nix/stable/#ch-upgrading-nix - upgrading nix cmdline
 
 ### nix garbage and updates
 
@@ -138,6 +140,7 @@ let a = 10; in with longName; longName.a + b # can refer to with scope explicitl
 
 # inherit
 with longName; { inherit a b } # declare a=a and b=b within the set
+{ inherit (longName) a b } # declare a=a and b=b, where longName is a source set
 
 let a = builtins.div 4 0; b = 6; in b  # nix is lazy, so a is never evaluated here because it's unused
 6
@@ -317,6 +320,8 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
     * With some standard arg conventions we can create predefined overrides like:
         * `debugVersion (applyPatches [ ./patch1.patch ./patch2.patch ] drv)` which enable debug flags and apply patches
     * Example: <https://nixos.wiki/wiki/Debug_Symbols>
+    * in nix packages lib.makeOverridable defines the methods for overrriding
+    * mkDerivation uses lib.makeOverridable
 * Package setup hooks pattern:
     * Define reusable scripts for use in packages dependant on particular package, to abstract away the repeated work the dependencies would have to do
     * Setup hooks in nixpkgs: <https://nixos.org/nixpkgs/manual/#ssec-setup-hooks>
@@ -339,6 +344,11 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
   };
 }
 ```
+* [overlays](https://nixos.wiki/wiki/Overlays)
+* makeScope - something overlay related?
+* [pkgs.buildEnv](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/buildenv/default.nix) 
+  * creates a tree of symlinks which make a "nix environment"
+  * [example usage](https://nixos.org/manual/nixpkgs/stable/#sec-building-environment)
 
 ### Nixpkgs
 

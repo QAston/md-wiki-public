@@ -1,4 +1,6 @@
 # GIT
+
+[visual guide to commands](http://marklodato.github.io/visual-git-guide/index-en.html)
     
 ```bash
 #stop confirming pass
