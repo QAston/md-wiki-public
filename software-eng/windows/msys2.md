@@ -135,28 +135,40 @@ set mark-modified-lines on
 set show-mode-in-prompt on
 
 $if mode=emacs
-  # custom
+  # custom - whitespace important - can't have whitespace before colon!
   "\C-p": history-search-backward
   "\C-n": history-search-forward
+  "\e[3;5~": kill-word   # ctrl - del
+
   # standard msys stuff
-  "\C-?": backward-kill-line         # Ctrl-BackSpace
-  "\e[2~": paste-from-clipboard      # "Ins. Key"
-  "\e[5~": beginning-of-history      # Page up
-  "\e[6~": end-of-history            # Page down
+  #"\e[2~": paste-from-clipboard      # "Ins. Key"
+  #"\e[5~": beginning-of-history      # Page up
+  #"\e[6~": end-of-history            # Page down
 
   "\e[1~": beginning-of-line      # Home Key
   "\e[4~": end-of-line            # End Key
   "\e[3~": delete-char      # Delete Key
-  "\e\e[C": forward-word      # Alt-Right
-  "\e\e[D": backward-word      # Alt-Left
   "\e[1;5C": forward-word   # ctrl + right
-  "\e[1;5D": backward-word  # ctrl + left
+  "\e[1;5D": backward-word  # ctrl + left 
   "\e[17~": "Function Key 6"
   "\e[18~": "Function Key 7"
   "\e[19~": "Function Key 8"
   "\e[20~": "Function Key 9"
   "\e[21~": "Function Key 10"
   "\e[23~": "Function Key 11"
+
+  $if clink
+    "\x1b[27;5;32~":    clink-popup-complete # ctrl+space
+    "\C-?": backward-kill-word         # Ctrl-BackSpace - works for clink, doesn't for msys
+     # intercepted and handled by conhost terminal   clink-scroll-line-up # ctrl up - scroll up
+     # intercepted and handled by conhost terminal   clink-scroll-line-down# ctrl down - scroll down
+    "\e[5;5~": clink-scroll-page-up # ctrl pgup - scroll page up
+    "\e[6;5~": clink-scroll-page-down # ctrl pgdown - scroll page down
+    "\e[1;5H": clink-scroll-top # ctrl home - scroll beginning
+    "\e[1;5F": clink-scroll-bottom # ctrl end - scroll end
+  $else
+    "\C-H": backward-kill-word # ctrl - backspace, doesn't work for clink
+  $endif
 $endif
 ```
 

@@ -1,13 +1,18 @@
 ## usage
 
-- wsl2 - use as a linux machine that can access windows drive
-- windows - multiple environments that ca
+### shortcuts
+
+- [](./windows.md)
+- [](./windows_terminal.md)
+- [](./terminals.md)
+- [](../tools/readline.md)
+- [](../tools/vscode.md)
 
 ### how to install windows software
 
 - the install method doesn't matter that much, because now you can easily shim it to the intended environments
     - prefer the fewest installs that cover cmd/ps/mingw
-    - don't add software to incompatible envs
+    - prefer portable dir if app doesn't need any system integration
 - powershell modules
     - install through Install-Module
     - unavailable in other shells, but that's probably just fine
@@ -26,8 +31,6 @@
     - if needs to be available in other shell make a shim for other shells? (TODO)
 - C:/portable apps
     - if needs to be available in shells add a shim to bin to the appropriate dir
-- msi apps
-- chocolatey apps
 
 ## setup steps
 
@@ -70,19 +73,35 @@ $env:PATHEXT=".PS1;$env:PATHEXT"
 * add `"fontFace": "Delugia Mono Nerd Font",` to the default section of the windows terminal settings
 * also install latest version of cascadia code ttf files, should be in portable/cascadiacode
 
+### replace altgr key with ralt
+
+* the only way to have windows recognize right alt as right alt(instead of remapping it to left-alt or other key) without it being altgr is to remove the altgr combinations from the layout
+* install the layout from portable\uknoaltg
+    * run setup exe
+    * start -> language settings -> english -> options -> remove the default layout and select the new one
+    * switch keyboard layout to the new custom one added by the installer in the tray
+    * disable switching layouts using ctrl+shift in the language bar options
+    * now ralt is just ralt, not altgr/lalt! and can be bound separately using things like autohotkey and some app shortcuts
+* this layout can be recreated by using microsoft keyboard layout creator
+    * install the software
+    * load the uk keyboard layout
+    * delete the keys for altgr and shift+altgr
+
+### disable gefore experience (because it sets up global shortcuts)
+
+- find NVidia LocalDisplay Container ("Container service for NVIDIA root features") -> properties -> startup type -> disabled
+
 ### install powershell 7
 
 * `choco install powershell-core --install-arguments='"ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=0"'`
 * in powershell 7:
     * `Update-Help`
-    * sorce windows powershell profile files
-* hardlink profile files (sourcing seems to not work well)
+    * hardlink profile files (sourcing seems to not work well, psreadline breaks for some reason)
 ```
-New-Item -Force -Path $profile.CurrentUserAllHosts
-New-Item -Force -Path $profile.CurrentUserCurrentHost
-". $env:USERPROFILE\Documents\WindowsPowerShell\profile.ps1 " |  Out-File -FilePath $profile.CurrentUserAllHosts
-". $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 " |  Out-File -FilePath $profile.CurrentUserCurrentHost
+fsutil hardlink create $profile.CurrentUserAllHosts $env:USERPROFILE\Documents\WindowsPowerShell\profile.ps1
+fsutil hardlink create $profile.CurrentUserCurrentHost $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 ```
+* $env:PSModulePath will contain both old and new module directories
 
 ### organize path variables
 
@@ -174,10 +193,40 @@ shimzon add -d msix_apps C:\Users\qasto\AppData\Local\Microsoft\WindowsApps\wt.e
 ```
 4. run C:\portable\bin\portable_env to regenerate `env_` scripts 
 
+### install symlink utils
+
+1. in admin shell
+```
+# adds right-click-drag menu as well as Pin Link Source and Drop Link menus in RMB
+choco install linkshellextension
+```
+2. download portable tools and add them to `all` shim
+- add http://www.schinagl.priv.at/nt/xdel/xdel64.zip
+- add https://schinagl.priv.at/nt/ln/ln64static.zip (rename to xln)
+- add http://schinagl.priv.at/nt/dupemerge/dupemerge64.zip
 
 ### install msix packaging tool
 
 store -> msix packaging tool
+
+### install powertoys
+
+* enable start at startup
+* enable always run as admin
+* disable
+    * color picker
+    * image resizer
+    * power rename
+    * shortcut guide
+* change shortcut for power toys run to win-x
+* configure fancy zones
+    * make a vertical zone split in 2 for vertical monitor
+    * enable hold shift to drag window to a zone
+        * also, when holding control while moving between zones the window will be assigned to multiple zones
+    * enable overriding windows snap keys and moving between 2 monitors
+    * in the zone editors disable borders
+    * you can do win+' to switch the layouts
+    * mouse movement for windows snap still works
 
 ### install windows terminal
 
@@ -198,6 +247,16 @@ store -> msix packaging tool
             "fontFace": "Delugia Mono Nerd Font",
             "altGrAliasing": false,
         },
+```
+* configure keybindings
+```
+        // scrollback config - same as my readline and vscode configs
+        { "command": "scrollDown", "keys": "ctrl+down" },
+        { "command": "scrollDownPage", "keys": "ctrl+pgdn" },
+        { "command": "scrollUp", "keys": "ctrl+up" },
+        { "command": "scrollUpPage", "keys": "ctrl+pgup" },
+        { "command": "scrollToTop", "keys": "ctrl+home" },
+        { "command": "scrollToBottom", "keys": "ctrl+end" },
 ```
 
 ### configure cmd.exe
@@ -234,9 +293,14 @@ clink set history.max_lines 10000
 # in .inputrc
 # add inside emacs block
   $if clink
-    "\x1b[27;5;32~":    clink-popup-complete # ctrl+space
+     # intercepted and handled by conhost terminal   clink-scroll-line-up # ctrl up - scroll up
+     # intercepted and handled by conhost terminal   clink-scroll-line-down# ctrl down - scroll down
+    "\e[5;5~": clink-scroll-page-up # ctrl pgup - scroll page up
+    "\e[6;5~": clink-scroll-page-down # ctrl pgdown - scroll page down
+    "\e[1;5H": clink-scroll-top # ctrl home - scroll beginning
+    "\e[1;5F": clink-scroll-bottom # ctrl end - scroll end
+    "\C-z": nop # unbind undo
   $endif
-  # todo: make bindings more in sync with standard bash keybindings here?
 ```
 
 ### configure windows powershell 5.1
@@ -251,15 +315,40 @@ powershell -noprofile -command "Install-Module PSReadLine -Force -SkipPublisherC
 ```
 configure PSReadLine based on <https://github.com/PowerShell/PSReadLine/blob/master/PSReadLine/SamplePSReadLineProfile.ps1>, add to Microsoft.PowerShell_profile.ps1
 ```
+using namespace System.Management.Automation
+using namespace System.Management.Automation.Language
+
+Import-Module -Name posh-git
 Import-Module PSReadLine
+
 Set-PSReadLineOption -EditMode Emacs
 #Set-PSReadLineOption -HistorySearchCursorMovesToEnd
-Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
-Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
-# In Emacs mode - Tab acts like in bash, but the Windows style completion
-# is still useful sometimes, so bind some keys so we can do both
-Set-PSReadLineKeyHandler -Key Ctrl+q -Function TabCompleteNext
-Set-PSReadLineKeyHandler -Key Ctrl+Q -Function TabCompletePrevious
+Set-PSReadLineKeyHandler -Key Ctrl+p -Function HistorySearchBackward
+Set-PSReadLineKeyHandler -Key Ctrl+n -Function HistorySearchForward
+
+# Clipboard interaction is bound by default in Windows mode, but not Emacs mode.
+Set-PSReadLineKeyHandler -Key Ctrl+C -Function Copy
+Set-PSReadLineKeyHandler -Key Ctrl+v -Function Paste
+Set-PSReadLineKeyHandler -Key Ctrl+V -Function Paste
+
+# Familiar windows keybingdings for navigation and deletion
+Set-PSReadLineKeyHandler -Key Ctrl+Delete -Function ShellKillWord
+Set-PSReadLineKeyHandler -Key Ctrl+Backspace -Function ShellBackwardKillWord
+Set-PSReadLineKeyHandler -Key Ctrl+LeftArrow -Function ShellBackwardWord
+Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function ShellForwardWord
+Set-PSReadLineKeyHandler -Key Ctrl+Shift+LeftArrow -Function SelectShellBackwardWord
+Set-PSReadLineKeyHandler -Key Ctrl+Shift+RightArrow -Function SelectShellForwardWord
+
+# common keybinds for scrolling
+Set-PSReadLineKeyHandler -Key Ctrl+PageDown -Function ScrollDisplayDown
+Set-PSReadLineKeyHandler -Key Ctrl+PageUp -Function ScrollDisplayUp
+Set-PSReadLineKeyHandler -Key Ctrl+DownArrow -Function ScrollDisplayDownLine
+Set-PSReadLineKeyHandler -Key Ctrl+UpArrow -Function ScrollDisplayUpLine
+Set-PSReadLineKeyHandler -Key Ctrl+End -Function ScrollDisplayToCursor
+Set-PSReadLineKeyHandler -Key Ctrl+Home -Function ScrollDisplayTop
+
+# display predictions
+Set-PSReadLineOption -PredictionSource History
 
 # F1 for help on the command line - naturally
 Set-PSReadLineKeyHandler -Key F1 `
@@ -302,8 +391,7 @@ Set-PSReadLineKeyHandler -Key F1 `
 Set-PSReadLineOption -BellStyle None
 Set-PSReadLineOption -MaximumHistoryCount 40960
 
-Set-PSReadLineOption -PredictionSource History
-# Set-PSReadLineOption -PredictionSource HistoryAndPlugin # will not work in old powershell
+Set-PoshPrompt -Theme "C:\portable\oh-my-posh\custom.omp.json"
 ```
 4. add autocompletion plugins for installed commands: <https://www.powershellgallery.com/packages?q=Tags%3A%22tab-completion%22>
 ```
@@ -323,44 +411,9 @@ add to profile
 Set-PoshPrompt -Theme c:\portable\oh-my-posh\custom.omp.json
 ```
 
-### configure terminals in vscode
+### configure vscode
 
-1. install shell launcher plugin
-2. Edit settings.json and add:
-```
-    #configure internal terminal (external terminal will open a separate window)
-    "terminal.integrated.fontFamily": "'Delugia Mono Nerd Font'",
-    "terminal.integrated.shell.windows": "C:\\Windows\\System32\\cmd.exe",
-    "shellLauncher.shells.windows": [
-        {
-            "shell": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-            "label": "PowerShell"
-        },
-        {
-            "shell": "C:\\Windows\\System32\\cmd.exe",
-            "label": "cmd"
-        },
-        {
-            "shell": "C:\\Windows\\System32\\wsl.exe",
-            "label": "Artix wsl"
-        },
-        {
-            "shell": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
-            "label": "pwsh"
-        },
-        {
-            "shell": "C:\\portable\\msys\\msys2_shell.cmd",
-            "args": ["-defterm", "-here", "-no-start", "-mingw64"],
-            "label": "mingw64"
-        },
-        {
-            "shell": "C:\\portable\\msys\\msys2_shell.cmd",
-            "args": ["-defterm", "-here", "-no-start", "-msys"],
-            "label": "msys"
-        }
-    ],
-```
-3. To launch the terminal do Ctrl+shift+P -> Shell launch -> choose shell
+- see [](../tools/vscode.md)
 
 ### set up send-to targets
 
@@ -393,7 +446,7 @@ Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Com
 
 ### set up wsl
 
-- see [windows/wsl2_artix]()
+- see [](./wsl2_artix.md)
 
 ### set up "everything search"
 
@@ -401,15 +454,25 @@ Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Com
 - in preferences disable indexes for games and elements
 - pin to windows bar
 
+### set up rust 
+
+follow [](../rust/tools.md)
+
 ### todos
 
-- powertoys
-- windows shortcuts
+- good terminal-based editor (neovim?)
+- <https://github.com/lucc/nvimpager>
+- docker for windows (in wsl2)
 - [fzf](https://github.com/junegunn/fzf) 
     - fzf based tools https://github.com/tadashi-aikawa/owl-cmder-tools
+    - windows: https://github.com/junegunn/fzf/wiki/Windows
 - ripgrep
 - [fd](https://github.com/sharkdp/fd)
-- readline shortcuts  
-- vscode shortcuts and plugins
+- vscode extensions
 - <https://github.com/anishathalye/dotbot>
 - <https://github.com/imachug/win-sudo>
+- <https://github.com/clvv/fasd>
+    - <https://github.com/clarity20/fasder>
+- windows debugging and sysinternals?
+- c++ ide?
+- python setup with readline? 

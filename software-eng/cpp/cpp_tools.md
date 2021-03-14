@@ -50,3 +50,7 @@
 
 * doxygen
 * cppdoc
+
+## frameworks
+
+* <https://github.com/libuv/libuv>

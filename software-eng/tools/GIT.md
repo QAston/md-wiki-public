@@ -14,7 +14,7 @@ local/private gitignore file .git/info/exclude
 
 gitignore:
 
-files without given / are ignored on every directory level
+files without / are ignored on every directory level
 
 ## setup
 

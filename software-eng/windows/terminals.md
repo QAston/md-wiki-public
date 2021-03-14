@@ -1,6 +1,6 @@
 # windows terminal software (conhost and extensions)
 
-- <https://mintty.github.io/>
+- <https://mintty.github.io/> (see below)
 - <https://github.com/cbucher/console>
 - [conemu](https://conemu.github.io/) - a good terminal and a great repository of info on command line tooling
 - [windows terminal](./windows_terminal.md) - a terminal replacement from ms
@@ -14,6 +14,13 @@
 
 * `HKEY_CURRENT_USER\Software\Microsoft\Command Processor\AutoRun` - `cmd.exe` autorun
     * "C:\Program Files (x86)\clink\1.1.34.d161e9\clink.bat" inject --autorun --profile ~\clink
+* new conhost - handle of xterm/vt100 terminal sequences:
+    * [handled terminal sequences](https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#input-sequences)
+    * keycodes:
+        * alt+shift+ctrl modifiers work on the f-keys, arrows, backspace, delete, pgup/down home/end (they yeld different sequences)
+        * alt works for every base keypress because alt modifier is encoded (see [](../unix/terminals.md)) as `ESC nonaltchar`
+        * ctlr characters are only supported in C0 ascii ctrl range (ctrl-space, ctrl-[, ctrl-], ctrl-^, ctrl-_) because they're encoded using C0 ASCII control codes. As a result ctrl+shift+char, ctrl+num, and in general ctrl with other ascii characters is ignored or reproduces a keycode already bound to control range
+        * keycodes can be inspected using `clink echo` on in msys using `ctrl-v` (quote) then keystroke
 * [improvements to the default windows terminal](https://docs.microsoft.com/en-us/previous-versions/orphan-topics/ws.11/mt427362(v=ws.11)?redirectedfrom=MSDN)
     - quick edit mode 
         - select and right click/enter to copy
@@ -105,7 +112,26 @@
         - set `history.dont_add_to_history_cmds` to say which commands to ignore in history
         - history is saved to `c:\Users\<username>\AppData\Local\clink`
     - other settings
-        - `clink.paste_crlf` by default is set to "replace crlf with space", but actually doesn't prevent pasting lines, so it's probably broken
+        - `clink.paste_crlf` is bad because it prevents multiple pastes, but it luckily doesn't apply in windows terminal
     - keybinds
         - most keybinds are the same as [readline](../tools/readline.md)
         - ESC - clear line text
+    - `clink echo` prints most of the input escape codes handled by windows conhost
+
+### mintty
+
+- the most xterm compatible terminal on windows (other than using xserver and wsl)
+- [documentation](https://mintty.github.io/mintty.1.html)
+- [wiki](https://github.com/mintty/mintty)
+- example config:
+```
+Font=Delugia Mono Nerd Font
+Term=xterm
+BellType=0
+TabBar=1
+SessionGeomSync=3
+AltGrIsAlsoAlt=yes
+CtrlShiftShortcuts=yes
+ConPTY=1
+ScrollMod=4
+```
