@@ -31,6 +31,7 @@ echo "*-gitignore" > ~/.gitignore_global
 * `git update-index --chmod=+x <your_file>` make executable
 * `git config submodule.recurse true` download submodules
 * `git config --global mergetool.keepBackup false` disable orig files generation
+* `git grep ` searches in history
 
 ## links
 

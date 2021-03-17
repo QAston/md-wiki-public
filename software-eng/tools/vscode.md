@@ -286,6 +286,8 @@ Preview: RMB -> open in preview
         - supports base search directories and favourites (stored custom path)
     - use workspace explorer extension to view .code-workspace workspaces
         - stored in a base dir and subdirs
+- todo: some templates for workspace configuration
+- todo: fuzzyfind? https://github.com/rlivings39/vscode-fzf-quick-open
 
 ## c++
 

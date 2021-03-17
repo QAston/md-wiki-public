@@ -20,6 +20,7 @@
     * ctrl-q in mintty msys then press shows the keycode (filtered through readline?, which seems to eat C1 control block (ctrl+shift+ascii characters))
     * 
 * xterm doc on keycodes: <https://github.com/mintty/mintty/wiki/Keycodes>
+* clink doc on keycodes on standard pc keyboard <https://chrisant996.github.io/clink/clink.html#miscellaneous> (search for Binding special keys)
 * notations for keycodes
     * `ESC` a.k.a `^[` a.k.a binary: 0x1b - ESC ASCII control character, nothing to do with the ESC key
         * see <https://en.wikipedia.org/wiki/Control_character> for other named ctrl characters

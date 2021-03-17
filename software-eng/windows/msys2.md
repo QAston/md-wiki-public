@@ -64,6 +64,10 @@ c:/Program\040Files\040(x86) /progsx86 ntfs binary,posix=0,noacl,user 0 0
 c:/Program\040Files /progs ntfs binary,posix=0,noacl,user 0 0
 ```
 
+#### cleanup pacman.comf
+
+- remove mingw 32 bit repository
+
 #### configure .bashrc:
 ```
 # history file management
@@ -74,6 +78,13 @@ export HISTFILESIZE=100000
 export PROMPT_COMMAND="history -a" # commit history on prompt because windows doesn't let bash commit history on exit; history from other shells still won't be picked unless reloaded
 
 shopt -s histappend
+
+# disable CTRL-S terminal halt
+stty -ixon
+stty -ixoff
+stty -ixany
+#
+#stty hup - send hup signal on disconnect
 
 # history substitution - !
 shopt -s histreedit # allow editing ! subs
@@ -199,7 +210,7 @@ pacman -Su
 
 #### install useful packages
 ```
-pacman -S --needed base-devel binutils mingw-w64-x86_64-toolchain cmake
+pacman -S --needed base-devel binutils mingw-w64-x86_64-toolchain cmake mingw64/mingw-w64-x86_64-diffutils
 ```
 #### set up ABS and AUR
 
@@ -215,6 +226,7 @@ git clone git@github.com:msys2/MSYS2-packages.git
 1. follow <https://github.com/git-for-windows/git/wiki/Install-or-update-inside-MSYS2,-Cygwin-or-Git-for-windows-itself>
 - in mingw64: curl https://raw.githubusercontent.com/git-for-windows/build-extra/HEAD/git-extra/getgit | bash
 - will add git.exe shim to c:/portable/msys/cmd
+- sadly, will also add a bunch of binaries to /mingw64, you'll need to install stuff with --override "*" to override these later
 2. add git to msys2 (by default it's only in mingw64)
 - install a version of git from MSYS-packages, but modify to not install binaries, as those will be used from git-for-windows
 ```
@@ -285,6 +297,15 @@ pacman -S git-extras # supporting modules
 # in /etc/pacman.conf
 IgnorePkg   =git
 ```
+#### install win-sudo (bash-only)
+
+1. clone <https://github.com/imachug/win-sudo>
+2. symlink sudo, su, sudobackend and sudorc to c:/portable/bin/msys_common
+3. looks like output redirection doesn't always work, you can add sleep to fix that:
+```
+sudo sleep 3 && echo "works"
+```
+4. could run it from bash/powershell using bash-mingw64-login?
 
 #### make bash scripts and mingw64/msys commands convenient to use from other shells
 
@@ -316,6 +337,8 @@ IgnorePkg   =git
   - prints contents of clipboard
 - regtool - editing registry
 - cygpath - path conversion
+- pacman
+    - pacman -Qo find package owning a file (must specify extension otherwise won't find anything)
 
 ### start options
 

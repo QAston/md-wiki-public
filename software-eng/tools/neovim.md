@@ -3,18 +3,30 @@
 ### usage
 
 - `:!ls` - run shell command
-    - doesn't work in msys/mingw, a half-working workaround is running `alias nvim="SHELL=cmd.exe nvim"`
-    - probably needs an msys-specific build: https://github.com/neovim/neovim/wiki/Building-Neovim#windows--msys2mingw
-        - the build doesn't fix the issue, looks like some msys-specific patches need to be applied
-    - <https://stackoverflow.com/questions/13911881/setting-cygwin-shell-path-on-vim-for-windows>
-    - msys2 vim works in bash - `alias nvim vim`?
-- `:terminal` runs an embedded terminal emulator (which so9mehow works lol)
+- `:terminal` runs an embedded terminal emulator (which somehow works lol)
 
 ### windows setup
 
 - unzip nvim-win64.zip to portable
 - the package has some gnu binutils: tee, cat, diff, tidy, xdd, so don't add it to path
 - sendto shim-windows: nvim.exe, nvim-qt.exe, wind32yank.exe
+
+#### msys/bash/cygwin support
+
+- neovim doesn't have an msys/cygwin build variant
+    - :h feature-list lists win32, wsl and unix, but not win32unix, which is what vim uses for msys/cygwin
+- a half-working workaround for making shell commands work in msys/mingw is running `alias nvim="SHELL=cmd.exe nvim"`
+    - <https://stackoverflow.com/questions/13911881/setting-cygwin-shell-path-on-vim-for-windows>
+    - msys2 vim works in bash - `alias nvim vim`?
+- some people claim wsl works? https://stackoverflow.com/questions/59804779/configure-nvim-and-oni-to-use-bash-on-wsl-in-windows
+- msys build: https://github.com/neovim/neovim/wiki/Building-Neovim#windows--msys2mingw is the build aimed at win32, doesn't have bash support
+    - looks like it'd need a custom patch
+- there's a cygport source you can build, but it lists the platform as unix:
+    - https://github.com/cascent/neovim-cygwin
+    - https://github.com/cascent/neovim-cygwin/issues/5
+- looks like has('wsl') flag isn't really well supported: 
+    - detection is compile time only <https://github.com/neovim/neovim/pull/7330>
+    - and it doesn't work by default   <https://github.com/neovim/neovim/issues/12642>
 
 ### linux setup
 

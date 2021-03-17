@@ -92,6 +92,7 @@
         * <https://github.com/vladimir-kotikov/clink-completions>
         * <https://github.com/chrisant996/cmder-powerline-prompt>
         * <https://github.com/HelloWorld017/clink-powerline>
+        * <https://github.com/skywind3000/z.lua>
     - clink disables ALL default keyboard input handling for the shell executable and replaces them with readline
         - other executables spawned from the shell are unaffected, as it only affects the shell process, not the terminal
         - you can still trigger mark mode by using the gui menu
@@ -117,6 +118,7 @@
         - most keybinds are the same as [readline](../tools/readline.md)
         - ESC - clear line text
     - `clink echo` prints most of the input escape codes handled by windows conhost
+    - binding keyboard to a custom command: <https://github.com/genotrance/ff/issues/4>
 
 ### mintty
 

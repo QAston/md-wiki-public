@@ -33,6 +33,9 @@ windows:
       * sharing files
     * won't work:
       * sharing network with host
+  * docker for windows wsl2 backend
+    * <https://docs.docker.com/docker-for-windows/wsl/>
+    * preferred method
 
 arguments agains docker - not neccessarily good
 <http://www.boycottdocker.org/>

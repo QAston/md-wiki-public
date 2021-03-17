@@ -12,7 +12,10 @@
 * [everything (search)](https://www.voidtools.com/)
 * [a lot of free windows tools](https://www.nirsoft.net/utils/index.html)
 * [mostly windows ui apps](https://winaero.com/winaero-apps/)
+* [a gnu software package](https://github.com/bmatzelle/gow)
 * [new windows app framework merging uwp and desktop?](https://github.com/microsoft/ProjectReunion)
+* [windows usability tips](https://lobste.rs/s/zpumlt/tips_for_surviving_windows_desktop_if_you)
+* <https://github.com/processhacker/processhacker>
 * <https://github.com/stax76/OpenWithPlusPlus>
 * <https://github.com/w00zla/WslPathShellExt>
 * [msix - new app isolation technology](https://docs.microsoft.com/en-us/windows/msix/) - containers for windows apps

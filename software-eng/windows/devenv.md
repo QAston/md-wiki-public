@@ -127,6 +127,7 @@ fsutil hardlink create $profile.CurrentUserCurrentHost $env:USERPROFILE\Document
     - `C:\portable\bin\msix_apps`
     - `C:\portable\bin\bash`
 - PATH_APPEND_MSYS_COMMON - software to append to path for all msys envs (msys, mingw)
+    - `C:\portable\bin\msys_common`
     - %PATH_VAR_WINDOWS%
     - %PATH_VAR_ALL%
 - PATH - software for windows shells
@@ -284,7 +285,7 @@ clink installscripts "C:\portable\clink-prompt "
 6. set up config
 ```
 # in shell:
-# clink set clink.paste_crlf  todo: disable this somehow, luckily it's only broken outside wt
+clink set clink.paste_crlf  crlf
 clink set history.max_lines 10000
 #clink config: https://chrisant996.github.io/clink/ https://chrisant996.github.io/clink/clink.html and "old console config and shortcuts"
 ```
@@ -444,7 +445,7 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tool
 Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"; Enter-VsDevShell e821c35b
 ```
 
-### set up wsl
+### set up wsl2 and docker
 
 - see [](./wsl2_artix.md)
 
@@ -453,26 +454,60 @@ Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Com
 - install with installer, enable indexing service
 - in preferences disable indexes for games and elements
 - pin to windows bar
+- run `Install-Module -Name PSEverything` in windows powershell
+    - run `Search-Everything -Extension cpp,h  | Get-Item` to search
 
 ### set up rust 
 
 follow [](../rust/tools.md)
 
-### todos
+### set up ripgrep
 
-- good terminal-based editor (neovim?)
+- [download](https://github.com/BurntSushi/ripgrep/releases) msvc x64 zip and put in portable
+- rg sendto shim-windows
+- add completions
+    - bash: add `. "C:\portable\ripgrep\complete\rg.bash"` to bashrc after /etc/bash_completion
+    - powershell: add `. C:\portable\ripgrep\complete\_rg.ps1` to profile
+
+### set up fd
+
+- [download](https://github.com/sharkdp/fd/releases/) msvc x64 zip and put in portable
+    - also download unknown-linux-gnu package and get the autocomplete folder and put it in portable
+- fd sendto shim-windows
+    - bash: `. "C:\portable\fd\autocomplete\fd.bash-completion"` to bashrc
+    - powershell: add `. "C:\portable\fd\_fd.ps1"`
+
+### add small gnu tools to windows path
+
+1. from c:\portable\msys\usr\bin - only add utilities that actually work outside of msys
+    - sendto wget winshell
+    - sendto which winshell
+    - sendto cygpath winshell
+2. download some binaries ported to windows, so that they work outside of msys (for example clone git@github.com:bmatzelle/gow.git)
+    - utilities which are shipped with msys, but don't work well outside of bash
+    - sendto cat winshell
+    - sendto xargs winshell
+    - sendto sed winshell
+3. download [jq](https://github.com/stedolan/jq) and add it to portable/bin/windows
+
+
+### set up fzf
+
+follow [](../tools/fzf.md)
+
+### set up nvim
+
+follow [](../tools/neovim.md)
+
+## future todos
+
 - <https://github.com/lucc/nvimpager>
 - docker for windows (in wsl2)
-- [fzf](https://github.com/junegunn/fzf) 
-    - fzf based tools https://github.com/tadashi-aikawa/owl-cmder-tools
-    - windows: https://github.com/junegunn/fzf/wiki/Windows
-- ripgrep
-- [fd](https://github.com/sharkdp/fd)
-- vscode extensions
-- <https://github.com/anishathalye/dotbot>
-- <https://github.com/imachug/win-sudo>
 - <https://github.com/clvv/fasd>
     - <https://github.com/clarity20/fasder>
 - windows debugging and sysinternals?
 - c++ ide?
 - python setup with readline? 
+- <https://github.com/anishathalye/dotbot>
+- vscode extensions
+- tmux/screen
