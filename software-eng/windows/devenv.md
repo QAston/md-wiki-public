@@ -411,6 +411,11 @@ add to profile
 ```
 Set-PoshPrompt -Theme c:\portable\oh-my-posh\custom.omp.json
 ```
+6. set SHELL variable for use in nvim and others
+```
+$env:SHELL=(Get-Process -Id $PID).Path
+$env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
+```
 
 ### configure vscode
 
@@ -477,7 +482,7 @@ follow [](../rust/tools.md)
     - bash: `. "C:\portable\fd\autocomplete\fd.bash-completion"` to bashrc
     - powershell: add `. "C:\portable\fd\_fd.ps1"`
 
-### add small gnu tools to windows path
+### add small unix tools to windows path
 
 1. from c:\portable\msys\usr\bin - only add utilities that actually work outside of msys
     - sendto wget winshell
@@ -501,13 +506,7 @@ follow [](../tools/neovim.md)
 
 ## future todos
 
-- <https://github.com/lucc/nvimpager>
-- docker for windows (in wsl2)
-- <https://github.com/clvv/fasd>
-    - <https://github.com/clarity20/fasder>
 - windows debugging and sysinternals?
 - c++ ide?
 - python setup with readline? 
-- <https://github.com/anishathalye/dotbot>
 - vscode extensions
-- tmux/screen

@@ -37,6 +37,7 @@
     - env variables values can use variables themselves, their values will be substituted (but only if the substituted variable value doesn't have variables itself, otherwise substitution won't happen)
     - path editor will switch to path mode if it finds semicolons and path-looking things
     - setx sets variables in windows registry
+    - you can set the variables with name `=name` and they won't show up in `env` prints, and are accessible through winapi, but can't be set from cmd.exe, some people call these "hidden variables"
 
 
 ### posix api implementations
