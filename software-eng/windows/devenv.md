@@ -7,6 +7,7 @@
 - [](./terminals.md)
 - [](../tools/readline.md)
 - [](../tools/vscode.md)
+- [](../tools/neovim.md)
 
 ### how to install windows software
 
@@ -465,6 +466,10 @@ Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Com
 ### set up rust 
 
 follow [](../rust/tools.md)
+
+### set up node/npm
+
+follow [](../tools/npm.md)
 
 ### set up ripgrep
 

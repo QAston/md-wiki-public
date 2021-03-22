@@ -51,12 +51,37 @@ endif
     - VISUAL=nvim
 
 ## todo:
-- leader key
+
 - switching windows
 - finish vimtutor
 
 ### usage
 
+#### concepts
+
+- shada - shared data - a file which stores registers and command listory shared between all the sessions
+- buffer - in memory text of a file, filename displayed at the bottom
+    - can be active (shown in a window), hidden(loaded but not shown) or inactive(unloaded and not shown)
+- window - a viewport on a buffer, can have multiple windows on a single buffer, or multiple windows pointing to different buffers
+    - split windows are windows displayed side by side at the same time
+- tab - collection of windows, name displayed at the top of the screen
+- registers - store deleted and yanked (copied) text
+    - read only registers:
+        - ". - last inserted text
+        - "% - last current file path
+        - ": - most recent command
+        - "# - alternate file (file you switch to with ctrl-^)
+        - "0 - last yank
+        - "" - unnamed register - last delete or yank
+        - "/ - last search pattern
+        - "- - last small (less than a line) delete
+    - special registers
+        - "= - expression register - pasting from it will prompt you to enter vimscript expression
+        - "_ - black hole register - use to throw away
+        - "+ and "* - system clipboard registers
+            - equivalent on windows, on linux * is selection buffer (last selection) and + is the cut buffer
+            - can be made the default register <https://vim.fandom.com/wiki/Accessing_the_system_clipboard>
+        
 #### config files
 
 - by default nvim stores config files in `~/AppData/Local/nvim` and user data in `~/AppData/Local/nvim-data` (see :h standard-path)
@@ -70,6 +95,140 @@ endif
 - `:PlugInstall` to install plugins
 - `:PlugUpdate` to update
 - `:PlugClean` to remove plugins no longer in plug#begin/end list
+- these only work in cmd (uses batch scripts)
+
+#### keybinds
+
+- normal
+    - window/tab management
+        - `Ctrl+w T` - move current window into a tab
+        - `gt` - next tab
+        - `gT` - previous tab
+        - `:tabs` - display status of all tabs
+        - `:tabonly` - close all other tabs
+        - `:tabclose` - close current tab and contained windows
+        - `:tabnew <file>` - open file in new tab
+        - `:tab ball` - edit all buffers as tabs
+        - `:tabdo <command>` - run command in all tabs
+        - `:buffers`/`:ls` - display status of buffers
+        - `:e <file>` - edit a file in new buffer in the current window
+        - `:bnext` - switch to next buffer
+        - `:bprevious` - switch to previous
+        - `:buffer <file>` - switch to buffer containing file
+        - `:bdelete` - close a buffer (close a file)
+        - `:split <file>` - open a file in new split window
+        - `:vsplit <file>` - open a file in new vertically split window
+        - `:vert ball` - open all buffers in vertical windows
+        - `Ctrl+w s` - split window
+        - `Ctrl+w v` - split window vertically
+        - `Ctrl+w w` - switch windows
+        - `Ctrl+w q` - close window
+        - `Ctrl+w x` - swap window positions with the last used window
+        - `Ctrl+w h` - switch to left window
+        - `Ctrl+w l` - switch to right window
+        - `Ctrl+w j` - switch to below window
+        - `Ctrl+w k` - switch to above window
+    - registers
+        - `:reg` - show contents of all registers
+        - `:reg <regname>` - show content of register
+        - `<regname>p` - paste contents of register
+        - `<regname>y` - copy into register
+    - filesystem
+        - `:r <file>` read contents of file and insert at cursor
+        - `:w <file>` save selection to file
+    - saving and exiting
+        - `:w`- write (save) the file, but don't exit
+        - `:w !sudo tee %` - write out the current file using sudo
+        - `:wq` or `:x` or `ZZ` - write (save) and quit
+        - `:q` - quit (fails if there are unsaved changes)
+        - `:q!` or `ZQ` - quit and throw away unsaved changes
+        - `:wqa` - write (save) and quit on all tabs
+    - `K` - open help page for word under cursor 
+    - motions
+        - b/w/e/B/W/E - beginning of previous word/ beginning next word/ end of current word
+            - CAPITAL moves WORDS (whitespace separated), while lowercase moves words(operator separated)
+    - modes
+        - i/a - to insert mode (before/after) cursor
+        - I/A - to insert mode at (beginning/end) of the line
+        - o/O - add a line (below/above) the current one and go to insert mode
+        - v - visual mode
+        - ctrl+v - visual block mode
+        - shift+v - line visual mode
+        - R - replace (overtype) mode (replacing chars with >1 size (like tab) will move things)
+        - gR - visual replace mode (replacing chars with >1 size (like tab) will not move things, editor will compensate using other chars instead)
+- visual
+    - o - move cursor to the other end of selection or opposite corner of block selection
+    - O - move cursor to the other corner of block selection
+    - (shift)(ctrl)v - change visual mode type
+    - using text-objects extends the selection by that object in the direction of the cursor for or if inside a block-object expands the block outwards
+        - `a<object>` - includes surrounding whitespace (or brackets, or quotes)
+        - `i<object>` - doesn't include surrounding whitespace(or brackets, or quotes), repeat once to include what `a` would include
+        - see :help text-objects for full details
+        - `<a/i>w` - a word
+        - `<a/i>W` - a WORD
+        - `<a/i>b` - a block with ()
+        - `<a/i>B` - a block with {}
+        - `<a/i>t` - a block with <> tags
+        - `<a/i>s` - a sentence
+        - `<a/i>p` - a paragraph
+        - `<a/i>'` - a '-quoted string
+        - `<a/i>"` - a "-quoted string
+        - ``<a/i>` `` - a `-quoted string
+        - `<a/i>[` - text between [ brackets
+        - `<a/i>(` - text between ( brackets
+        - `<a/i><` - text between < brackets
+        - `<a/i>{` - text between { brackets
+    - operators - act on selection and move back to normal mode
+        `>` - shift text right
+        `<` - shift text left
+        `y` - yank (copy) marked text
+        `d` - delete marked text
+        `~` - switch case
+        `u` - change marked text to lowercase
+        `U` - change marked text to uppercase
+        `=` - format
+        `c` - change
+        `!` - execute shell command on selection
+        `:` - execute Ex command on the selection
+    - motions select the area between the cursor and motion target
+- insert
+    - `ctrl+r <regname>` - paste register
+    - `ctrl+a ` - paste last insert
+    - `ctrl+x ctrl+<many keys>` - completion keys
+        - `ctrl+f` - autocomplete/insert filename
+        - `ctrl+o` - guess type of item in front of the cursor and find first match
+        - `ctrl+n/p` - keyword completion (see standalone `ctrl+n/p`)
+        - repeated presses of `ctrl+<many keys>` switch to next found completion of that type
+    - `ctrl+n/p` - keyword completion (next/previous) - complete for keyword in front of the cursor
+        - repeated presses replace the previous completion with the another completion of the same type (see ctrl+x keybinds family)
+        - see :help complete-functions
+        - <https://vim.fandom.com/wiki/Any_word_completion>
+    - `ctrl+v` - insert raw keypress/3 digit decimal number as a byte
+    - `ctrl+k <char1> <char2>` - enter a digraph 
+        - `:digraphs` shows available digraphs
+    - `ctrl+o` - execute single normal-mode command and return to insert mode
+    - `ctrl+]` - expand abbreviation under cursor (abbreviations are defined using :abbr command)
+    - other ctrl commands are useless and can be ignored
+    - todo: port standard keyboard mappings to insert mode?
+        - alt+left/right for jumplist
+        - shift for selection instead of being dupe of ctrl
+        - tab/shifttab for indent/deindent?
+        - ctrl+space for completion?
+
+#### keyboard mappings
+
+- [free keys list](https://vim.fandom.com/wiki/Unused_keys)
+- other free keys:
+    - `ctrl+shift+<key>`
+    - `<space>`
+        - see <https://stackoverflow.com/questions/446269/can-i-use-space-as-mapleader-in-vim> for space: leader
+        - <https://superuser.com/questions/693528/vim-is-there-a-downside-to-using-space-as-your-leader-key>
+    - `ctrl+k` - enter digraph in insert mode (see :digraph for list), unbound in normal mode
+        - rebind ctrl-k to something else because digraphs can actually be useful?
+- keys which are kind of obsolete because I have good keyboard layout:
+    - `x` - use delete instead
+    - `hjkl` - arrows
+    - shift+arrows/pgup/down/end/begin
 
 #### feature flags
 
@@ -110,9 +269,12 @@ endif
 - <https://github.com/junegunn/vim-plug>
     - <https://github.com/junegunn/vim-plug/wiki/tutorial>
 - <https://github.com/neovim/nvim-lspconfig>
+- <https://github.com/preservim/nerdtree>
+- [completion engine from vscode ported to vim](https://github.com/neoclide/coc.nvim)
 
 ## build instructions
 
+- not actually needed - prebuilt vim works just fine
 - [msys](https://github.com/neovim/neovim/wiki/Building-Neovim#windows--msys2mingw)
     - list platform as win32, not win32unix
 - [cygwin](https://github.com/neovim/neovim/wiki/Building-Neovim#cygwin)

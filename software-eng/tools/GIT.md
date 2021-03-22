@@ -25,6 +25,11 @@ touch ~/.gitignore_global
 git config --global core.excludesfile ~/.gitignore_global
 echo "*-gitignore" > ~/.gitignore_global
 ```
+* set up aliases
+```
+git config --global alias.st status
+git config --global alias.unstage 'reset HEAD --
+```
 
 # commands
 

@@ -62,6 +62,7 @@ fi
 ```
 c:/Program\040Files\040(x86) /progsx86 ntfs binary,posix=0,noacl,user 0 0
 c:/Program\040Files /progs ntfs binary,posix=0,noacl,user 0 0
+#/usr/bin /bin ntfs binary,posix=0,noacl,user 0 0
 ```
 
 #### cleanup pacman.comf
@@ -210,7 +211,7 @@ pacman -Su
 
 #### install useful packages
 ```
-pacman -S --needed base-devel binutils mingw-w64-x86_64-toolchain cmake mingw64/mingw-w64-x86_64-diffutils
+pacman -S --needed base-devel binutils mingw-w64-x86_64-toolchain cmake mingw64/mingw-w64-x86_64-diffutils ncurses
 ```
 #### set up ABS and AUR
 
@@ -297,6 +298,8 @@ pacman -S git-extras # supporting modules
 # in /etc/pacman.conf
 IgnorePkg   =git
 ```
+3. Configure git by following setup in [](../tools/GIT.md)
+
 #### install win-sudo (bash-only)
 
 1. clone <https://github.com/imachug/win-sudo>
@@ -321,6 +324,9 @@ sudo sleep 3 && echo "works"
 - [mingw setup for llvm](https://github.com/valtron/llvm-stuff/wiki/Set-up-Windows-dev-environment-with-MSYS2)
 - [mingw setup for openfgrameworks](https://openframeworks.cc/setup/msys2/)
 - [msys2 path guide](https://www.msys2.org/docs/filesystem-paths/)
+  - this means that `cmd.exe /c` will by default be converted to `cmd.exe C:\`, unless escaped `cmd.exe //c` or disabled using `MSYS2_ARG_CONV_EXCL="*"`
+  - this is also true for env variables: MSYS2_ENV_CONV_EXCL="*" (which will sadly prevent PATH from being fixed)
+  - the conversion is only applied when msys apps execute native apps, not the other way around
 - [msys here](https://gist.github.com/elieux/ef044468d067d68040c7), windowsterminal-shell is much better though
 
 ### useful utilities

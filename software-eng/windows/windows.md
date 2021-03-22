@@ -109,6 +109,8 @@
             * you can right click on windows in this view to pin a window/app to all desktops/move app between desktops
             * virtual desktops are great if you have few distinct groups of windows with clustered interactions and little cross-over
             * settings->multitasking configures the behaviour of taskbar and alt-tab with virtual desktop (by default desktop has a private taskbar/alt-tab)
+            * desktops can be renamed by clicking their name in the task view
+            * [new virtual desktop features coming](https://blogs.windows.com/windows-insider/2021/03/17/announcing-windows-10-insider-preview-build-21337/)
             * win-ctrl-d - creates a new virtual desktop
             * win-ctrl-f4 - close curr entvirtual desktop
             * win-ctrl-left/right - switches between desktops
@@ -133,6 +135,9 @@
             * with ctrl-shift - open as admin
             * with alt - show the app's "jump list", same as right click
         * windows-T - cycle through taskbar apps and taskbars
+        * right click -> toolbars -> new toolbar 
+            * adds a menu from which you can start applications which are in the specified custom directory
+            * also you can right click -> open directory
     * start menu
         * ctrl-shift-click starts with admin priviledges
     * explorer
@@ -189,7 +194,7 @@
     * shift-pgup/down - select a page
     * ctrl-a - select all
     * ctrl-z - undo
-    * ctrl-y - redo
+    * ctrl-y - redo (sometimes ctrl+shift+z)
 * browsers
     * 
 
@@ -214,7 +219,9 @@
 * [great symlink tools](https://schinagl.priv.at/)
     - includes shell extension and delete/backup tools which are symlink aware
 
-### winapi
+### windows api
 
+- [api choices overview](https://docs.microsoft.com/en-us/cpp/windows/overview-of-windows-programming-in-cpp?view=msvc-160)
 - <https://en.wikibooks.org/wiki/Windows_Programming>
+- <https://github.com/microsoft/cppwinrt>
 

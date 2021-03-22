@@ -28,6 +28,21 @@
 * clang-tidy - lint, can do static analisys and coding style checks
 * clang-format - auto formatter
 * modularize -introduce real modules to c++ <http://clang.llvm.org/extra/modularize.html>
+* clang compiler has sanitizer tools:(-fsanitize flag)
+    -fsanitize=address: AddressSanitizer, a memory error detector.
+    -fsanitize=thread: ThreadSanitizer, a data race detector.
+    -fsanitize=memory: MemorySanitizer, a detector of uninitialized reads. Requires instrumentation of all program code.
+    -fsanitize=undefined: UndefinedBehaviorSanitizer, a fast and compatible undefined behavior checker.
+    -fsanitize=dataflow: DataFlowSanitizer, a general data flow analysis.
+    -fsanitize=cfi: control flow integrity checks. Requires -flto.
+    -fsanitize=safe-stack: safe stack protection against stack-based memory corruption errors.
+* compiler static analizer
+    -Xanalyzer
+* compiler coverage:
+    -fcoverage-* options
+* <https://llvm.org/docs/XRay.html> - tracing
+
+
 
 ## gnu tools
 

@@ -72,7 +72,7 @@
         - with regext mode (alt+r) parenthesis define groups and $num refers to parenthesis group in the repla mode
         - (shift)+f3 - find (previous)next
         - alt+enter - select all occurences of the match
-    - ctrl+a - select all
+    - ctrl+shift+a - select all
     - shift+alt+left/right - shrink/expand selection
     - ctrl+s - save
     - alt+z - toggle word wrap
@@ -94,9 +94,13 @@
     - markdown
         - ctrl+shift+v - open markdown preview
         - ctrl+k v - side by side markdown preview
-    - folding
-        - ctrl+shift+`[`/`]` - fold/unfold
+    - folding - good for hiding stuff that gets in the way
+        - ctrl+shift+`[`/`]` - fold/unfold at the cursor
+        - ctrl+k ctrl+l - toggle fold of the region under cursor
+        - ctrl+k ctrl+`[`/`]` - fold/unfold recursively current region and regions inside that region
         - ctrl+k ctrl+0 - fold all
+        - ctrl+k ctrl+`<number>` - fold all regions of level n *except the region with the cursor currently* (including subregions)
+            - ctrl+k ctrl+1 - fold only level one stuff (the most convenient variant)
         - ctrl+k ctrl+j - unfold all
         - ctrl+k ctrl+/ - fold all block comments
     - language support
@@ -137,9 +141,9 @@
         - `term ` switch to chosen terminal
         - `> ` commands (ctrl+shift+p)
         - `@ ` go to symbol (ctrl+shift+o)
-            -`@: ` - groups symbols by type
+            - `@: ` - groups symbols by type
         - `# ` go to symbol in workspace (ctrl+t)
-        - `ext ` (ctrl+shift+x)
+        - `ext ` go to extensions (ctrl+shift+x)
         - `debug ` run debug configuration
         - `: ` go to line (ctrl+g)
         - `view ` quick open view (ctrl+q)
@@ -226,31 +230,122 @@
     - ctrl+shift+q - quick open view (switch between panes)
     - ctrl+k ctrl+k - ctrl+k
 
-## workspaces and projects
+## setup/configuration
 
-- todo: figure out if this is still correct and where are the settings saved in each case
+- add code to ALL path variable
+- terminal
+    - use cycle-settings extension to do terminal switching
+    - unbind all global keybindings which interfere with terminal
+    - bind all navigation keybindings to key shortcuts terminal doesn't care about (ctrl-shift, ctrl-num) or bind them only when not in terminalFocus
+    - use cycle-settings to add a mode which enables terminal getting all the input
+- accessing workspaces/sessions
+    - use project manager extension to view single-dir workspaces
+        - supports base search directories and favourites (stored custom path)
+    - use workspace explorer extension to view .code-workspace workspaces
+        - stored in a base dir and subdirs
+- install bookmarks extension
+- install windows explorer context menu
+- install [vscode-neovim](https://marketplace.visualstudio.com/items?itemName=asvetliakov.vscode-neovim)
+    - disable scrolling past end
+    - enable always starting with insert mode
+```vim
+if exists('g:vscode')
+" start in insert mode
+    au BufEnter * start
+endif
+```
+    - disable insert mode keybindings which overlap with desired vscode keybinds
+```json
+    // disable keybinds that are duplicates of vscode binds or interfere with standard vscode keybinds
+    { "key": "ctrl+c",                "command": "-vscode-neovim.escape" },
+    { "key": "ctrl+oem_4" ,                "command": "-vscode-neovim.escape" },
+    { "key": "f1",                    "command": "-vscode-neovim.send" },
+    { "key": "shift+win+p",           "command": "-vscode-neovim.send"},
+    { "key": "shift+win+o",           "command": "vscode-neovim.send"},
+    
+    { "key": "ctrl+j",                "command": "-editor.action.insertLineAfter"}, // this one overrides toggle panel, so it's fine?, but then ctrl+enter is very easy to type too
+    { "key": "ctrl+d",                "command": "-editor.action.outdentLines"},
+    { "key": "ctrl+t",                "command": "-editor.action.indentLines"},
+    { "key": "ctrl+h",                "command": "-deleteLeft"},
+    { "key": "ctrl+w",                "command": "-deleteWordLeft"},
+    { "key": "ctrl+u",                "command": "-deleteAllLeft"},
+    // rebind vscode keybindings that conflict with useful neovim insert keybinds
+    { "key": "ctrl+shift+a",                "command": "editor.action.selectAll"}, // conficted with ctrl+a
+    { "key": "ctrl+r ctrl+r",              "command": "workbench.action.openRecent", // conflicted with ctrl+r global binding
+        "when": "editorTextFocus && neovim.ctrlKeysInsert && !neovim.recording && neovim.mode == 'insert'"},
+```
+- todo: some templates for workspace configuration
+- todo: fuzzyfind? https://github.com/rlivings39/vscode-fzf-quick-open
 
-- Opening a file
-    - will open an editor in open editors section, but will not add the file to the project
-    - if a project is already opened (o), it will open in the project open editors, but the file is still independent
-- Opening a directory
-    - will add a "project" view in explorer, showing contents of the directory
-    - will potentially add `.vscode` dir in the directory, settings in that directory will apply to the contents of the directory
-    - project, (root) directory and (root) folder are synonymous in this context
-    - projects are the unit of management/execution/settings etc.
-    - opening another directory from file-> open will close current "project" and open a new window
-    - there's a project manager plugin which can scan directories for projects and provide a list of saved projects to easily switch between them
-- Opening a workspace
-    - workspace is a group of (root) directories/folderes opened in a single vscode window
-    - workspaces are optional, they are only mandatory for multiple projects in a single window
-    - workspace is represented by a `*.code-workspace` file
-    - every project in a workspace gets it's own `.vscode` directory with settings applied only to that root directory
-    - to create a workspace:
-        - file -> add folder to workspace, then save a workspace file when prompted
-        - file -> save workspace as will create a workspace file if there isn't one
-    - for workspace explorer plugin it's neccessary to put workspace files in a single directory
+## interesting settings extensions
 
-## Markdown
+- settings cycler can be used to toggle a setting with a keybinding
+  - useful to trigger terminal friendly mode for example
+  - sadly, doesn't have a builtin way to display setting in the status bar, but this can be emulated by changing settings of some extension or ui
+     - who's the boss and project tag extensions allow showing status
+     - could also change a ui setting, like colour of terminal or status bar
+     - todo: make an extension fork that does these things and also adds a picker option for cycling?
+  - the override workspace settings setting only overrides workspace entry if workspace has a config for the values already :(
+- multi-command - bind multiple commands to a single command name
+- commands - allows binding any command to status bar and to display custom text (sadly doesn't evaluate variables)
+- differently colored windows for easy distinguishing: https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock
+
+### vim integration
+
+- vscode vim reimplements vim in vscode
+    - [supports more vim special keys in insert mode](https://github.com/VSCodeVim/Vim/blob/master/ROADMAP.md#insert-mode-keys)
+        - doesn't support all of them, but supports CTR+O (switch to normal for a single command)
+    - configuring to work well with vscode keybindings:
+        - on the vscode level remap all ctrl bindings:
+            - leave regular mapping for `vim.mode != 'Insert'
+            - add ctrl-; `<key>` mapping for insert (or all) modes so that they don't conflict with default mappings and insert works like standard vscode editor
+- vscode neovim connects to neovim for modes other than insert
+    - [less support for insert mode keys](https://github.com/asvetliakov/vscode-neovim#insert-mode-special-keys)
+        - [doesn't support ctrl+o](https://github.com/asvetliakov/vscode-neovim/issues/181#issuecomment-585264621)
+        - fixed ctrl+o on my local branch
+    - superior to vscode vim in every other way
+    - custom insert mode mappings from neovim won't work, configre these in keybindings.json instead
+    - modes different than normal are displayed in the vscode status bar
+    - visual mode selections are displayed on vscode but aren't always accurate, and aren't real vscode selections
+        - to make them a real selection press ctrl+shift+p, as a bonus you can then do a command on the selection or just escape
+    - keyboard events are sent to vim only when forwarded through [keybindings.json](https://github.com/asvetliakov/vscode-neovim#pass-additional-keys-to-neovim-or-disable-existing-ctrl-keys-mappings)
+        - [list of passed ctrl keymaps](https://github.com/asvetliakov/vscode-neovim#normal-mode-control-keys)
+    - custom normal mode mappings [should be done from neovim](https://github.com/asvetliakov/vscode-neovim#custom-keymaps-for-scrollingwindowtabetc-management)
+        - [all bindings](https://github.com/asvetliakov/vscode-neovim/tree/master/vim)
+
+### c++
+
+- [default cpp extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+    - provides support for build tasks, debugging and code navigation/analysis using internal intellisense engine
+    - can be configured to use any toolchain as long as you set all the variables
+- [cmake tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
+    - tools for running build configuration and running cmake generation
+    - it's a build config provider for the cpp extension
+- [msys/mingw toolchains](https://marketplace.visualstudio.com/items?itemName=fougas.msys2)
+    - provides easy to use configuration variables for msys2 and mingw and example configuration to plug these into the default c++ plugin and cmake tools
+- [cmake](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
+    - cmake text editing support (completion and stuff)
+- clang tools using compile_commands.json
+    - [ccls](https://marketplace.visualstudio.com/items?itemName=ccls-project.ccls)
+        - lsp server based navigation/analysis, runs configured executable in the configured location and provides completion based on the actual commands used in the build (using `compile_commands.json`)
+        - when used disable default cpp navigation analysis feature
+        - [example usage - aether](https://github.com/hadeaninc/aether/blob/develop/EDITORS.md#vscode)
+    - [clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd)
+        - same as ccls, but uses clangd
+    - [clang format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format)
+    - [clang tidy gui](https://marketplace.visualstudio.com/items?itemName=TimZoet.clangtidygui)
+    - [clang tidy problems list](https://marketplace.visualstudio.com/items?itemName=notskm.clang-tidy)
+    - [include what you use](https://marketplace.visualstudio.com/items?itemName=pokowaka.pokowaka-iwyu)
+        - header cleanup
+- [lldb integration](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)
+    - the default extension doesn't support lldb on windows/linux
+- [c++ advanced lint](https://marketplace.visualstudio.com/items?itemName=jbenden.c-cpp-flylint)
+    - runs static analysis tools that you have in your path
+- [alternative cmake integration](https://marketplace.visualstudio.com/items?itemName=go2sh.cmake-integration-vscode)
+    - less updated
+    - 1 step build, similar to editors which read cmake directly
+
+### Markdown
 
 Outline in explorer shows headers
 
@@ -262,45 +357,9 @@ Plugins:
 
 Preview: RMB -> open in preview
 
-## settings extensions
-
-- settings cycler can be used to toggle a setting with a keybinding
-  - useful to trigger terminal friendly mode for example
-  - sadly, doesn't have a builtin way to display setting in the status bar, but this can be emulated by changing settings of some extension or ui
-     - who's the boss and project tag extensions allow showing status
-     - could also change a ui setting, like colour of terminal or status bar
-     - todo: make an extension fork that does these things and also adds a picker option for cycling?
-  - the override workspace settings setting only overrides workspace entry if workspace has a config for the values already :(
-- multi-command - bind multiple commands to a single command name
-- commands - allows binding any command to status bar and to display custom text (sadly doesn't evaluate variables)
-
-## configuration
-
-- terminal
-    - use cycle-settings extension to do terminal switching
-    - unbind all global keybindings which interfere with terminal
-    - bind all navigation keybindings to key shortcuts terminal doesn't care about (ctrl-shift, ctrl-num) or bind them only when not in terminalFocus
-    - use cycle-settings to add a mode which enables terminal getting all the input
-- accessing workspaces/sessions
-    - use project manager extension to view single-dir workspaces
-        - supports base search directories and favourites (stored custom path)
-    - use workspace explorer extension to view .code-workspace workspaces
-        - stored in a base dir and subdirs
-- todo: some templates for workspace configuration
-- todo: fuzzyfind? https://github.com/rlivings39/vscode-fzf-quick-open
-
-## c++
-
-- [aether](https://github.com/hadeaninc/aether/blob/develop/EDITORS.md#vscode)
-
-### vscode-ccls
-
-- outline, call-hierarchy, member-hierarchy - very useful views
-
 ## wsl
 
 - make sure to run code.sh from windows path for starting windows wsl integration or linux path with windows path removed to guarantee linux startup
-
 
 ## config files
 
@@ -828,148 +887,3 @@ Preview: RMB -> open in preview
     },
 ]
 ```
-
-
-## TODO: vscodevim
-
-- emulates vim
-- disable ctrl-keys
-- on the vscode level remap all ctrl bindings:
-    - leave regular mapping for `vim.mode != 'Insert'
-    - add ctrl-; `<key>` mapping for insert (or all) modes so that they don't conflict with defaults
-    - todo: these vi keybindings are obsolete, they need updating!
-```json
-// Place your key bindings in this file to override the defaults
-[
-{ "key": "ctrl+; a",                "command": "extension.vim_ctrl+a",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; b",                "command": "extension.vim_ctrl+b",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl && vim.mode != 'Insert'" },
-{ "key": "ctrl+; c",                "command": "extension.vim_ctrl+c",
-        "when": "editorTextFocus && vim.active && vim.overrideCtrlC  && !inDebugRepl" },
-{ "key": "ctrl+; d",                "command": "extension.vim_ctrl+d",
-        "when": "editorTextFocus && vim.active && !inDebugRepl" },
-{ "key": "ctrl+; d",                "command": "list.focusPageDown",
-        "when": "listFocus && !inputFocus" },
-{ "key": "ctrl+; e",                "command": "extension.vim_ctrl+e",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; f",                "command": "extension.vim_ctrl+f",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl && vim.mode != 'Insert'" },
-{ "key": "ctrl+; g",                "command": "extension.vim_ctrl+g",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; h",                "command": "extension.vim_ctrl+h",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; i",                "command": "extension.vim_ctrl+i",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; j",                "command": "extension.vim_ctrl+j",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; k",                "command": "extension.vim_ctrl+k",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; l",                "command": "extension.vim_navigateCtrlL",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; n",                "command": "extension.vim_ctrl+n",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; o",                "command": "extension.vim_ctrl+o",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; p",                "command": "extension.vim_ctrl+p",
-        "when": "suggestWidgetVisible && vim.active " },
-{ "key": "ctrl+; q",                "command": "extension.vim_winCtrlQ",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; r",                "command": "extension.vim_ctrl+r",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; t",                "command": "extension.vim_ctrl+t",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; u",                "command": "extension.vim_ctrl+u",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; u",                "command": "list.focusPageUp",
-        "when": "listFocus && !inputFocus" },
-{ "key": "ctrl+; v",                "command": "extension.vim_ctrl+v",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; w",                "command": "extension.vim_ctrl+w",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; x",                "command": "extension.vim_ctrl+x",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; y",                "command": "extension.vim_ctrl+y",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; oem_4",            "command": "extension.vim_ctrl+[",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; oem_6",            "command": "extension.vim_ctrl+]",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; shift+2",          "command": "extension.vim_ctrl+shift+2",
-        "when": "editorTextFocus && vim.active" },
-{ "key": "ctrl+; pagedown",         "command": "extension.vim_ctrl+pagedown",
-        "when": "editorTextFocus && vim.active  && !inDebugRepl" },
-{ "key": "ctrl+; pageup",           "command": "extension.vim_ctrl+pageup",
-        "when": "editorTextFocus && vim.active && !inDebugRepl" },
-        { "key": "ctrl+a",                "command": "extension.vim_ctrl+a",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+b",                "command": "extension.vim_ctrl+b",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl && vim.mode != 'Insert'" },
-        { "key": "ctrl+c",                "command": "extension.vim_ctrl+c",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert' && !inDebugRepl" },
-        { "key": "ctrl+d",                "command": "extension.vim_ctrl+d",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert' && !inDebugRepl" },
-        { "key": "ctrl+d",                "command": "list.focusPageDown",
-                "when": "listFocus && !inputFocus" },
-        { "key": "ctrl+e",                "command": "extension.vim_ctrl+e",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+f",                "command": "extension.vim_ctrl+f",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl && vim.mode != 'Insert'" },
-        { "key": "ctrl+g",                "command": "extension.vim_ctrl+g",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+h",                "command": "extension.vim_ctrl+h",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+i",                "command": "extension.vim_ctrl+i",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+j",                "command": "extension.vim_ctrl+j",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+k",                "command": "extension.vim_ctrl+k",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+l",                "command": "extension.vim_navigateCtrlL",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+n",                "command": "extension.vim_ctrl+n",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+o",                "command": "extension.vim_ctrl+o",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+p",                "command": "extension.vim_ctrl+p",
-                "when": "suggestWidgetVisible && vim.active && vim.mode != 'Insert' " },
-        { "key": "ctrl+q",                "command": "extension.vim_winCtrlQ",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+r",                "command": "extension.vim_ctrl+r",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+t",                "command": "extension.vim_ctrl+t",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+u",                "command": "extension.vim_ctrl+u",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+v",                "command": "extension.vim_ctrl+v",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+w",                "command": "extension.vim_ctrl+w",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+x",                "command": "extension.vim_ctrl+x",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+y",                "command": "extension.vim_ctrl+y",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+oem_4",            "command": "extension.vim_ctrl+[",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+oem_6",            "command": "extension.vim_ctrl+]",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+shift+2",          "command": "extension.vim_ctrl+shift+2",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'" },
-        { "key": "ctrl+pagedown",         "command": "extension.vim_ctrl+pagedown",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert'  && !inDebugRepl" },
-        { "key": "ctrl+pageup",           "command": "extension.vim_ctrl+pageup",
-                "when": "editorTextFocus && vim.active && vim.mode != 'Insert' && !inDebugRepl"
-        },
-        {
-                "key": "ctrl+oem_3",
-                "command": "-workbench.action.terminal.toggleTerminal"
-        },
-        {
-                "key": "ctrl+oem_3",
-                "command": "workbench.action.terminal.focus"
-        },
-]
-```
-
-
-

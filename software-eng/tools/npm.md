@@ -2,7 +2,13 @@
 
 Files: <https://docs.npmjs.com/files/folders>
 
-## Installing stuff
+## setup
+
+download zip to portable and add `C:\portable\node` to `PATH_APPEND_WINDOWS`
+
+## usage
+
+### installing packages
 
 Global instals:
 
