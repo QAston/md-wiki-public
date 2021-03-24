@@ -15,3 +15,4 @@
     * interactive non-login shell runs ~/.bashrc on startup
     * noninteractive shells run contents of $BASH_ENV on startup
 * [writing more reliable scripts](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
+* [bash pitfals](https://mywiki.wooledge.org/BashPitfalls)
