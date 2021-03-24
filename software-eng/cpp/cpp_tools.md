@@ -1,5 +1,11 @@
 # c++ tools
 
+## toolchain
+
+* [vcpkg](../vcpkg.md) for downloading libraries
+* cmake for generating build files
+* ninja/msbuild for building
+
 ## debuggers
 
 * gdb
@@ -69,3 +75,5 @@
 ## frameworks
 
 * <https://github.com/libuv/libuv>
+- [a multimedia framework that glues a lot of libraries like opengl, openvs, etc](https://openframeworks.cc/about/)
+- [mingw llvm setup](https://github.com/valtron/llvm-stuff/wiki/Set-up-Windows-dev-environment-with-MSYS2)

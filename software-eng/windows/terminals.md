@@ -14,6 +14,7 @@
 
 * `HKEY_CURRENT_USER\Software\Microsoft\Command Processor\AutoRun` - `cmd.exe` autorun
     * "C:\Program Files (x86)\clink\1.1.34.d161e9\clink.bat" inject --autorun --profile ~\clink
+    * can be disabled by running cmd with `/d` flag
 * new conhost - handle of xterm/vt100 terminal sequences:
     * [handled terminal sequences](https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#input-sequences)
     * keycodes:
