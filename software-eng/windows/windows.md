@@ -219,9 +219,3 @@
 * [great symlink tools](https://schinagl.priv.at/)
     - includes shell extension and delete/backup tools which are symlink aware
 
-### windows api
-
-- [api choices overview](https://docs.microsoft.com/en-us/cpp/windows/overview-of-windows-programming-in-cpp?view=msvc-160)
-- <https://en.wikibooks.org/wiki/Windows_Programming>
-- <https://github.com/microsoft/cppwinrt>
-

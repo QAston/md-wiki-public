@@ -215,12 +215,22 @@ store -> msix packaging tool
 
 * enable start at startup
 * enable always run as admin
-* disable
-    * color picker
-    * image resizer
-    * power rename
-    * shortcut guide
-* change shortcut for power toys run to win-x
+* disable everything except fancy zones and run
+* configure run
+    * change shortcut to win-x
+    * change num results to 8
+    * [usage](https://docs.microsoft.com/en-gb/windows/powertoys/run#action-key)
+        * search prefixes:
+            * `?` - file search
+            * `//` - open browser
+            * `<` - switch to window by name/title
+            * `>` - run shell command
+            * `:` - search registry key
+            * `!` - search windows service
+        * commands
+            * Shutdown/Restart/Sign Out/Lock/Sleep/Hibernate
+        * executables
+            * you can add command line args
 * configure fancy zones
     * make a vertical zone split in 2 for vertical monitor
     * enable hold shift to drag window to a zone
@@ -433,23 +443,7 @@ $env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
 
 ### set up visual studio
 
-- install visual studio
-- add modules using visual studio installer
-    - desktop c++ development
-    - uwp development
-- add components using the installer
-    - clang compiler
-    - clang-cl
-- set up scripts for dev shell and add to portable\bin\cmd & ps
-    - take contents from shortcuts to the developer prompt/powershell from start menu
-    - env_vs.bat:
-```
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
-```
-    - env_vs.ps1
-```
-Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"; Enter-VsDevShell e821c35b
-```
+- see [](./visual_studio.md)
 
 ### set up wsl2 and docker
 
@@ -514,4 +508,3 @@ follow [](../tools/neovim.md)
 - windows debugging and sysinternals?
 - c++ ide?
 - python setup with readline? 
-- vscode extensions

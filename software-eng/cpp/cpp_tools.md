@@ -17,15 +17,26 @@
 
 ## profilers and tracing
 
-* gperf
-* amd profiler for cpu/gpu/opengl and stuff
+* [amd profiler for cpu/gpu/opengl and stuff](https://developer.amd.com/amd-uprof/)
 * <http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/>
 * valgrind
     * linux only
-    * <http://stackoverflow.com/questions/413477/is-there-a-good-valgrind-substitute-for-windows#413842>
-* drmemory
-* amd tools <http://developer.amd.com/tools-and-sdks/tools-libraries-sdks-index/>
+    * windows alternatives:
+        * <http://stackoverflow.com/questions/413477/is-there-a-good-valgrind-substitute-for-windows#413842>
+        * <https://kinddragon.github.io/vld/>
+    * has multiple tools
+        * memcheck - leaks/oob
+        * cachegrind - profiling cache
+        * massif - heap profiler
+        * helgrind - data races in multithreaded programs
+        * drd - multithreading checker
+* [drmemory memory issues debugger](https://github.com/DynamoRIO/drmemory)
+    * includes [strace for windows](https://drmemory.org/page_drstrace.html) for tracing syscalls
+    * includes [symbol query tool](https://drmemory.org/page_symquery.html)
+    * includes [dr fuzz](https://drmemory.org/page_fuzzer.html)
+    * also shadow memory (seeing the memory contents) and symbol caching
 * google performance tools: <https://github.com/gperftools/gperftools>
+    * also golang profiler impl <https://github.com/google/pprof> (doesn't include instrumentation)
 
 ## clang tools
 
@@ -54,6 +65,7 @@
 
 * as – GNU Assembler Command
 * ld – GNU Linker Command
+    * https://wiki.osdev.org/Linker_Scripts
 * ar – GNU Archive Command
 * nm – List Object File Symbols
     * nm -gC - public symbols
@@ -67,13 +79,92 @@
 * readelf – Display ELF File Info
 * Ldd - show shared libraries for executable
 
+## windows tools
+
+* [everything you want to know about dlls  - how dlls work and how to inspect them](https://www.youtube.com/watch?v=JPQWQfDhICA)
+    * gflags +sls
+    * dumpbin
+* [additional visual studio tools](https://docs.microsoft.com/en-us/cpp/build/reference/c-cpp-build-tools?view=msvc-160)
+    * dumpbin - print info on exe/dll/lib files
+    * editbin - change options of a exe/dll/lib file
+    * lib
+    * nmake - makefile execution
+    * errlook - print string error based on error code
+* windows performace toolkit
+* windows debugging toolkit
+
 ## documentation
 
 * doxygen
 * cppdoc
 
-## frameworks
+## frameworks and libraries
 
-* <https://github.com/libuv/libuv>
+- [nice list on cppreference](https://en.cppreference.com/w/cpp/links/libs)
+- [cross platform async io framework](https://github.com/libuv/libuv)
+- [seastar - high perf c++ io framework](http://seastar.io/)
+- [a large collection of advanced libraries](https://github.com/oneapi-src)
+    - [thread building blocks - framework for writing parallel programs](https://github.com/oneapi-src/oneTBB)
 - [a multimedia framework that glues a lot of libraries like opengl, openvs, etc](https://openframeworks.cc/about/)
 - [mingw llvm setup](https://github.com/valtron/llvm-stuff/wiki/Set-up-Windows-dev-environment-with-MSYS2)
+- [guidelines support library](https://github.com/Microsoft/GSL)
+-   [alternative, smaller gsl implementation](https://github.com/gsl-lite/gsl-lite)
+- [type_safe - utilities for write safer/more-strongly-typed c++](https://github.com/foonathan/type_safe)
+- [kvasir - standard library extensions for microcontrollers](https://github.com/kvasir-io/mpl)
+- [etl - standard library extensions for microcontrollers](https://github.com/ETLCPP/etl)
+- [google standard library](https://abseil.io/)
+- [bloomberg standard libraries](https://github.com/bloomberg/bde)
+- [eastl - ea standard library](https://github.com/electronicarts/EASTL)
+- [facebook folly - fb standard library](https://github.com/facebook/folly)
+    - includes a tag_invoke impl
+- [persistent data structures](https://github.com/arximboldi/immer)
+- boost
+    - [a gigantic library with lots of stuff](https://www.boost.org/doc/libs/)
+- [brigand](https://github.com/edouarda/brigand) - a replacement for boost.mpl - metaprogramming
+- [metric units library](https://github.com/mpusz/units)
+- [physical metrics library with validation](https://github.com/jansende/benri)
+- [compile time big num library](https://github.com/niekbouman/ctbignum)
+- [fmt - typesafe formatting library](https://fmt.dev/latest/index.html)
+- [text encoding utilities](https://github.com/soasis/text)
+- [entt - entity component system framework](https://github.com/skypjack/entt)
+- [hsfm - hierarchical finite state machine](https://github.com/andrew-gresyk/HFSM2)
+- [data flow architecture for c++](https://github.com/arximboldi/lager)
+- [rx cpp - reactive programming (data flow?)](https://github.com/ReactiveX/RxCpp)
+- [transducers for c++](https://github.com/arximboldi/zug)
+- [error handling without exceptions](https://ned14.github.io/outcome/)
+- [quantstack - scientific algorithms](https://xtl.readthedocs.io/en/latest/#)
+- [simd intrinsics abstraction](https://xsimd.readthedocs.io/en/latest/)
+- [vectorclass - simd intrinsics abstraction](https://github.com/vectorclass)
+- [enoki - vectorization abstractions](https://github.com/mitsuba-renderer/enoki)
+- [simd everywhere - polyfill for simd intrinsics](https://github.com/simd-everywhere/simde)
+- [numerical analysis with multi-dim array expressions](https://xtensor.readthedocs.io/en/latest/)
+- [numerical analysis with multi-dim array expressions](https://github.com/romeric/Fastor)
+- [machine learning algorithms and toolkit](http://dlib.net/)
+- [civil/absolute time utilities](https://github.com/google/cctz)
+- [fixed precision numeric classes](https://github.com/johnmcfarlane/cnl)
+- [c++ math library](https://bitbucket.org/blaze-lib/blaze/src/master/)
+- [compile time regexp impl](https://github.com/hanickadot/compile-time-regular-expressions)
+- [maths for opengl](https://github.com/g-truc/glm)
+- [multithreaded programming library](https://github.com/copperspice/cs_libguarded)
+- [coroutine utilities for c++20 coroutines](https://github.com/lewissbaker/cppcoro)
+- [sender/receiver async multithreading programming proposal](https://github.com/facebookexperimental/libunifex)
+    - includes a tag_invoke impl
+- [constexpr based feature detection](https://github.com/jfalcou/spy)
+- [abstraction over compiler features](https://nemequ.github.io/hedley/user-guide.html)
+- [pipes - alternative to ranges/transducers](https://github.com/joboccara/Pipes)
+- [named type - strong typedef implementation](https://github.com/joboccara/NamedType)
+- [c++20 ranges for c++17](https://github.com/tcbrindle/NanoRange)
+- [basis for c++20 ranges proposal](https://github.com/ericniebler/range-v3)
+- [eigen - linear algebra library](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+- [unit testing for c++](https://github.com/catchorg/Catch2)
+- [unit testing for c++, allows writing tests near library code](https://github.com/onqtam/doctest)
+- [googletest](https://github.com/google/googletest)
+- [tts - testing library](https://github.com/jfalcou/tts)
+- [trompleoeil - header only mocking framework](https://github.com/rollbear/trompeloeil)
+- [google benchmark framework](https://github.com/google/benchmark)
+- [spdlog - logging library](https://github.com/gabime/spdlog)
+- [jemalloc - faster default allocator](https://github.com/jemalloc/jemalloc)
+- [utility for tag_invoke](https://github.com/bfgroup/duck_invoke)
+- [utility for enum reflection](https://github.com/krabicezpapundeklu/smart_enum)
+- [utility for enum reflection](https://github.com/aantron/better-enums)
+- [utility for multimethods](https://github.com/jll63/yomm2)
