@@ -1,21 +1,5 @@
 # GIT
 
-[visual guide to commands](http://marklodato.github.io/visual-git-guide/index-en.html)
-    
-```bash
-#stop confirming pass
-git config credential.helper store
-
-# stop tracking file
-git update-index \--[no-]assume-unchanged] [target]
-```
-
-local/private gitignore file .git/info/exclude
-
-gitignore:
-
-files without / are ignored on every directory level
-
 ## setup
 
 * `git config --global mergetool.keepBackup false` disable orig files generation
@@ -23,23 +7,36 @@ files without / are ignored on every directory level
 ```
 touch ~/.gitignore_global
 git config --global core.excludesfile ~/.gitignore_global
-echo "*-gitignore" > ~/.gitignore_global
+echo '*-gitignore' > ~/.gitignore_global
 ```
 * set up aliases
 ```
 git config --global alias.st status
-git config --global alias.unstage 'reset HEAD --
+git config --global alias.unstage 'reset HEAD --'
+git config --global alias.lg "log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr %an)%Creset' --abbrev-commit --date=relative"
+```
+* other config 
+```
+git config --global push.default simple
 ```
 
-# commands
+## usage
+
+- gitignore: files without / are ignored on every directory level
+- local/private gitignore file .git/info/exclude
+
+## commands
 
 * `git update-index --chmod=+x <your_file>` make executable
 * `git config submodule.recurse true` download submodules
 * `git config --global mergetool.keepBackup false` disable orig files generation
 * `git grep ` searches in history
+* `git config credential.helper store` stop confirming pass
+* `git update-index \--[no-]assume-unchanged] [target]` - stop tracking file
 
 ## links
 
+* [visual guide to commands](http://marklodato.github.io/visual-git-guide/index-en.html)
 * [progit.org/book/](http://progit.org/book/)
 * [Effectively Using Git With Subversion | Viget Extend](http://www.viget.com/extend/effectively-using-git-with-subversion/)
 * [How To Use Git-SVN as the Only Subversion Client You’ll Need at Everything In Between](http://maymay.net/blog/2009/02/24/how-to-use-git-svn-as-the-only-subversion-client-youll-need/)

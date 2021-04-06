@@ -33,6 +33,24 @@ Set-PsFzfOption -PSReadlineChordReverseHistory 'Alt+s'
     - set windows env variable FZF_DEFAULT_COMMAND to `fd --type f --follow`
 - todo: add some shortcut scripts for common fzf usage?
 
+### setup wsl2
+
+- pacman -S fzf
+- copy the modified "C:\portable\fzf\fzf\shell\key-bindings.bash" file to ~/portable/fzf
+```
+cp "/mnt/c/portable/fzf/fzf/shell/key-bindings.bash" ~/portable/fzf/key-bindings.bash
+```
+- copy the modified "C:\portable\fzf\fzf-tab-completion\bash\fzf-bash-completion.sh" to ~/portable/fzf/fzf-bash-completion.sh
+```
+cp "/mnt/c/portable/fzf/fzf-tab-completion/bash/fzf-bash-completion.sh" ~/portable/fzf/
+```
+- add to ~/.bashrc:
+```
+source ~/portable/fzf/key-bindings.bash
+source ~/portable/fzf/fzf-bash-completion.sh
+bind -x '"\e[Z": fzf_bash_completion'
+```
+
 ### usage
 
 - a command which when piped let's you interactively choose which entry will be printed to stdout

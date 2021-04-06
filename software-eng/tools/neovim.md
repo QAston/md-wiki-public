@@ -1,11 +1,6 @@
 ## neovim
 
-### usage
-
-- `:!ls` - run shell command
-- `:terminal` runs an embedded terminal emulator (which somehow works lol)
-
-### windows setup
+### setup windows
 
 - get at least version 0.5x because it has lsp support
 - unzip nvim-win64.zip to portable
@@ -50,12 +45,25 @@ endif
     - EDITOR=nvim
     - VISUAL=nvim
 
-## todo:
+### setup wsl2
 
-- switching windows
-- finish vimtutor
+```
+pacaur -S neovim-nightly-bin
+mkdir ~/.config/nvim/
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+# sync windows and linux config
+cp "/mnt/c/Users/qasto/AppData/Local/nvim/init.vim" ~/.config/nvim/init.vim
+dos2unix ~/.config/nvim/init.vim
+```
+
 
 ### usage
+
+- `:!ls` - run shell command
+- `:terminal` runs an embedded terminal emulator (which somehow works lol)
+- `:edit $MYVIMRC`
 
 #### concepts
 

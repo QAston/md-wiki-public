@@ -6,38 +6,6 @@
 * cmake for generating build files
 * ninja/msbuild for building
 
-## debuggers
-
-* gdb
-* lldb
-* <https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/time-travel-debugging-overview>
-* visualgdb - płatny :(
-    * <http://visualgdb.com/tutorials/mingw/mingw64/>
-* <http://wingdb.com/> - paid
-
-## profilers and tracing
-
-* [amd profiler for cpu/gpu/opengl and stuff](https://developer.amd.com/amd-uprof/)
-* <http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/>
-* valgrind
-    * linux only
-    * windows alternatives:
-        * <http://stackoverflow.com/questions/413477/is-there-a-good-valgrind-substitute-for-windows#413842>
-        * <https://kinddragon.github.io/vld/>
-    * has multiple tools
-        * memcheck - leaks/oob
-        * cachegrind - profiling cache
-        * massif - heap profiler
-        * helgrind - data races in multithreaded programs
-        * drd - multithreading checker
-* [drmemory memory issues debugger](https://github.com/DynamoRIO/drmemory)
-    * includes [strace for windows](https://drmemory.org/page_drstrace.html) for tracing syscalls
-    * includes [symbol query tool](https://drmemory.org/page_symquery.html)
-    * includes [dr fuzz](https://drmemory.org/page_fuzzer.html)
-    * also shadow memory (seeing the memory contents) and symbol caching
-* google performance tools: <https://github.com/gperftools/gperftools>
-    * also golang profiler impl <https://github.com/google/pprof> (doesn't include instrumentation)
-
 ## clang tools
 
 * <http://clang.llvm.org/docs/ClangTools.html>
@@ -58,8 +26,7 @@
 * compiler coverage:
     -fcoverage-* options
 * <https://llvm.org/docs/XRay.html> - tracing
-
-
+* lldb
 
 ## gnu tools
 
@@ -77,7 +44,43 @@
 * c++filt – Demangle Command
 * addr2line – Convert Address to Filename and Numbers
 * readelf – Display ELF File Info
-* Ldd - show shared libraries for executable
+* ldd - show shared libraries for executable
+* [gdb](../tools/gdb.md)
+
+## xplatform tools
+
+* [drmemory memory issues debugger](https://github.com/DynamoRIO/drmemory)
+    * includes [strace for windows - drstrace](https://drmemory.org/page_drstrace.html) for tracing syscalls
+    * includes [symbol query tool](https://drmemory.org/page_symquery.html)
+    * includes [dr fuzz](https://drmemory.org/page_fuzzer.html)
+    * also shadow memory (seeing the memory contents) and symbol caching
+* google performance tools: <https://github.com/gperftools/gperftools>
+    * also golang profiler impl <https://github.com/google/pprof> (doesn't include instrumentation)
+
+## linux tools
+
+* strace - trace all syscalls of a process
+    * `strace <cmd>`
+* ltrace - trace all dllcalls of a process
+    * `ltrace <cmd>`
+* perf trace
+    * `perf trace` - trace evey syscall
+    * `perf trace <cmd>` - trace every syscall by cmd
+    * faster than strace, more flexible, but requires more priviledges
+* perf pt
+* ftrace - function tracer
+    * a fast way to trace various kernel functions
+    * controlled through /sys/kernel/debug/tracing or trace-cmd
+* (https://rr-project.org/) - reversible debugger
+* [amd profiler for cpu/gpu/opengl and stuff](https://developer.amd.com/amd-uprof/)
+* <http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/>
+* valgrind
+    * has multiple tools
+        * memcheck - leaks/oob
+        * cachegrind - profiling cache
+        * massif - heap profiler
+        * helgrind - multithreaded programs issues
+        * data race detector - multithreading checker
 
 ## windows tools
 
@@ -90,6 +93,20 @@
     * lib
     * nmake - makefile execution
     * errlook - print string error based on error code
+* visual studio
+    * [code sanitizers](https://docs.microsoft.com/en-us/cpp/sanitizers/?view=msvc-160) now
+        * currently only address sanitizer
+    * [profiler](https://docs.microsoft.com/en-us/visualstudio/profiling/?view=vs-2019)
+    * [static analysis](https://docs.microsoft.com/en-us/cpp/code-quality/?view=msvc-160)
+* [drmingw](https://github.com/jrfonseca/drmingw)
+* <https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/time-travel-debugging-overview>
+* [nttrace - strace for windows](https://github.com/rogerorr/NtTrace)
+* [stracent - strace for windows - not updated since 2015](https://intellectualheaven.com/?BH=StraceNT)
+* [sysinternals](../windows/sysinternals.md)
+* windows valgrind alternatives:
+    * <http://stackoverflow.com/questions/413477/is-there-a-good-valgrind-substitute-for-windows#413842>
+    * <https://kinddragon.github.io/vld/>
+
 * windows performace toolkit
 * windows debugging toolkit
 

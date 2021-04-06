@@ -17,6 +17,8 @@
         - can be configured to restart the app
     - tool help library - api for querying state dumps of apps
 
+TODO: how to set each of the debuggers as the default catch/postmortem debugger, including gdb and wind
+
 ### performance tools
 
 - [windows performance toolkit](https://docs.microsoft.com/en-us/windows-hardware/test/wpt/)
@@ -30,3 +32,4 @@
 - [api choices overview](https://docs.microsoft.com/en-us/cpp/windows/overview-of-windows-programming-in-cpp?view=msvc-160)
 - <https://en.wikibooks.org/wiki/Windows_Programming>
 - <https://github.com/microsoft/cppwinrt>
+- [native api - api below win32](https://www.youtube.com/watch?v=a0KozcRhotM)
