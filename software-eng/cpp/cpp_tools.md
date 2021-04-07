@@ -59,21 +59,31 @@
 
 ## linux tools
 
-* strace - trace all syscalls of a process
+* [strace](https://strace.io/) - trace all syscalls of a process
     * `strace <cmd>`
-* ltrace - trace all dllcalls of a process
+* [ltrace](https://ltrace.org/) - trace all dllcalls of a process
     * `ltrace <cmd>`
-* perf trace
+* [linux perf](https://perf.wiki.kernel.org/index.php/Main_Page)
+    * `pacman -S perf`
     * `perf trace` - trace evey syscall
-    * `perf trace <cmd>` - trace every syscall by cmd
-    * faster than strace, more flexible, but requires more priviledges
-* perf pt
-* ftrace - function tracer
+        * `perf trace <cmd>` - trace every syscall by cmd
+        * faster than strace, more flexible, but requires more priviledges
+    * [perf intel pt](https://man7.org/linux/man-pages/man1/perf-intel-pt.1.html) - processor trace - shows branches taken in the program
+```
+perf record -e intel_pt//u ./a.out
+perf script
+```
+* [ftrace](https://www.kernel.org/doc/Documentation/trace/ftrace.txt) - function tracer
     * a fast way to trace various kernel functions
-    * controlled through /sys/kernel/debug/tracing or trace-cmd
-* (https://rr-project.org/) - reversible debugger
+    * controlled through /sys/kernel/debug/tracing or [trace-cmd](https://github.com/rostedt/trace-cmd) (pacman -S trace-cmd)
+* [systemtap](https://sourceware.org/systemtap/wiki)
+* [dtrace4linux - looks dead? last update 2019](https://github.com/dtrace4linux/linux)
+* [lttng](https://lttng.org/docs/v2.12/)
+* [other tracing resources](https://elinux.org/Kernel_Trace_Systems)
+* [record replay debugger](https://rr-project.org/)
+    * [similar software](https://github.com/rr-debugger/rr/wiki/Related-work)
 * [amd profiler for cpu/gpu/opengl and stuff](https://developer.amd.com/amd-uprof/)
-* <http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/>
+* [sysprof](http://www.sysprof.com/)
 * valgrind
     * has multiple tools
         * memcheck - leaks/oob
@@ -81,6 +91,14 @@
         * massif - heap profiler
         * helgrind - multithreaded programs issues
         * data race detector - multithreading checker
+* [eBPF - run userspace code in kernel](https://ebpf.io/projects)
+    * pacman -S bpf - [tools for building bpf software](https://archlinux.org/packages/community/x86_64/bpf/)
+    * can be used to add tracing code
+        * [bpftrace](https://bpftrace.org/)
+        * bcc [toolkit](https://github.com/iovisor/bcc) and [tools](https://github.com/iovisor/bcc#tools) for creating kernel tracing
+        * [ply - a dynamic tracer for linux](https://wkz.github.io/ply/)
+        * <https://github.com/aquasecurity/tracee>
+
 
 ## windows tools
 
@@ -99,16 +117,13 @@
     * [profiler](https://docs.microsoft.com/en-us/visualstudio/profiling/?view=vs-2019)
     * [static analysis](https://docs.microsoft.com/en-us/cpp/code-quality/?view=msvc-160)
 * [drmingw](https://github.com/jrfonseca/drmingw)
-* <https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/time-travel-debugging-overview>
 * [nttrace - strace for windows](https://github.com/rogerorr/NtTrace)
-* [stracent - strace for windows - not updated since 2015](https://intellectualheaven.com/?BH=StraceNT)
+* [stracent - strace for windows - not updated since 2015, x86 only](https://intellectualheaven.com/?BH=StraceNT)
 * [sysinternals](../windows/sysinternals.md)
 * windows valgrind alternatives:
     * <http://stackoverflow.com/questions/413477/is-there-a-good-valgrind-substitute-for-windows#413842>
     * <https://kinddragon.github.io/vld/>
-
-* windows performace toolkit
-* windows debugging toolkit
+* [tools in the windows sdk](../windows/windows_sdk.md)
 
 ## documentation
 

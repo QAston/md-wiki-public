@@ -57,14 +57,14 @@
     - modules - shows dlls, you can see where symbols are coming from and get the base address of a dll
 - useful options
     - right click -> run to cursor
-    - **right click -> set next statement!** - manual unconditional jump
+    - **right click -> set next statement** - manual unconditional jump
     - right click -> show disassembly
 - can save a dump on breakpoint
 - can load a dump, but must have a pdb file to be able to see symbols (mingw builds don't have it)
 
 #### other tools
 
-* [code sanitizers](https://docs.microsoft.com/en-us/cpp/sanitizers/?view=msvc-160) now
+* [code sanitizers](https://docs.microsoft.com/en-us/cpp/sanitizers/?view=msvc-160)
     * currently only address sanitizer
 * [profiler](https://docs.microsoft.com/en-us/visualstudio/profiling/?view=vs-2019)
 * [static analysis](https://docs.microsoft.com/en-us/cpp/code-quality/?view=msvc-160)
@@ -114,17 +114,3 @@ Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Com
     - show call hierarchy
     - close team explorer
 - window -> save window layout
-
-### old stuff
-visual studio iot development
-<https://visualstudiogallery.msdn.microsoft.com/35dbae07-8c1a-4f9d-94b7-bac16cad9c01>
-visual studio linux development:
-<https://visualstudiogallery.msdn.microsoft.com/725025cf-7067-45c2-8d01-1e0fd359ae6e>
-visual studio has android support now
-visual studio + clang:
--llvm version - clang with  x86_64-pc-windows-msvc - targets 
-     -package on llvm page, can install into visualstudio, compatible with msvc binaries
--ms c2 version -clang with Microsoft CodeGen - clang + ms optimization backend
-     -is visual studio addon
--mingw version
-     -not compatible with msvc

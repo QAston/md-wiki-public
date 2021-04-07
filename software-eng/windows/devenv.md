@@ -445,6 +445,14 @@ $env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
 
 - see [](./visual_studio.md)
 
+### set up windows sdk
+
+- see [](./windows_sdk.md)
+
+### set up sysinternals
+
+- see [](./sysinternals.md)
+
 ### set up wsl2 and docker
 
 - see [](./wsl2_artix.md)
