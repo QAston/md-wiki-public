@@ -8,6 +8,7 @@
 touch ~/.gitignore_global
 git config --global core.excludesfile ~/.gitignore_global
 echo '*-gitignore' > ~/.gitignore_global
+echo '*-gitignore.*' >> ~/.gitignore_global
 ```
 * set up aliases
 ```
