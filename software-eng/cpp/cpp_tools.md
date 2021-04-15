@@ -124,6 +124,7 @@ perf script
     * <http://stackoverflow.com/questions/413477/is-there-a-good-valgrind-substitute-for-windows#413842>
     * <https://kinddragon.github.io/vld/>
 * [tools in the windows sdk](../windows/windows_sdk.md)
+* [hypevisor debugger](https://github.com/HyperDbg/HyperDbg)
 
 ## documentation
 
