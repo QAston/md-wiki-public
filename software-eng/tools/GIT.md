@@ -16,10 +16,20 @@ git config --global alias.st status
 git config --global alias.unstage 'reset HEAD --'
 git config --global alias.lg "log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr %an)%Creset' --abbrev-commit --date=relative"
 ```
+* set up crlf handling to cooperate well with linux users
+```
+git config --global core.autocrlf false
+
+touch ~/.gitattributes_global
+git config --global core.attributesFile ~/.gitattributes_global
+wget -O - https://raw.githubusercontent.com/alexkaratarakis/gitattributes/master/{Common,C++,VisualStudio,Java,CSharp}.gitattributes > ~/.gitattributes_global
+```
 * other config 
 ```
 git config --global push.default simple
+git config --global mergetool.keepBackup false
 ```
+
 
 ## usage
 
@@ -30,7 +40,6 @@ git config --global push.default simple
 
 * `git update-index --chmod=+x <your_file>` make executable
 * `git config submodule.recurse true` download submodules
-* `git config --global mergetool.keepBackup false` disable orig files generation
 * `git grep ` searches in history
 * `git config credential.helper store` stop confirming pass
 * `git update-index \--[no-]assume-unchanged] [target]` - stop tracking file
