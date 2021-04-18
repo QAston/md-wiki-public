@@ -49,6 +49,7 @@ cp "/mnt/c/portable/fzf/fzf-tab-completion/bash/fzf-bash-completion.sh" ~/portab
 source ~/portable/fzf/key-bindings.bash
 source ~/portable/fzf/fzf-bash-completion.sh
 bind -x '"\e[Z": fzf_bash_completion'
+export FZF_DEFAULT_COMMAND="fd --type f --follow"
 ```
 
 ### usage

@@ -17,23 +17,70 @@ iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim |`
 #New-Item -Force $env:LOCALAPPDATA/nvim/init.vim
 call plug#begin()
 Plug 'junegunn/vim-plug'
+Plug 'unblevable/quick-scope'
+if !exists('g:vscode')
+    Plug 'editorconfig/editorconfig-vim'
+endif
 call plug#end()
 
+" save the backup and swap files in a single directory
+let g:backupdir=expand(stdpath('data') . '/backup')
+if !isdirectory(g:backupdir)
+  execute '!mkdir '. g:backupdir
+endif
+let g:backupdir=g:backupdir . '//'
+let &backupdir=g:backupdir
+let &directory=g:backupdir
+
+if has('win32')
 if $SHELL =~ ".*pwsh.exe$"
     set shell=pwsh
+    set shellcmdflag=-Command
     set shellquote= shellpipe=\| shellxquote=
     set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
     set shellredir=\|\ Out-File\ -Encoding\ UTF8
 elseif $SHELL =~ ".*powershell.exe$"
     set shell=powershell
+    set shellcmdflag=-Command
     set shellquote= shellpipe=\| shellxquote=
     set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
     set shellredir=\|\ Out-File\ -Encoding\ UTF8
 elseif $SHELL =~ ".*bash$"
-    set shell=bash
-    set shellcmdflag=-c
+    set shell=c:\portable\msys\usr\bin\bash.exe
+    set shellcmdflag=wincommand " -c by default; here replaced with a script that checks if first arg is a bat file to execute it in cmd
+    set shellxquote=
+    set shellxescape=
+    set shellquote=
+    set shellpipe=2>&1\|\ tee
+    set shellredir=>%s\ 2>&1
+    set shellslash
 else
     set shell=cmd.exe
+endif
+endif
+
+" unmap space for normal, visual and select and operator
+noremap <SPACE> <Nop>
+" set space as default leader
+let mapleader=" "
+
+" enable quickscope
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+
+" show keys in status line
+set showcmd
+
+" vscode specific stuff
+if exists('g:vscode')
+" start in insert mode
+    au BufEnter * start
+    highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
+    highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
+else
+    set relativenumber
+    set number
+    highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
+    highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
 endif
 ```
 - install plugins

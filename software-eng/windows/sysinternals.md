@@ -4,7 +4,7 @@
 
 ### setup
 
-- copy to c:\portable\sysinternals
+- copy to `c:\portable\sysinternals`
 - remove 32bit executables
 - verify that symbols are working
     - open procmon right click -> stack and the location should show methodname+addr instead of dllname+addr (it can take a few seconds to update)

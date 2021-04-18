@@ -22,6 +22,7 @@ git config --global core.autocrlf false
 
 touch ~/.gitattributes_global
 git config --global core.attributesFile ~/.gitattributes_global
+# convert most files to core.eol line ending, with platform specific files having their endings preserved:
 wget -O - https://raw.githubusercontent.com/alexkaratarakis/gitattributes/master/{Common,C++,VisualStudio,Java,CSharp}.gitattributes > ~/.gitattributes_global
 ```
 * other config 
@@ -43,6 +44,7 @@ git config --global mergetool.keepBackup false
 * `git grep ` searches in history
 * `git config credential.helper store` stop confirming pass
 * `git update-index \--[no-]assume-unchanged] [target]` - stop tracking file
+* `git add --renormalize .` - normalize line endings of text files in the repository
 
 ## links
 

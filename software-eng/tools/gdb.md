@@ -7,4 +7,4 @@
 
 ### utilities
 
-- https://github.com/cyrus-and/gdb-dashboard
+- <https://github.com/cyrus-and/gdb-dashboard>

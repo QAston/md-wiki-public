@@ -7,7 +7,17 @@ WSL 2 is a windows preview feature. It replaces the old WSL system (which was ba
  * there _might_ be issues with opengl rendering or missing opengl features, although I didn’t have any problems so far, in that case the workaround is to use opengl clients built natively on windows
  * cpu performance is slightly worse than native (similar to a vm)
  * the init process can’t be replaced/rebuilt
- * the kernel can be changed/rebuilt as long as it’s compatible with the MS kernel: ([example build](https://github.com/kdrag0n/proton_wsl2/blob/v4.19-proton/README.md#installation)), it’s easy way to swap kernel using .wslconfig: [https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945](https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945)
+ * the kernel can be changed/rebuilt as long as it’s compatible with the MS kernel: ([example build](https://github.com/kdrag0n/proton_wsl2/blob/v4.19-proton/README.md#installation)), it’s easy way to swap kernel [using .wslconfig](https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945)
+    * [example - building with kvm support](https://gist.github.com/offlinehacker/b1d96515f87a47bd0b0bea574eab5583)
+ * performance counters aren't working by default, [but can be made to work](https://github.com/microsoft/WSL/issues/4678)
+    * [this is how to set the flags in regular hyperv for intel cpus](https://docs.microsoft.com/en-us/windows-server/virtualization/hyper-v/manage/performance-monitoring-hardware)
+        * [these options can be edited by intercepting loading of vmcreator](https://gist.github.com/steffengy/62a0b5baa124830a4b0fe4334ccc2606)
+    * wsl2 vm is managed using HypervComputeService - HCS API - it's possible perf counters can be enabled from there?
+        * [api introduction](https://docs.microsoft.com/en-us/virtualization/community/team-blog/2017/20170127-introducing-the-host-compute-service-hcs)
+        * [rust api](https://github.com/rafawo/hcs-rs/blob/c8d70a431eed24ccc53b4119975cc11fc8972d6a/src/schema/virtual_machines/resources/compute/mod.rs)
+        * hcsdiag.exe can list the hcs resources
+    * what needs to be done for amd performance counters to work? looks like not supported 
+* apparently amd uprof [doesn't work when wsl2 is enabled](https://community.amd.com/t5/server-gurus-discussions/amd-uprof-not-showing-performance-counters/td-p/438368), this includes in and out of wsl2
 
 ### Usage tips
  * you can access windows files from wsl using /mnt/c/ path, this includes starting windows applications from linux command line, this includes running linux executables on windows files

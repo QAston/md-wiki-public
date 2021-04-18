@@ -15,7 +15,7 @@
 - configure symbols
     - `file.exe+addres` means symbols are not found for a file
     - `file.exe!methodName()` means symbols are found
-    - set env variable: `_NT_SYMBOL_PATH=cache*%TMP%\SymbolCache;srv*https://msdl.microsoft.com/download/symbols`
+    - set env variable: `_NT_SYMBOL_PATH=srv*%TMP%\SymbolCache*https://msdl.microsoft.com/download/symbols`
     - use `_NT_ALT_SYMBOL_PATH` to prepend any symbol dirs if needed, not needed if symbols are in the same dir as executable
 
 ### sdk tools docs

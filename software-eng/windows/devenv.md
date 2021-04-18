@@ -511,8 +511,24 @@ follow [](../tools/fzf.md)
 
 follow [](../tools/neovim.md)
 
+### set up openjdk
+
+- unpack the zip downloaded from <https://jdk.java.net/java-se-ri/16> to portable
+- add an entry to portable_env:
+```
+jdk16 = [
+    {command = 'env', key = 'JAVA_HOME', value = 'C:\portable\openjdk16\jdk-16\', mode = 'PATH'},
+    {command = 'env', key = 'JRE_HOME', value = 'C:\portable\openjdk16\jdk-16\', mode = 'PATH'},
+    {command = 'env', key = 'PATH', value = '%JAVA_HOME%\bin', mode = 'PREPEND_PATH'}
+]
+```
+
+### set up ghidra
+
+- download <https://ghidra-sre.org/> to portable
+- edit runGhidra.bat to add env_jdk11 call so java is found (must be jdk11, otherwise it'll complain)
+
 ## future todos
 
-- windows debugging and sysinternals?
 - c++ ide?
 - python setup with readline? 
