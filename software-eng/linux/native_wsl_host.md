@@ -34,6 +34,9 @@ cat ~/.ssh/id_rsa.pub > ~/.ssh/authorized_keys
 ```
 - set up env variables
 ```
+if [ -n "$WSL_DISTRO_NAME" ]; then
+# old vars here
+else
 export DISPLAY=:0
 export PULSE_SERVER=tcp:127.0.0.1
 unset LIBGL_ALWAYS_INDIRECT
@@ -41,8 +44,8 @@ export __NV_PRIME_RENDER_OFFLOAD=0
 export __GL_SYNC_TO_VBLANK=1
 export __GLX_VENDOR_LIBRARY_NAME=nvidia
 export LIBGL_DEBUG=verbose
+fi
 ```
-- set up drivers
 
 ### setup manjaro
 
@@ -53,6 +56,7 @@ export LIBGL_DEBUG=verbose
 - update packages
 - configure display settings for 2 monitors
     - search for display settings/manager
+- configure konsole and yakuake to use breeze-silver scheme
 - copy ssh keys
 ```
 mkdir ~/.ssh
@@ -72,6 +76,24 @@ sudo timedatectl set-local-rtc true # set windows clock
 ```
 sudo pacman -S qemu-headless nbd
 ```
+- load nbd module on startup - run in su session:
+```
+echo "nbd" > /etc/modules-load.d/nbd.conf
+echo "options nbd max_part=16" > /etc/modprobe.d/nbd.conf
+```
+- set up basic utilities by copying the wsl config
+```
+cp wsl2-vhd/home/dariusza/.inputrc ~/.inputrc
+cp wsl2-vhd/home/dariusza/.bashrc ~/.bashrc
+nano ~/.bashrc # remove settings which depend on utilities
+sudo pacman -S neovim
+```
+- set up host sysctl config from host.conf
+```
+sudo cp wsl2-vhd/home/dariusza/bin/host.conf /etc/sysctl.d/60-wslhost.conf
+sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
+mkdir /tmp/cores
+```
 
 #### mount the ntfs drive
 
@@ -82,7 +104,6 @@ sudo mkdir wsl2-ntfs
 - find partition uuid of /dev/sdc2 ("Linux" label)
 ```
 lsblk -f
-
 ```
 - add to fstab
 ```
@@ -108,36 +129,40 @@ load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1
 
 #### mount/unmount and start container
 
-### mount the vhd drive
-
-- mount script - requires sudo
+- run-wsl2.sh to start wsl daemon
 ```
-!/bin/bash
+#!/bin/bash
+set -e
 
-VHDX_IMG="wsl2-ntfs/Artix/ext4.vhdx"
-MOUNT_POINT="wsl2-vhd/"
+function unmount_device {
+  qemu-nbd -d /dev/nbd0
+  echo "cleanup done"
+}
 
-# Load the nbd kernel module.
-rmmod nbd;modprobe nbd max_part=16
+function unmount_partition {
+  umount "$MOUNT_POINT"
+}
+
+function unmount_all {
+  unmount_partition
+  unmount_device
+}
+
+VHDX_IMG="/home/dariusza/wsl2-ntfs/Artix/ext4.vhdx"
+MOUNT_POINT="/home/dariusza/wsl2-vhd/"
 
 # mount block device
 qemu-nbd -c /dev/nbd0 "$VHDX_IMG"
+trap unmount_device EXIT
 
 # reload partition table
 partprobe /dev/nbd0
 
 # mount partition
 mount -o rw,nouser /dev/nbd0 "$MOUNT_POINT"
-```
-- unmount
-```
-MOUNT_POINT="wsl2-vhd/"
-umount "$MOUNT_POINT" && qemu-nbd -d /dev/nbd0 && rmmod nbd
-```
-- start
-```
-cd ~/wsl2-vhd
-sudo SYSTEMD_SECCOMP=0 systemd-nspawn --bind-ro=$HOME/.Xauthority:/root/.Xauthority  --bind-ro=/tmp/.X11-unix --capability=all
+trap unmount_all EXIT
+
+SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT"  --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all /home/dariusza/bin/init 
 ```
 - login into shell
 ```
