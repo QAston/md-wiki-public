@@ -137,7 +137,7 @@ umount "$MOUNT_POINT" && qemu-nbd -d /dev/nbd0 && rmmod nbd
 - start
 ```
 cd ~/wsl2-vhd
-sudo systemd-nspawn --bind-ro=$HOME/.Xauthority:/root/.Xauthority  --bind-ro=/tmp/.X11-unix
+sudo SYSTEMD_SECCOMP=0 systemd-nspawn --bind-ro=$HOME/.Xauthority:/root/.Xauthority  --bind-ro=/tmp/.X11-unix --capability=all
 ```
 - login into shell
 ```
