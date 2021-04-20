@@ -16,6 +16,11 @@ ssh localhost
 
 ### setup on windows
 
+#### auto disable sparse
+
+- linux drivers can make the drive file sparse
+- run `fsutil sparse setflag "F:\Artix\ext4.vhdx" 0` to make things work again if file is made sparse
+
 #### disable fast boot and hibernation
 
 - power and sleep settings -> advanced settings -> enable unavailable options -> deselect turn on fast statup -> save changes
@@ -87,6 +92,10 @@ sudo pacman -S qemu-headless nbd
 ```
 echo "nbd" > /etc/modules-load.d/nbd.conf
 echo "options nbd max_part=16" > /etc/modprobe.d/nbd.conf
+```
+- configure nbd to not use sparse files
+```
+http://manpages.ubuntu.com/manpages/bionic/man5/nbd-server.5.html
 ```
 - set up basic utilities by copying the wsl config
 ```
