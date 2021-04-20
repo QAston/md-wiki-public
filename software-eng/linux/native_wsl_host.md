@@ -173,6 +173,7 @@ partprobe /dev/nbd0
 mount -o rw,nouser /dev/nbd0 "$MOUNT_POINT"
 trap unmount_all EXIT
 
+#SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 - make kernel filesystems writeable
 SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all /home/dariusza/bin/init
 ```
 - sudo nvim /etc/systemd/system/mount-wsl2.service
@@ -197,6 +198,7 @@ sudo systemctl enable mount-wsl2.service
 
 ### todos
 
+- can use SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 to enable writing to /sys/kernel and other stuff
 - docker? run on the host instead?
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk
