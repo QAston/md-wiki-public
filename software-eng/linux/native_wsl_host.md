@@ -7,6 +7,13 @@
 - things that are host-specific need to be guarded by WSL_DISTRO_NAME env variable existence check
 - if anything needs sharing between the system put it in wsl
 
+### usage
+
+connect to wsl:
+```
+ssh localhost 
+```
+
 ### setup on windows
 
 #### disable fast boot and hibernation
@@ -121,15 +128,19 @@ sudo pacman nvidia-libgl
 # add +iglx option
 ServerArguments=-nolisten tcp +iglx
 ```
+- allow connecting to the x server from the container
+```
+echo "xhost +local:" >> ~/.bash_profile
+```
 - configure pulseaudio - in `sudo nano /etc/pulse/default.pa`
 ```
 # add ip auth for the host
 load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1
 ```
 
-#### mount/unmount and start container
+#### setup a systemd service to mount/unmount and start container
 
-- run-wsl2.sh to start wsl daemon
+- nano ~/mount-wsl2.sh to start wsl daemon
 ```
 #!/bin/bash
 set -e
@@ -162,19 +173,34 @@ partprobe /dev/nbd0
 mount -o rw,nouser /dev/nbd0 "$MOUNT_POINT"
 trap unmount_all EXIT
 
-SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT"  --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all /home/dariusza/bin/init 
+SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all /home/dariusza/bin/init
 ```
-- login into shell
+- sudo nvim /etc/systemd/system/mount-wsl2.service
 ```
-ssh localhost
+[Unit]
+Description=Wsl2 mount service
+RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp
+Requires=systemd-modules-load.service
+After=systemd-modules-load.service
+
+[Service]
+ExecStart=/home/dariusza/mount-wsl2.sh
+Restart=no
+
+[Install]
+WantedBy=local-fs.target
+```
+- enable service autostart
+```
+sudo systemctl enable mount-wsl2.service
 ```
 
 ### todos
 
-- automate startup/shutdown
 - docker? run on the host instead?
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk
+    - alternatively try to make ext4 partition be visible as a special vhdx file? by somehow implementing [device files](https://en.wikipedia.org/wiki/Device_file) on windows? possibly by implementing it in linux and loading wsl partition from wsl share?
 
 ### references
 
