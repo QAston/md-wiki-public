@@ -20,6 +20,10 @@ ssh localhost
 
 - linux drivers can make the drive file sparse
 - run `fsutil sparse setflag "F:\Artix\ext4.vhdx" 0` to make things work again if file is made sparse
+  - todo: this might be corrupting the file, a file desparser might be needed instead
+  - [this](https://github.com/dantmnf/desparse) removes the flag, but only if the file doesn't have sparse fields
+  - copy supposedly removes sparse flag? https://superuser.com/questions/508801/removing-sparse-file-attribute
+    - looks like removing the flags does expand the zeroes area, maybe corruption got introduced some other way?
 
 #### disable fast boot and hibernation
 
@@ -95,7 +99,9 @@ echo "options nbd max_part=16" > /etc/modprobe.d/nbd.conf
 ```
 - configure nbd to not use sparse files
 ```
-http://manpages.ubuntu.com/manpages/bionic/man5/nbd-server.5.html
+# sudo nvim /etc/nbd-server/config
+# add in [export] sections
+sparse_cow = false
 ```
 - set up basic utilities by copying the wsl config
 ```
@@ -172,7 +178,7 @@ VHDX_IMG="/home/dariusza/wsl2-ntfs/Artix/ext4.vhdx"
 MOUNT_POINT="/home/dariusza/wsl2-vhd/"
 
 # mount block device
-qemu-nbd -c /dev/nbd0 "$VHDX_IMG"
+qemu-nbd --detect-zeroes=off -c /dev/nbd0 "$VHDX_IMG"
 trap unmount_device EXIT
 
 # reload partition table
