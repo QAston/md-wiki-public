@@ -14,18 +14,14 @@ connect to wsl:
 ssh localhost 
 ```
 
+#### manually desparse a file
+
+- qemu-nbd can make the drive file sparse
+- run `fsutil sparse getflag "F:\Artix\ext4.vhdx"` to make check if file is made sparse
+  - if it is, make a copy of the file
+  - then run `fsutil sparse setflag "F:\Artix\ext4.vhdx" 0`
+
 ### setup on windows
-
-#### auto disable sparse
-
-- linux drivers can make the drive file sparse
-- run `fsutil sparse setflag "F:\Artix\ext4.vhdx" 0` to make things work again if file is made sparse
-  - todo: this might be corrupting the file, a file desparser might be needed instead
-  - [this](https://github.com/dantmnf/desparse) removes the flag, but only if the file doesn't have sparse fields
-  - copy supposedly removes sparse flag? https://superuser.com/questions/508801/removing-sparse-file-attribute
-    - copy first, check properties to see if the size is correct, then remove the flag, confirmed works locally
-  - build a fork of qemu that doesn't make files sparse:
-
 
 #### disable fast boot and hibernation
 
@@ -92,9 +88,7 @@ sudo timedatectl set-local-rtc true # set windows clock
 ```
 - set up mounting tools for vhd
 ```
-#sudo pacman -S qemu-headless nbd
-#todo: build a fork of qemu that doesn't use sparse:
-//https://github.com/cloudbase/qemu/commit/da5c10c49480d24012d8dfb2d83ce78710f0fcaa
+sudo pacman -S qemu-headless nbd
 ```
 - load nbd module on startup - run in su session:
 ```
@@ -228,12 +222,48 @@ sudo systemctl enable mount-wsl2.service
 - solve the sparse image problem by making qemu not write sparse files
   - `--image-opts driver=vhdx,file.filename=ext4.vhdx,file.driver=vhdx`
   - <https://qemu-project.gitlab.io/qemu/system/images.html#disk-image-file-formats>
-- solve the sparse image problem by changing the vhdx driver
-  - todo
+  - <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=934873>
 - solve the sparse problem by not allowing writes from linux
   - qemu-nbd --snapshot flag
 - solve the sparse problem by filling in the sparse gaps
   - takes 20 minutes :(
+- solve the sparse problem by making a fork that doesn't use sparse filesystem calls
+  - https://github.com/qemu/qemu/blob/266469947161aa10b1d36843580d369d5aa38589/block/vhdx-log.c
+
+#### building a fork of qemu-nbd
+pacaur -S asp
+
+mkdir ~/abs
+cd ~/abs
+asp checkout qemu-headless
+
+cd qemu
+cd trunk
+todo: add a path file
+
+```
+# add patch to PKGBUILD
+nano PKGBUILD
+```
+makepkg -s --skipchecksums --skipinteg --skippgpcheck
+
+```
+# disable pgp check in /etc/pacman.conf
+SigLevel    = Never
+#Required DatabaseOptional
+LocalFileSigLevel = Never
+#Optional
+```
+
+sudo pacman -U qemu-headless-5.2.0-5-x86_64.pkg.tar.zst
+
+```
+# reenable pgp check in pacman.conf, add qemu-headless to ignored packages
+IgnorePkg   = qemu-headless
+SigLevel    = Required DatabaseOptional
+LocalFileSigLevel = Optional
+```
+        
 
 ### references
 
