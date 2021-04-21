@@ -221,6 +221,19 @@ sudo systemctl enable mount-wsl2.service
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk
     - alternatively try to make ext4 partition be visible as a special vhdx file? by somehow implementing [device files](https://en.wikipedia.org/wiki/Device_file) on windows? possibly by implementing it in linux and loading wsl partition from wsl share?
+- solve the sparse image problem by not using wsl's vhd as a linux entry point?
+  - need a small distro to bootstrap things and start a qemu image
+    - needs to forward kernel filesystems and do other stuff
+    - would be neat if nspawn could be used but can't
+- solve the sparse image problem by making qemu not write sparse files
+  - `--image-opts driver=vhdx,file.filename=ext4.vhdx,file.driver=vhdx`
+  - <https://qemu-project.gitlab.io/qemu/system/images.html#disk-image-file-formats>
+- solve the sparse image problem by changing the vhdx driver
+  - todo
+- solve the sparse problem by not allowing writes from linux
+  - qemu-nbd --snapshot flag
+- solve the sparse problem by filling in the sparse gaps
+  - takes 20 minutes :(
 
 ### references
 
