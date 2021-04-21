@@ -23,7 +23,9 @@ ssh localhost
   - todo: this might be corrupting the file, a file desparser might be needed instead
   - [this](https://github.com/dantmnf/desparse) removes the flag, but only if the file doesn't have sparse fields
   - copy supposedly removes sparse flag? https://superuser.com/questions/508801/removing-sparse-file-attribute
-    - looks like removing the flags does expand the zeroes area, maybe corruption got introduced some other way?
+    - copy first, check properties to see if the size is correct, then remove the flag, confirmed works locally
+  - build a fork of qemu that doesn't make files sparse:
+
 
 #### disable fast boot and hibernation
 
@@ -90,7 +92,9 @@ sudo timedatectl set-local-rtc true # set windows clock
 ```
 - set up mounting tools for vhd
 ```
-sudo pacman -S qemu-headless nbd
+#sudo pacman -S qemu-headless nbd
+#todo: build a fork of qemu that doesn't use sparse:
+//https://github.com/cloudbase/qemu/commit/da5c10c49480d24012d8dfb2d83ce78710f0fcaa
 ```
 - load nbd module on startup - run in su session:
 ```
@@ -213,7 +217,6 @@ sudo systemctl enable mount-wsl2.service
 
 ### todos
 
-- can use SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 to enable writing to /sys/kernel and other stuff
 - docker? run on the host instead?
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk
