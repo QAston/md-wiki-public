@@ -214,6 +214,8 @@ sudo systemctl enable mount-wsl2.service
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk (currently in insider only)
     - alternatively try to make ext4 partition be visible as a special vhdx file? by somehow implementing [device files](https://en.wikipedia.org/wiki/Device_file) on windows? possibly by implementing it in linux and loading wsl partition from wsl share?
+      - could make a wrapper wsl2 distro that mounts the main one like on linux?
+- add a profile to terminal apps that starts the ssh localhost shell directly, as well as a shell-start script that runs stuff directly in that environment
 
 ### references
 
