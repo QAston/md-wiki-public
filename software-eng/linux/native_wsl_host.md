@@ -9,9 +9,13 @@
 
 ### usage
 
-connect to wsl:
+- connect from host shell:
 ```
 ssh localhost 
+```
+- start wsl2 shell
+```
+~/.bash-wsl2.sh
 ```
 
 ### setup on windows
@@ -69,7 +73,6 @@ fi
 - update packages
 - configure display settings for 2 monitors
     - search for display settings/manager
-- configure konsole and yakuake to use breeze-silver scheme
 - copy ssh keys
 ```
 mkdir ~/.ssh
@@ -113,6 +116,9 @@ sudo cp wsl2-vhd/home/dariusza/bin/host.conf /etc/sysctl.d/60-wslhost.conf
 sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
 mkdir /tmp/cores
 ```
+- configure konsole and yakuake
+  - change appearance to use breeze-silver scheme
+  - add a profile that runs ~/bash-wsl2.sh as the shell and make it the default
 
 #### mount the ntfs drive
 
@@ -206,6 +212,11 @@ WantedBy=local-fs.target
 - enable service autostart
 ```
 sudo systemctl enable mount-wsl2.service
+```
+- add a shell startup script in ~/bash-wsl2.sh
+```
+#!/bin/bash
+exec ssh localhost "$@"
 ```
 
 ### todos
