@@ -14,14 +14,13 @@ connect to wsl:
 ssh localhost 
 ```
 
-#### manually desparse a file
-
-- qemu-nbd can make the drive file sparse
-- run `fsutil sparse getflag "F:\Artix\ext4.vhdx"` to make check if file is made sparse
-  - if it is, make a copy of the file
-  - then run `fsutil sparse setflag "F:\Artix\ext4.vhdx" 0`
-
 ### setup on windows
+
+#### convert the image to a fixed vhdx
+
+- open the file in hyperv manager  (right click on a vm -> edit image)
+- convert the dynamic image to fixed one
+- once converted, qemu-nbd will stop marking the image as sparse!
 
 #### disable fast boot and hibernation
 
@@ -213,57 +212,8 @@ sudo systemctl enable mount-wsl2.service
 
 - docker? run on the host instead?
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
-    - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk
+    - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk (currently in insider only)
     - alternatively try to make ext4 partition be visible as a special vhdx file? by somehow implementing [device files](https://en.wikipedia.org/wiki/Device_file) on windows? possibly by implementing it in linux and loading wsl partition from wsl share?
-- solve the sparse image problem by not using wsl's vhd as a linux entry point?
-  - need a small distro to bootstrap things and start a qemu image
-    - needs to forward kernel filesystems and do other stuff
-    - would be neat if nspawn could be used but can't
-- solve the sparse image problem by making qemu not write sparse files
-  - `--image-opts driver=vhdx,file.filename=ext4.vhdx,file.driver=vhdx`
-  - <https://qemu-project.gitlab.io/qemu/system/images.html#disk-image-file-formats>
-  - <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=934873>
-- solve the sparse problem by not allowing writes from linux
-  - qemu-nbd --snapshot flag
-- solve the sparse problem by filling in the sparse gaps
-  - takes 20 minutes :(
-- solve the sparse problem by making a fork that doesn't use sparse filesystem calls
-  - https://github.com/qemu/qemu/blob/266469947161aa10b1d36843580d369d5aa38589/block/vhdx-log.c
-
-#### building a fork of qemu-nbd
-pacaur -S asp
-
-mkdir ~/abs
-cd ~/abs
-asp checkout qemu-headless
-
-cd qemu
-cd trunk
-todo: add a path file
-
-```
-# add patch to PKGBUILD
-nano PKGBUILD
-```
-makepkg -s --skipchecksums --skipinteg --skippgpcheck
-
-```
-# disable pgp check in /etc/pacman.conf
-SigLevel    = Never
-#Required DatabaseOptional
-LocalFileSigLevel = Never
-#Optional
-```
-
-sudo pacman -U qemu-headless-5.2.0-5-x86_64.pkg.tar.zst
-
-```
-# reenable pgp check in pacman.conf, add qemu-headless to ignored packages
-IgnorePkg   = qemu-headless
-SigLevel    = Required DatabaseOptional
-LocalFileSigLevel = Optional
-```
-        
 
 ### references
 
