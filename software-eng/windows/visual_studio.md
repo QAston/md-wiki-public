@@ -76,11 +76,11 @@
     - take contents from shortcuts to the developer prompt/powershell from start menu
     - env_vs.bat:
 ```
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=x64 -no_logo
 ```
     - env_vs.ps1
 ```
-Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"; Enter-VsDevShell e821c35b
+Import-Module "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"; Enter-VsDevShell -DevCmdArguments '-arch=x64 -no_logo'    e821c35b
 ```
 - install workloads in visual studio installer:
     - .net desktop development
