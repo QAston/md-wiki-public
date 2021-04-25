@@ -151,6 +151,7 @@ perf script
 - [facebook folly - fb standard library](https://github.com/facebook/folly)
     - includes a tag_invoke impl
 - [persistent data structures](https://github.com/arximboldi/immer)
+- [result + throw error handling proposal](https://github.com/TartanLlama/expected)
 - boost
     - [a gigantic library with lots of stuff](https://www.boost.org/doc/libs/)
 - [brigand](https://github.com/edouarda/brigand) - a replacement for boost.mpl - metaprogramming
