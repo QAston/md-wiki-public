@@ -16,7 +16,7 @@
  * Differences from regular packaging systems:
      * nix-build is deterministic, uses sandboxing
      * nix doesn't use standard paths and executables, it uses non-standard environments and CC-wrappers
-         * this has consequences for tooling: <https://github.com/hadeaninc/aether/blob/develop/EDITORS.md> 
+         * this has consequences for tooling: [nix_editors](../cpp/nix_meson_dev_env.md)
          * supposedly CC-wrappers are just for badly defined packages and can be disabled in favour of standard pkgconfig mechanisms
 * configuration: <https://www.mankier.com/5/nix.conf> in `~/.config/nix/nix.conf`
 
