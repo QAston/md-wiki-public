@@ -298,7 +298,7 @@ pacman -S git-extras # supporting modules
 # in /etc/pacman.conf
 IgnorePkg   =git
 ```
-3. Configure git by following setup in [](../tools/GIT.md)
+3. Configure git by following setup in [git](../tools/GIT.md)
 
 #### install win-sudo (bash-only)
 

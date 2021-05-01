@@ -43,8 +43,8 @@
 ### posix api implementations
 
 * midpix - a syscall and posix layer for windows that allows using linux's libc on windows
-    * [](https://midipix.org/#sec-implementation)
-    * [](https://dev.midipix.org/)
+    * [midpix](https://midipix.org/#sec-implementation)
+    * [midpix dev](https://dev.midipix.org/)
 * cygwin
 * https://github.com/JFLarvoire/SysToolsLib/tree/master/C/MsvcLibX
 

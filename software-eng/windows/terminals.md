@@ -19,7 +19,7 @@
     * [handled terminal sequences](https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#input-sequences)
     * keycodes:
         * alt+shift+ctrl modifiers work on the f-keys, arrows, backspace, delete, pgup/down home/end (they yeld different sequences)
-        * alt works for every base keypress because alt modifier is encoded (see [](../unix/terminals.md)) as `ESC nonaltchar`
+        * alt works for every base keypress because alt modifier is encoded (see [terminals](../unix/terminals.md)) as `ESC nonaltchar`
         * ctlr characters are only supported in C0 ascii ctrl range (ctrl-space, ctrl-[, ctrl-], ctrl-^, ctrl-_) because they're encoded using C0 ASCII control codes. As a result ctrl+shift+char, ctrl+num, and in general ctrl with other ascii characters is ignored or reproduces a keycode already bound to control range
         * keycodes can be inspected using `clink echo` on in msys using `ctrl-v` (quote) then keystroke
 * [improvements to the default windows terminal](https://docs.microsoft.com/en-us/previous-versions/orphan-topics/ws.11/mt427362(v=ws.11)?redirectedfrom=MSDN)

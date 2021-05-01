@@ -2,12 +2,12 @@
 
 ### shortcuts
 
-- [](./windows.md)
-- [](./windows_terminal.md)
-- [](./terminals.md)
-- [](../tools/readline.md)
-- [](../tools/vscode.md)
-- [](../tools/neovim.md)
+- [windows](./windows.md)
+- [windows terminal](./windows_terminal.md)
+- [terminals on windows](./terminals.md)
+- [readline](../tools/readline.md)
+- [vscode](../toocls/vscode.md)
+- [neovim](../tools/neovim.md)
 
 ### how to install windows software
 
@@ -430,7 +430,7 @@ $env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
 
 ### configure vscode
 
-- see [](../tools/vscode.md)
+- see [vscode](../tools/vscode.md)
 
 ### set up send-to targets
 
@@ -443,19 +443,19 @@ $env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
 
 ### set up visual studio
 
-- see [](./visual_studio.md)
+- see [visual studio](./visual_studio.md)
 
 ### set up windows sdk
 
-- see [](./windows_sdk.md)
+- see [windows sdk](./windows_sdk.md)
 
 ### set up sysinternals
 
-- see [](./sysinternals.md)
+- see [sysinternals](./sysinternals.md)
 
 ### set up wsl2 and docker
 
-- see [](./wsl2_artix.md)
+- see [wsl2_artix](./wsl2_artix.md)
 
 ### set up "everything search"
 
@@ -467,11 +467,11 @@ $env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
 
 ### set up rust 
 
-follow [](../rust/tools.md)
+follow [rust_tools](../rust/tools.md)
 
 ### set up node/npm
 
-follow [](../tools/npm.md)
+follow [npm](../tools/npm.md)
 
 ### set up ripgrep
 
@@ -512,11 +512,11 @@ follow [](../tools/npm.md)
 
 ### set up fzf
 
-follow [](../tools/fzf.md)
+follow [fzf](../tools/fzf.md)
 
 ### set up nvim
 
-follow [](../tools/neovim.md)
+follow [neovim](../tools/neovim.md)
 
 ### set up openjdk
 
