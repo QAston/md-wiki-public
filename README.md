@@ -12,7 +12,7 @@ Relevant XKCD:
 
 ### Highlights
 
-I've made a documentation for setting up my development environment which I'm very fond of:
+I've documented the configuration of my development environment which I'm very fond of:
 - [windows environment](software-eng/windows/devenv.md)
 - [msys2](software-eng/windows/msys2.md)
 - [wsl2](software-eng/windows/wsl2_artix.md)
