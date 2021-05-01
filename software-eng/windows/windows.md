@@ -51,7 +51,7 @@
 ### shell
 
 * [drag and drop does things based on dest and modifier keys](https://www.tenforums.com/tutorials/38097-change-drag-drop-default-action-windows.html)
-    - drag with RMB allows specifying exactly if you want to copy, link or symlink
+    * drag with RMB allows specifying exactly if you want to copy, link or symlink
 * extensions: <https://docs.microsoft.com/en-us/windows/win32/shell/shell-exts>
     * see/disable all shell extensions <https://www.nirsoft.net/utils/shexview.html>
     * fuse could be great as a special directory extension

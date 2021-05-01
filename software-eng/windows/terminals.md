@@ -70,6 +70,7 @@
         - CTRL+C - copy selection and deselect
         - CRTL+V or SHIFT+INS - paste
 * shell shortcuts - powershell amd cmd.exe only
+    - using [doskey](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-xp/bb490894(v=technet.10)?redirectedfrom=MSDN)
     - command manipulation
         - ESC - clear the text
         - CTRL+home - delete all the characters to the left (if not empty)

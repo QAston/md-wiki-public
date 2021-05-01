@@ -502,6 +502,13 @@ follow [](../tools/npm.md)
     - sendto sed winshell
 3. download [jq](https://github.com/stedolan/jq) and add it to portable/bin/windows
 
+### TODO: set up cross-shell aliases 
+
+- doskey for cmd
+- alias for bash
+- New-Alias for powershell
+- set up a shared file that is read on startup of each shell
+
 
 ### set up fzf
 
