@@ -44,6 +44,7 @@
 * c++filt – Demangle Command
 * addr2line – Convert Address to Filename and Numbers
 * readelf – Display ELF File Info
+    * readelf --debug-dump read debug info from the executable
 * ldd - show shared libraries for executable
 * [gdb](../tools/gdb.md)
 
