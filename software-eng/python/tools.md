@@ -14,6 +14,19 @@ See <https://docs.python.org/3/library/venv.html> for details
    * `pip install -e .` installs a development version, which will reload changes, use when setup.py is present
    * `pip install -r requirements.txt` if requirements fileis present
 
+## readline
+
+- mingw build has readline disabled <https://github.com/msys2/MINGW-packages/blob/master/mingw-w64-python/1850-disable-readline.patch>
+   - back out 1850-disable-readline.patch, remote it from PKGBUILD
+   - uncomment readline module in src/Python-3.8.9/Modules/readline.c
+   - fix build of Modules/readline.c
+      - add #include <winsock.h> for fd_set and select
+      - add #undef HAVE_RL_RESIZE_TERMINAL because windows doesn't provide a resize signal
+   - sadly, this doesn't fully work, the keyboard input doesn't get processed with this build
+      - could use libedit? or try to fix the readline.c to work with windows c runtime?
+- msys build has readline enabled and working
+- native windows builds have readline disabled for some reason
+
 
 ## Pip
 

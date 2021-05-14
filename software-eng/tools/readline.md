@@ -5,6 +5,21 @@
 - <https://catonmat.net/ftp/readline-emacs-editing-mode-cheat-sheet.pdf>
 - some applications have option to have readline but don't ship it by default (like python on windows for example)
 
+### readline wrappers
+
+- you can make an application use readline by using one of the readline wrappers:
+    - https://github.com/hanslub42/rlwrap
+    - will not be able to use context-based completion because that needs to be provided by the application
+- rlwrap example using msys2
+```
+pacman -S rlwrap
+#Here is a nice configuration example for wrapping a command with rlwrap, the
+#command in this example being sqlplus, this would go into your ~/.bashrc:
+
+    alias sqlplus="rlwrap -i -f ~/.sqlplus_history -H ~/.sqlplus_history -s 30000 sqlplus --"
+    touch ~/.sqlplus_history
+```
+
 
 ### arguments
 
