@@ -126,6 +126,10 @@ perf script
     * <https://kinddragon.github.io/vld/>
 * [tools in the windows sdk](../windows/windows_sdk.md)
 * [hypevisor debugger](https://github.com/HyperDbg/HyperDbg)
+* [detours] - a toolkit for intercepting dll method calls and modifying executables
+    * [load a method detour dll without modifying executable](https://github.com/microsoft/Detours/wiki/SampleWithdll)
+    * [modify an executable to load a detour dll](https://github.com/microsoft/Detours/wiki/OverviewPayloads)
+    * [other samples](https://github.com/microsoft/Detours/wiki/Samples) - includes tracing various win32 functions: io, memory, etc
 
 ## documentation
 
