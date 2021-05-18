@@ -33,6 +33,7 @@ See <https://docs.python.org/3/library/venv.html> for details
          - https://tiswww.case.edu/php/chet/readline/readline.html#SEC41
    - it looks like mingw-based python builds fail some tests, but the failures aren't dramatic (+0.0 vs -0.0 for example)
       - python -m test --pgo doesn't pass in msys build(2 tests), and fails in mingw with a couple more of test cases (in lib/ntpath.py we set path separator to '/' when running in bash, this causes some tests to fail, is that even a good idea?)
+      - might be better to build the msvc version of python with msvc readline (clink has a working readline build)
 - msys build has readline enabled and working
 - native windows builds have readline disabled for some reason
 
