@@ -22,8 +22,7 @@ See <https://docs.python.org/3/library/venv.html> for details
    - back out 1850-disable-readline.patch, remote it from PKGBUILD
    - uncomment readline module in src/Python-3.8.9/Modules/readline.c
    - fix build of Modules/readline.c
-      - add #include <winsock.h> for fd_set and select
-      - add #undef HAVE_RL_RESIZE_TERMINAL because windows doesn't provide a resize signal
+      - add #undef HAVE_RL_RESIZE_TERMINAL because msvcrt doesn't provide a resize signal
    - run makepkg-mingw -e to build with these changes
    - sadly, this doesn't fully work, the keyboard input isn't read because winsock2's select only works on sockets and not on files
       - todo: fix readline_until_enter_or_signal to properly read files
