@@ -1,5 +1,7 @@
 ## msys2
 
+Guide on how to configure msys2. Integration with other environments is documented in [devenv](../devenv.md).
+
 ### environment setup
 
 #### set home dir to windows dir, edit /etc/nsswitch.conf
@@ -211,7 +213,7 @@ pacman -Su
 
 #### install useful packages
 ```
-pacman -S --needed base-devel binutils mingw-w64-x86_64-toolchain cmake mingw64/mingw-w64-x86_64-diffutils ncurses
+pacman -S --needed base-devel binutils mingw-w64-x86_64-toolchain cmake mingw64/mingw-w64-x86_64-diffutils ncurses rlwrap
 ```
 #### set up ABS and AUR
 

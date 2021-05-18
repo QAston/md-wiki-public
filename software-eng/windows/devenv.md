@@ -50,21 +50,12 @@ windows search -> advanced language settings -> Use Unicode-UTF-8 for worldwide 
 
 ### enable long paths for long-path-aware apps
 
-- set Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled to 1 in regedit
+- set `Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled` to 1 in regedit
 - [docs](https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation)
 
 ### install redistributables
 
 - <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>
-
-### copy portable dir and update system config
-1. copy c:/portable dir
-2. install https://github.com/QAston/PEIS, which should be in portable/Utils
-* add the following to `%USERPROFILE%\Documents\WindowsPowerShell\profile.ps1`
-```
-$env:PATH="C:\portable\bin\ps;$env:PATH"
-$env:PATHEXT=".PS1;$env:PATHEXT"
-```
 
 ### install fonts
 
@@ -159,20 +150,30 @@ $prevpath = (get-itemproperty -Path HKCU:\Environment).Path
 Set-ItemProperty -Name PATH_APPEND_MSYS_COMMON -PropertyType String -Value "$prevpath;C:\portable\portable_env\cmd;%PATH_VAR_NATIVE%;%PATH_VAR_WINDOWS%;%PATH_VAR_ALL%" -Path HKCU:\Environment
 ```
 
-### setup bin
+### setup `portable\bin`
 
-1. c:\portable\bin has a following structure to store scripts, standalone binaries and shims
+1. in `c:\portable\bin` make the following directory structure to store scripts, standalone binaries and shims
 - all - all environments
 - windows - native + msys
 - winshell - cmd + powershell + explorer
 - native - winshell + mingw
 - cmd/ps/bash - shell-specific shims
 - msix_apps - aliases for the winapps dir
-2. C:\portable\shimzon\bin\shimzon has a tool to add shims to various envrionments, to add a shim run:
+- msys_common - msys and mingw
+2. install and run portable env
+    * install https://github.com/QAston/portable_env to c:\portable\bin
+    * run `C:\portable\bin\portable_env` to regenerate `env_` scripts 
+    * add the following to `%USERPROFILE%\Documents\WindowsPowerShell\profile.ps1`
 ```
-shimzon add path\to\exe -d <envname>
+$env:PATH="C:\portable\bin\ps;$env:PATH"
+$env:PATHEXT=".PS1;$env:PATHEXT"
 ```
-3. shims to set up
+3. install [shimzon](git@github.com:QAston/shimzon.git) to `C:\portable\shimzon\bin\` to be able to add shims to various environments
+
+### set up msys2
+
+1. follow [msys2 setup guide](../msys2.md)
+2. set up shims for integrating with msys2
 ```
 c:\portable\shimzon\bin\shimzon.exe add -d all c:\portable\shimzon\bin\shimzon.exe 
 shimzon add  -d winshell -n bash-mingw64.exe C:\portable\msys\usr\bin\bash.exe
@@ -190,10 +191,7 @@ shimzon add  -d winshell -n bash-msys.exe C:\portable\msys\usr\bin\bash.exe
 MSYSTEM = "MSYS"
 CHERE_INVOKING = "true"
 MSYS2_PATH_TYPE = "minimal"
-
-shimzon add -d msix_apps C:\Users\qasto\AppData\Local\Microsoft\WindowsApps\wt.exe
 ```
-4. run C:\portable\bin\portable_env to regenerate `env_` scripts 
 
 ### install symlink utils
 
@@ -270,6 +268,7 @@ store -> msix packaging tool
         { "command": "scrollToTop", "keys": "ctrl+home" },
         { "command": "scrollToBottom", "keys": "ctrl+end" },
 ```
+* sendto shim-msix_apps C:\Users\qasto\AppData\Local\Microsoft\WindowsApps\wt.exe
 
 ### configure cmd.exe
 1. better theme using concfg
@@ -491,16 +490,20 @@ follow [npm](../tools/npm.md)
 
 ### add small unix tools to windows path
 
-1. from c:\portable\msys\usr\bin - only add utilities that actually work outside of msys
+1. configure user env variables required by some unix tools
+    - HOME="C:\Users\qasto\"
+    - EDITOR="nvim"
+2. from c:\portable\msys\usr\bin - only add utilities that actually work outside of msys
+    - sendto rlwrap winshell
     - sendto wget winshell
     - sendto which winshell
     - sendto cygpath winshell
-2. download some binaries ported to windows, so that they work outside of msys (for example clone git@github.com:bmatzelle/gow.git)
+3. download some binaries ported to windows, so that they work outside of msys (for example clone git@github.com:bmatzelle/gow.git)
     - utilities which are shipped with msys, but don't work well outside of bash
     - sendto cat winshell
     - sendto xargs winshell
     - sendto sed winshell
-3. download [jq](https://github.com/stedolan/jq) and add it to portable/bin/windows
+4. download [jq](https://github.com/stedolan/jq) and add it to portable/bin/windows
 
 ### TODO: set up cross-shell aliases 
 
