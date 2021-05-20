@@ -13,25 +13,21 @@
 
 - the install method doesn't matter that much, because now you can easily shim it to the intended environments
     - prefer the fewest installs that cover cmd/ps/mingw
-    - prefer portable dir if app doesn't need any system integration
+    - prefer installing zips to C:\portable dir if app doesn't need any system integration, add shims using shimzon if needed
 - powershell modules
     - install through Install-Module
     - unavailable in other shells, but that's probably just fine
 - msix apps
     - just install from the store
     - apps available in command line through C:\Users\qasto\AppData\Local\Microsoft\WindowsApps path entry (execution aliases)
-    - add a shim using shimzon
 - mingw64 native apps
     - install through pacman
-    - available in other command lines through env_mingw? (TODO: fix env_mingw)
     - if needs to be available in msys you can shim it there, or install the msys-equivalent module
+    - env_mingw to bring to PATH, use shimzon to add to other envs
 - msys posix apps
     - install through pacman
     - available in mingw64 shells through fallback
-    - available in other command lines through env_msys (TODO)
-    - if needs to be available in other shell make a shim for other shells? (TODO)
-- C:/portable apps
-    - if needs to be available in shells add a shim to bin to the appropriate dir
+    - env_msys to bring to PATH, use shimzon to add to other envs
 
 ## setup steps
 
@@ -169,13 +165,13 @@ $env:PATH="C:\portable\bin\ps;$env:PATH"
 $env:PATHEXT=".PS1;$env:PATHEXT"
 ```
 3. install [shimzon](git@github.com:QAston/shimzon.git) to `C:\portable\shimzon\bin\` to be able to add shims to various environments
+    * add a shim to shimzon itself c:\portable\shimzon\bin\shimzon.exe add -d all c:\portable\shimzon\bin\shimzon.exe 
 
 ### set up msys2
 
 1. follow [msys2 setup guide](../msys2.md)
 2. set up shims for integrating with msys2
 ```
-c:\portable\shimzon\bin\shimzon.exe add -d all c:\portable\shimzon\bin\shimzon.exe 
 shimzon add  -d winshell -n bash-mingw64.exe C:\portable\msys\usr\bin\bash.exe
 # this one has to be edited to add envvars:
 [env]

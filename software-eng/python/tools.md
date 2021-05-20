@@ -14,6 +14,10 @@ See <https://docs.python.org/3/library/venv.html> for details
    * `pip install -e .` installs a development version, which will reload changes, use when setup.py is present
    * `pip install -r requirements.txt` if requirements fileis present
 
+### python's "autorun" using siteconfig.py for venv
+
+- <https://docs.python.org/3/library/site.html>
+
 ## readline
 
 - python can hook a readline library for reading input using PyOS_ReadlineFunctionPointer
@@ -35,8 +39,20 @@ See <https://docs.python.org/3/library/venv.html> for details
       - might be better to build the msvc version of python with msvc readline (clink has a working readline build)
 - msys build has readline enabled and working
 - native windows builds have readline disabled for some reason
+- python-editline package looks promising, but it's linux only
 
 
 ## Pip
 
 - `pip freeze` prints requirements.txt with all versions specified
+
+## conda
+
+- a cross platform package manager recommended for jupyter
+- installs both python and native dependencies as well as deps for other managed languages
+
+### usage
+
+- [installing a package from a file](https://docs.anaconda.com/anaconda/user-guide/tasks/install-packages/#installing-packages-on-a-non-networked-air-gapped-computer)
+- [virtual environments](https://conda.io/projects/conda/en/latest/user-guide/concepts/environments.html)
+- [build recipes are embedded in packages](https://docs.conda.io/projects/conda-build/en/latest/concepts/recipe.html#conda-build-recipes)

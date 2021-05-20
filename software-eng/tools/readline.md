@@ -151,5 +151,21 @@ alternatively you can press esc, then immediately k (on keyboards without alt on
     - h - leave only head of path
     - t - remove head of path
 - [details](https://tiswww.case.edu/php/chet/readline/history.html) 
-    
 
+## editline - alternative readline api implementation
+
+- it's a port of NetBSD's libedit, project's website: <http://thrysoee.dk/editline/>
+    - windows implementation: <http://mingweditline.sourceforge.net/>
+    - there's a different library with the same name which is based on an old fork of the same codebase: <https://github.com/troglobit/editline>
+        - this fork doesn't support config files, but doesn't have the ncurses dependency
+- configuration file has a different format compared to readline: <https://manpages.debian.org/testing/libedit-dev/editrc.5.en.html>
+- documentation: <https://manpages.debian.org/testing/libedit2/editline.7edit.en.html>
+- requirements
+    - standard keybinds, configurable in a file - yes
+    - possibility of integrating fzf - ?
+        - registering custom commands - yes, EL_ADDFN, missing in mingweditline
+
+## linenoise, now repl++
+
+- minimalistic readline-like-functionality implementation, no readline api compatibility
+- <https://github.com/AmokHuginnsson/replxx>

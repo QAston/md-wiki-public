@@ -301,6 +301,9 @@ pacman -S git-extras # supporting modules
 IgnorePkg   =git
 ```
 3. Configure git by following setup in [git](../tools/GIT.md)
+4. install git command extensions:
+  - clone https://github.com/newren/git-filter-repo
+  - copy binaries (.py and executable linkg) to c:\portable\msys2\cmd
 
 #### install win-sudo (bash-only)
 
