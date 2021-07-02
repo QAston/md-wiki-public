@@ -207,3 +207,4 @@ perf script
 - [utility for enum reflection](https://github.com/krabicezpapundeklu/smart_enum)
 - [utility for enum reflection](https://github.com/aantron/better-enums)
 - [utility for multimethods](https://github.com/jll63/yomm2)
+- [sane encoding conversion, validation and implementation](https://ztdtext.readthedocs.io/en/latest/)
