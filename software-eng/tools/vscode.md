@@ -2,6 +2,7 @@
 
 - [educators documentation](https://code.visualstudio.com/learn/educators/python)
 - [learn jupyter notebooks](https://code.visualstudio.com/learn/educators/notebooks)
+- [microsoft vs code oss](https://github.com/microsoft/vscode/wiki/Differences-between-the-repository-and-Visual-Studio-Code)
 
 ## workspaces and sessions
 
@@ -230,11 +231,10 @@
     - ctrl+shift+q - quick open view (switch between panes)
     - ctrl+k ctrl+k - ctrl+k
 
-## setup/configuration
+## setup/configuration - windows
 
 - add code to ALL path variable
 - terminal
-    - use cycle-settings extension to do terminal switching
     - unbind all global keybindings which interfere with terminal
     - bind all navigation keybindings to key shortcuts terminal doesn't care about (ctrl-shift, ctrl-num) or bind them only when not in terminalFocus
     - use cycle-settings to add a mode which enables terminal getting all the input
@@ -276,6 +276,13 @@ endif
 ```
 - todo: some templates for workspace configuration
 - todo: fuzzyfind? https://github.com/rlivings39/vscode-fzf-quick-open
+
+### setup linux
+
+```
+pacman -S code
+pacaur -S  code-marketplace
+```
 
 ## interesting settings extensions
 
