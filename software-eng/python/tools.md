@@ -2,6 +2,12 @@
 
 General guide: <https://packaging.python.org/tutorials/installing-packages/> and <https://packaging.python.org/overview/>
 
+## setup for arch
+
+```
+sudo pacman -S python-pip
+```
+
 ## Python3 venv
 
 See <https://docs.python.org/3/library/venv.html> for details
@@ -18,7 +24,7 @@ See <https://docs.python.org/3/library/venv.html> for details
 
 - <https://docs.python.org/3/library/site.html>
 
-## readline
+## readline(windows)
 
 - python can hook a readline library for reading input using PyOS_ReadlineFunctionPointer
    - by default done in Modules/readline.c which is only built on posix systems

@@ -500,6 +500,9 @@ follow [npm](../tools/npm.md)
     - sendto xargs winshell
     - sendto sed winshell
 4. download [jq](https://github.com/stedolan/jq) and add it to portable/bin/windows
+5. download [tldr-sharp](https://github.com/principis/tldr-sharp)
+    - sendto tldr-sharp windows, rename to tldr
+6. download [sd](https://github.com/chmln/sd/releases/tag/v0.7.5)
 
 ### TODO: set up cross-shell aliases 
 
@@ -534,7 +537,23 @@ jdk16 = [
 - download <https://ghidra-sre.org/> to portable
 - edit runGhidra.bat to add env_jdk11 call so java is found (must be jdk11, otherwise it'll complain)
 
+### set up pbcopy/pbpaste
+
+- shimto all
+```
+# pbcopy
+path = "C:\\portable\\nvim\\Neovim\\bin\\win32yank.exe"
+args = "-i"
+```
+```
+# pbpaste
+path = "C:\\portable\\nvim\\Neovim\\bin\\win32yank.exe"
+args = "-o"
+```
+
 ## future todos
 
 - c++ ide?
 - python setup with readline? 
+- https://github.com/ibraheemdev/modern-unix
+- https://direnv.net/
