@@ -279,6 +279,8 @@ endif
 
 ## interesting settings extensions
 
+- settings sync allows syncing config files
+    - each part of the config can be commented out and disabled on a machine: <https://github.com/shanalikhan/code-settings-sync/wiki/Sync-Pragmas>
 - settings cycler can be used to toggle a setting with a keybinding
   - useful to trigger terminal friendly mode for example
   - sadly, doesn't have a builtin way to display setting in the status bar, but this can be emulated by changing settings of some extension or ui

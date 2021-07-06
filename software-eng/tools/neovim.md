@@ -134,8 +134,10 @@ dos2unix ~/.config/nvim/init.vim
         - "= - expression register - pasting from it will prompt you to enter vimscript expression
         - "_ - black hole register - use to throw away
         - "+ and "* - system clipboard registers
-            - equivalent on windows, on linux * is selection buffer (last selection) and + is the cut buffer
-            - can be made the default register <https://vim.fandom.com/wiki/Accessing_the_system_clipboard>
+            - equivalent on windows, on linux * is selection buffer (last selection, aka PRIMARY) and + is the real clipboard buffer
+            - use `set clipboard+=unnamedplus` to make + the default register for all ops which have optional register arg
+            - neovim uses "clipboard privders" for these, by default `xclip` on linux when `$DISPLAY` is set, which only works if windows x server is running
+
         
 #### config files
 
