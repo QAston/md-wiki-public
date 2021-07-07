@@ -157,6 +157,7 @@ dos2unix ~/.config/nvim/init.vim
 #### keybinds
 
 - normal
+    - leader key - configured to be space  
     - window/tab management
         - `Ctrl+w T` - move current window into a tab
         - `gt` - next tab
@@ -337,7 +338,7 @@ dos2unix ~/.config/nvim/init.vim
 - [cygwin](https://github.com/neovim/neovim/wiki/Building-Neovim#cygwin)
     - https://github.com/cascent/neovim-cygwin/issues/5 - list platform as unix, not win32unix
 
-### linux setup
+### ccls lsp - obsolete
 
 install pacman -S neovim
  

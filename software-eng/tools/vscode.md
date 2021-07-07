@@ -39,6 +39,11 @@
             - allows for having multiple separate settings/sessions for the same set of files depending on which `.code-workspace` is used 
         - potentially useful for working on multiple projects at once, like in eclipse workspaces
         - tasks,files,searches,etc. that are present in multiple root directories will be disambigulated in the ui by showing the name of the root at the end of the item's name
+        - a good way to work with projects which have nested projects
+            - open master directory
+            - add subdirectories with subprojects as additional root directories
+            - save the workspace for later use
+            - vscode will always open the files in the most nested subproject context even when opened from explorer window, so there's no duplicates of the same file
 - command line
     - `code .` - open directory workspace 
     - `code filename` - open file in an active session, or create new no-workspace session
@@ -48,6 +53,8 @@
     - `code -w` - wait until exit
     - `code --goto filepath:10:5` - go to line and character
     - `code --add dir1 dir2` add a folder or multiple folders to the last active VS Code instance for a multi-root workspace
+
+
 
 ## keybinds
 
