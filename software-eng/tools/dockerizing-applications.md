@@ -1,24 +1,6 @@
 Dockerizing Applications
 ================
 
-## Introduction
-
-This document details the process of converting an application to use docker.  This may be necessary when converting applications to use Nautillus deployment (the full process for which is detailed on the [Nautillus](/infrastructure/nautilus) page).
-
-This page also details various configuration details around docker.  If you have any issues getting a newly dockerized application to function it is recommended you search this page, even if the problem may not appear to be docker related.
-
-This guide is based on:
-* [OSI platform requirements](https://sre.pages.tech.lastmile.com/platform/)  
-* [Gitlab CI requirements](https://gitlab.tech.lastmile.com/classic-control-systems/ci-core)
-* [Standard java dockerization practices](https://blogs.oracle.com/java-platform-group/java-se-support-for-docker-cpu-and-memory-limits)
-* [Docker best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/) and [docker-compose documentation](https://docs.docker.com/compose/)
-* Other de-facto standards and practices
-
-Other documents that may be useful:
-* [Nautilus](/infrastructure/nautilus)
-* [SRE Service Inventory](https://sre.pages.tech.lastmile.com/platform/service-inventory.html)
-    * In reference to this document, see also [Database Services's instructions on setting up Secret Encryption](https://sites.google.com/a/ocado.com/dba-team/oracle/connecting-kubernetes-applications-to-oracle?pli=1).
-
 ## Instructions
 
 ## Configuring applications

@@ -37,5 +37,8 @@ windows:
     * <https://docs.docker.com/docker-for-windows/wsl/>
     * preferred method
 
-arguments agains docker - not neccessarily good
-<http://www.boycottdocker.org/>
+### setup (windows and linux)
+
+- install <https://docs.docker.com/docker-for-windows/wsl/>
+- start "C:\Program Files\Docker\Docker\Docker Desktop.exe" in wsl2 start scipt and kill it in shutdown script
+- once started docker executables will be visible both in windows and wsl2

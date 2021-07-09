@@ -24,3 +24,31 @@ Npx:
 - Runs binaries found in local installs, global installs, or downloads and runs from caches if none are found
 - `npx [options] <command>[@version] [command-arg]...`
 - see <https://www.npmjs.com/package/npx>
+
+### scripts
+
+- describe shell commands to execute when `npm run <key>` is used
+- some of the `<key>`s are reserved to be executed by npm with other commands like `npm install`
+    - npm install
+        - preinstall
+        - install
+        - postinstall
+        - prepublish
+        - preprepare
+        - prepare
+        - postprepare
+    - npm start
+        - prestart
+        - start
+        - poststart
+    - npm stop
+        - prestop
+        - stop
+        - poststop
+    - npm test
+    - npm restart
+- default scripts:
+```
+{"start": "node server.js"} // if there's a server.js
+{"install": "node-gyp rebuild"} // if there's a binding.gyp
+```

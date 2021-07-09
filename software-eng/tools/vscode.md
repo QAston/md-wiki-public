@@ -54,8 +54,6 @@
     - `code --goto filepath:10:5` - go to line and character
     - `code --add dir1 dir2` add a folder or multiple folders to the last active VS Code instance for a multi-root workspace
 
-
-
 ## keybinds
 
 - file explorer
@@ -286,9 +284,13 @@ endif
 
 ### setup linux
 
+- official binary
+pacaur -S pacaur -S visual-studio-code-bin
+add export DONT_PROMPT_WSL_INSTALL=1 to .bashrc
+- alternatively OSS - slightly broken (some features don't work)
 ```
 pacman -S code
-pacaur -S  code-marketplace
+pacaur -S code-marketplace code-features
 ```
 
 ## interesting settings extensions
@@ -305,6 +307,10 @@ pacaur -S  code-marketplace
 - multi-command - bind multiple commands to a single command name
 - commands - allows binding any command to status bar and to display custom text (sadly doesn't evaluate variables)
 - differently colored windows for easy distinguishing: https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock
+- remote container development plugin automatically starts a container defined in .devcontainer directory/file - use remote container open directory command
+    - vscode installs a remote module in the container, similar to wsl, and executes plugins there
+- there's an option to just attach to an existing container and also configure steps vscode would do automatically for that container
+    - <https://code.visualstudio.com/docs/remote/attach-container>
 
 ### vim integration
 
