@@ -23,7 +23,7 @@
     * configure mirrors: <https://wiki.archlinux.org/title/mirrors>
         * uncomment uk mirrors /etc/pacman.d/mirrorlist
         * run `sudo pacman -Syyu`
-5. Set up basic packages (ignore fakeroot for now)
+5. Set up basic packages, follow [neovim](../tools/neovim.md) to configure neovim
 ```
 sudo pacman -S base-devel git subversion openssh wget neovim
 ```
@@ -48,6 +48,10 @@ fi
 
 - follow [setup ABS and AUR](../linux/arch_custom_packages.md)
 
+### set up windows-linux integration
+
+- follow [wsl](./wsl.md)/setup windows-linux integration
+
 ### set up systemd
 
 1. Install https://github.com/sorah/subsystemctl
@@ -55,7 +59,7 @@ fi
 2. Build and install [subsystemctl-bash-wrapper](https://github.com/QAston/wslconfig/tree/master/bin/subsystemctl-redir)
     * add bash to ignored pacman packages in /etc/pacman.conf
     * The wrapper will put bash in the systemd context if subsystemctl start has been run, otherwise you run outside
-3. Set up startup scripts
+3. Add init to wsl-init.bat script
 ```
 wsl.exe -d Arch -u root -e subsystemctl start && startup done
 wt -p Arch -d \\wsl$\Arch\home\dariusza\
@@ -78,5 +82,4 @@ EOF
 
 ### set up other linux software
 
-- follow [set up other software](./wsl.md)/setup other linux software
-
+- follow [wsl](./wsl.md)/setup other linux software

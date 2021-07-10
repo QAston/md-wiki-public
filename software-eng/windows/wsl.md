@@ -35,13 +35,14 @@
 ### Setup X on linux side
 
 1. Login as a regular user
-2. Modify .bashrc to configure x variables
+2. Modify `.bashrc` to configure x variables
      * `export __GLX_VENDOR_LIBRARY_NAME=mesa`
      * `export LIBGL_ALWAYS_INDIRECT=0`
      * `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0`
 3. relogin
 4. sudo pacman -S xterm mesa-demos noto-fonts ttf-cascadia-code xorg-xrdb xclip
-5. Xterm should launch properly
+5. pacaur -S nerd-fonts-complete
+6. Xterm should launch properly
 - configure ~/.Xresources
 ```
 xterm*faceName: Cascadia Mono
@@ -50,7 +51,7 @@ xterm*background: black
 xterm*foreground: lightgray
 ```
 - load the config `xrdb -merge ~/.Xresources`
-6. Glxgears should launch properly
+7. Glxgears should launch properly
 
 ### Set up pulse audio (windows side)
 
@@ -99,6 +100,28 @@ pacat < /dev/urandom
 * xdg-settings set default-web-browser wslview.desktop
     * copy .local/shared/applications from <https://github.com/QAston/wslconfig/home/.local>
     * see <https://wiki.archlinux.org/index.php/Desktop_entries>
+
+### set up startup script
+
+Make a wsl-init.bat file:
+```
+wsl -- echo startup done
+call start_pulseaudio.bat
+start "C:\Program Files\VcXsrv\vcxsrv.exe" multiwin.xlaunch
+@rem start docker daemon, immediately exit the command line
+start "C:\Program Files\Docker\Docker\Docker Desktop.exe" exit
+```
+
+### set up shutdown script
+
+Make a wsl-shutdown.bat file:
+```
+@rem wsl-shutdown
+wsl --shutdown
+taskkill  /IM vcxsrv.exe /T /F
+taskkill  /IM pulseaudio.exe /T /F
+taskkill  /IM "Docker Desktop.exe"  /T /F
+```
 
 ## setup other linux software
 
