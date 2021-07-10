@@ -284,6 +284,7 @@ endif
 
 ### setup linux
 
+- running `"C:\Users\qasto\AppData\Local\Programs\Microsoft VS Code\bin\code"` from linux runs windows vscode, first time run installs a connector to windows
 - official binary
 pacaur -S pacaur -S visual-studio-code-bin
 add export DONT_PROMPT_WSL_INSTALL=1 to .bashrc

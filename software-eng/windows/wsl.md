@@ -1,8 +1,275 @@
-WSL 2 is a windows preview feature. It replaces the old WSL system (which was based on linux kernel emulation) with a lightweight VM running a real linux kernel (microsoft has made an open source fork of the linux kernel for this purpose).
+## setup windows - wsl integration
+
+### Setup X on the windows side
+
+1. No longer needed/possible?: Mount the linux root as a drive (go to `\\wsl$\` in explorer, right click on a linux dir and select mount as network drive)
+2. Install an x server
+     * Cygwin x
+         * Install cygwin
+         * Install xlaunch package
+         * "C:\portable\cygwin\bin\xwin.exe" -ac -multiwindow -nowgl -listen tcp
+     * Vcxsrv - seems to have window cleanup problems in multiwindow mode
+         * Install <https://sourceforge.net/projects/vcxsrv/>
+         * create a file called `multiwin.xlaunch` 
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<XLaunch WindowMode="MultiWindow" ClientMode="NoClient" LocalClient="False" Display="-1" LocalProgram="xcalc" RemoteProgram="xterm" RemotePassword="" PrivateKey="" RemoteHost="" RemoteUser="" XDMCPHost="" XDMCPBroadcast="False" XDMCPIndirect="False" Clipboard="True" ClipboardPrimary="False" ExtraParams="-multiwindow -ac -nowgl -reset -background none -xkblayout gb -xkbmodel kinesis" Wgl="False" DisableAC="True" XDMCPTerminate="False"/>
+```
+         * You can run in a single window mode to prevent the window cleanup glitch, or just restart the server
+4. Run the shortcut anytime you want gui access
+5. Window managers - you can use linux window manager instead of multiwindow x server
+     * "xserver" -ac -nowgl -screen 0 
+     * pacman -S kwin openbox
+     * `openbox`/`kwin_x11`
+     * add `-rootless` to run in rootless mode - don't display root window for winmgr - x windows can overlap with regular windows
+6. Troubleshooting - visual glitches
+     * Some apps have broken rendering code and restarting won’t help - try a different ui style/widget set instead, maybe an app update
+     * Vcxsrv needs restarting when a part of the screen is glitched out (or switch to cygwin x win instead)
+7. Documentation:
+    * <https://x.cygwin.com/docs/man1/XWin.1.html> - flags
+    * <https://x.cygwin.com/docs/man5/XWinrc.5.html> - config file
+8. Set up [env variable forwarding](https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows/):
+    * set windows env var `WSLENV` to `PATH_VAR_ALL/l:PATH_APPEND_BASH_COMMON/l`
+
+
+### Setup X on linux side
+
+1. Login as a regular user
+2. Modify .bashrc to configure x variables
+     * `export __GLX_VENDOR_LIBRARY_NAME=mesa`
+     * `export LIBGL_ALWAYS_INDIRECT=0`
+     * `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0`
+3. relogin
+4. sudo pacman -S xterm mesa-demos noto-fonts ttf-cascadia-code xorg-xrdb xclip
+5. Xterm should launch properly
+- configure ~/.Xresources
+```
+xterm*faceName: Cascadia Mono
+xterm*faceSize: 12
+xterm*background: black
+xterm*foreground: lightgray
+```
+- load the config `xrdb -merge ~/.Xresources`
+6. Glxgears should launch properly
+
+### Set up pulse audio (windows side)
+
+1. get cygwin, install pulseaudio package
+2. edit configuration
+```
+# in /etc/pulse/default.pa find load-module module-native-protocol-tcp and replace with:
+load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;172.16.0.0/12
+```
+```
+# in /etc/pulse/daemon.conf set
+daemonize = yes
+use-pid-file = no
+exit-idle-time = -1 
+```
+3. add a script to start pulseaudio daemon:
+```
+@echo off
+setlocal enableextensions
+set TERM=
+cd /d "C:\portable\cygwin\bin" && .\bash --login -c "HOME=/home/qasto pulseaudio"
+```
+4. make sure the firewall access is enabled
+
+### Set up pulse audio (linux side)
+
+1. install pulseaudio client
+```
+sudo pacman -S pulseaudio pulseaudio-alsa
+```
+2. set up pulseaudio connection to windows - add to bashrc
+```
+export PULSE_SERVER=tcp:$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}')
+```
+3. test
+```
+# test, should output noise on the speakers
+pacat < /dev/urandom 
+```
+
+### setup wslu and windows browser
+
+* `pacaur -S wslu`: <https://github.com/wslutilities/wslu>
+* Add /etc/os-release with <https://github.com/QAston/wslconfig/blob/master/etc/os-release> otherwise it won’t work
+* Usage: wslview http://google.com
+* xdg-settings set default-web-browser wslview.desktop
+    * copy .local/shared/applications from <https://github.com/QAston/wslconfig/home/.local>
+    * see <https://wiki.archlinux.org/index.php/Desktop_entries>
+
+## setup other linux software
+
+### setup bash
+
+* Follow [bash](../unix/bash.md)
+
+### set up git
+
+* Follow [git](../tools/GIT.md)
+* `git config --global diff.tool kdiff3`
+* `git config --global core.autocrlf false`
+
+### Setup gtk applications
+ * `pacman -S lxappearance`
+ * Open lxappearance and set theme to dark
+ * edit.config/gtk-3.0/settings.ini to set gtk-cursor-theme-size=1
+ * .bashrc:
+    * `export GDK_SCALE="1"`
+    * `export GDK_DPI_SCALE=1 # 2 for cygwin xwin`
+
+### Setup kde applications
+ * sudo pacman -S qt5ct qt5-xmlpatterns qt5-svg breeze breeze-icons qt5-svg gnome-themes-standard
+ * Set `export QT_QPA_PLATFORMTHEME="qt5ct"` in .bashrc
+ * Choose fushion style and breeze icons in qt5ct and apply
+ * Breeze style has some widgets broken (scrolling ones)
+
+### setup nix (see tools/nix)
+ * `curl https://nixos.org/nix/install | sh`
+ * `mkdir -p ~/.config/nix`
+ * `echo "require-sigs = false" >> ~/.config/nix/nix.conf` config <https://www.mankier.com/5/nix.conf>
+
+### setup vscode
+
+* follow [vscode](../tools/vscode.md)
+
+### setup docker
+
+- download and run setup from https://hub.docker.com/editions/community/docker-ce-desktop-windows/
+- select the wsl2 option
+- follow <https://docs.docker.com/docker-for-windows/wsl/>
+
+### set up command line utilities
+
+#### set up ripgrep, fd, jq, sd
+
+```
+sudo pacman -S ripgrep fd jq dos2unix zip tldr sd
+```
+
+#### set up btree
+
+- follow [btree](../tools/btree.md)
+
+#### set up fzf
+
+- follow [fzf](../tools/fzf.md)/setup_wsl2
+
+#### set up nvim
+
+- follow [neovim](../tools/neovim.md)/setup_wsl2
+
+### set up debugging and tracing
+
+#### set up strace
+
+```
+pacman -S strace
+# strace <command> to trace syscalls of a command
+```
+
+#### set up ltrace
+
+```
+pacman -S ltrace
+# ltrace <command> to trace .so calls of a command
+```
+
+#### set up ftrace
+```
+pacman -S trace-cmd
+# relies on /sys/kernel to be r/w, so needs SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 in env when in nspawn
+# trace-cmd list
+# trace-cmd start -e <events from list> # kernel wide tracing of events
+```
+
+#### set up valgrind
+
+```
+sudo pacman -S valgrind
+# valgrind <command> runs application and prints memcheck summary
+# valgrind --vgdb --vgdb-error 0 <command> - runs command, pauses on first error and allows connecting with dbg to inspect/debug
+```
+
+#### set up bpftrace
+```
+sudo pacman -S bpftrace
+# see https://github.com/iovisor/bpftrace for example usageg
+```
+
+### set up linux host system and tools which work only in the host system
+
+* follow [linux wsl host](../linux/native_wsl_host.md)
+
+#### set up perf
+
+```
+pacman -S perf
+# perf stat <command> to trace .so calls of a command
+# hardware counters aren't available with wsl2/hyperv enabled :(
+```
+
+#### set up rr
+
+```
+pacaur -S rr
+# rr record <command>
+# rr replay <recording> - opens gdb with additonal commands: reverse-stepi, reverse-continue, etc
+```
+
+### Setup faster builds - todo
+
+ * ccache: <https://wiki.archlinux.org/index.php/Ccache>
+ * Warp: <https://engineering.fb.com/open-source/under-the-hood-warp-a-fast-c-and-c-preprocessor/>
+ * Zapcc: <https://github.com/yrnkrn/zapcc>
+
+### Set up custom kernel - todo
+
+ * installing <https://docs.microsoft.com/en-us/windows/wsl/release-notes#build-18945>
+ * Building: <https://github.com/kdrag0n/proton_wsl2/blob/v4.19-proton/README.md#installation>
+
+### Set up debugging and tracing software - todo
+
+ * <https://github.com/crash-utility/crash>
+ * <https://wiki.archlinux.org/index.php/Benchmarking>
+
+### Other stuff - todo
+
+- https://github.com/ibraheemdev/modern-unix
+- https://direnv.net/
+- https://github.com/andreafrancia/trash-cli
+- pbcopy/pbpaste
+- xdg handlers for file types
+* https://github.com/cascadium/wsl-windows-toolbar-launcher
+* https://aur.archlinux.org/packages/broot/ https://dystroy.org/broot/ or XTree
+* mc ()
+    * ctrl-o - switches to shell
+    * tab switches left/right
+* tmux
+* <https://wiki.archlinux.org/index.php/XDG_user_directories#Creating_default_directories>
+* <https://aur.archlinux.org/packages/clion/>
+* <https://wiki.archlinux.org/index.php/Uniform_look_for_Qt_and_GTK_applications>
+* <https://www.freedesktop.org/wiki/Software/xdg-utils/>
+
+## usage
+
+### vhdx 
+
+* wsl vhdx files have dynamic size by default, capped at 256gb - dynamic type isn't good for linux access
+    * converting to fixed will result in 256gb fixed file, that can't be made smaller
+    * the only way to make fixed drive smaller is to make a new static drive and then copy contents to the smaller drive using `cp -a` from a vm with access to both drives
+    * make sure to remove the drive from all vms and give everyone read/write access, otherwise you'll get access is denied error on wsl startup
+* wsl vhdx files use a partitionless drive, to create one:
+    * use new vhdx disk creator, select fixed or dynamic
+    * add the vhdx to a vm and initialize it using `mkfs.ext4 /dev/sd<letter>`
 
 ### wsl2 issues
- * lack of systemd support - WSL2 uses it’s own init daemon, so systemd commands won’t work. In most cases this can be worked-around by using init.d scripts, for example instead of: `sudo systemctl start ssh` you need to use `/etc/init.d/ssh start`. Some daemons (for example udev) can’t be started this way and there seems to be no workaround for that
-     * if you want coredumps use this: [https://sigquit.wordpress.com/2009/03/13/the-core-pattern/](https://sigquit.wordpress.com/2009/03/13/the-core-pattern/) instead of coredumpctl which is a part of systemd
+
+ * lack of official systemd support - WSL2 uses it’s own init daemon, so systemd commands won’t work. In most cases this can be worked-around by using init.d scripts, for example instead of: `sudo systemctl start ssh` you need to use `/etc/init.d/ssh start`. Some daemons (for example udev) can’t be started this way and there seems to be no workaround for that, but then some of the daemons aren't needed (for example udev)
+     * wsl2_artix uses kernel config to change fix this
+     * wsl2_arch enables custom systemd support
  * issues releasing memory back to windows - sometimes wsl2 doesn’t free the requested memory properly, there’s a workaround available here ([https://github.com/microsoft/WSL/issues/4166](https://github.com/microsoft/WSL/issues/4166) )
  * there _might_ be issues with opengl rendering or missing opengl features, although I didn’t have any problems so far, in that case the workaround is to use opengl clients built natively on windows
  * cpu performance is slightly worse than native (similar to a vm)
@@ -17,9 +284,11 @@ WSL 2 is a windows preview feature. It replaces the old WSL system (which was ba
         * [rust api](https://github.com/rafawo/hcs-rs/blob/c8d70a431eed24ccc53b4119975cc11fc8972d6a/src/schema/virtual_machines/resources/compute/mod.rs)
         * hcsdiag.exe can list the hcs resources
     * what needs to be done for amd performance counters to work? looks like not supported 
-* apparently amd uprof [doesn't work when wsl2 is enabled](https://community.amd.com/t5/server-gurus-discussions/amd-uprof-not-showing-performance-counters/td-p/438368), this includes in and out of wsl2
+* apparently amd uprof [doesn't work when hyperv is enabled](https://community.amd.com/t5/server-gurus-discussions/amd-uprof-not-showing-performance-counters/td-p/438368), this includes in and out of wsl2
 
-### Usage tips
+### tips
+
+ * making wsl2 coexist with a dns server:  <https://old.reddit.com/r/programming/comments/jidoyn/simple_way_to_docker_on_windows_10_home_with_wsl_2/ga65arg/>
  * you can access windows files from wsl using /mnt/c/ path, this includes starting windows applications from linux command line, this includes running linux executables on windows files
  * you can access linux files from windows using \\\\wsl$\\<distro-name>\\ path
      * many applications will not like \\\\wsl$\\ path, so as a workaround you can mount the path to a drive (go to \\\\wsl$\\ in explorer, right click on a linux dir and select mount as network drive)
@@ -39,25 +308,3 @@ WSL 2 is a windows preview feature. It replaces the old WSL system (which was ba
  * `/etc/wsl.conf` configuration: <https://github.com/QAston/wslconfig/blob/master/etc/wsl.conf>
     * configures network integration, PATH variable append
     * <https://docs.microsoft.com/en-us/windows/wsl/wsl-config#interop>
-
-### Troubleshooting
-#### Can’t launch gui applications
- * Make sure you have configured vcxsrv and linux as described above
- * Make sure you have enabled vcxsrv to work in all networks, otherwise linux will not be able to connect to it
-     * If GUIs stop working after you’ve started vpn, this is the cause of the problem
-     * The correct windows defented configuration looks like the one below (notice All, not public) for VcXsrv!
- * If it still doesn’t work you can try some combination of the following:
-     * export DISPLAY=:0
-     * set the display number to 0 in vcxsrv settings,
-     * you can try a different X server for windows
-#### OpenGL applications don’t work, gears don’t turn
- * Make sure you have configured vcxsrv and linux as described above
- * GLFW library has a bug, where glfw\_init() crashes when run in wsl, make sure you use version 3.3 or above where this bug is fixed
- * If it still doesn’t work you can try some combination of the following:
-     * Change the vcxsrv to use a single window instead of multi-window mode, opengl support might be better
-     * Enable Native OpenGL option in vcxsrv settings, then set LIBGL\_ALWAYS\_INDIRECT=1 env variable in linux
-     * unset the `__GLX_VENDOR_LIBRARY_NAME`
-     * you can try a different X server for windows
- * Alternatively, if you want to connect to aether, you could build a windows native client instead and connect remotely
- #### wsl2 conflicting with dns server
- * <https://old.reddit.com/r/programming/comments/jidoyn/simple_way_to_docker_on_windows_10_home_with_wsl_2/ga65arg/>

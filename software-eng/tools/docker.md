@@ -42,3 +42,6 @@ windows:
 - install <https://docs.docker.com/docker-for-windows/wsl/>
 - start "C:\Program Files\Docker\Docker\Docker Desktop.exe" in wsl2 start scipt and kill it in shutdown script
 - once started docker executables will be visible both in windows and wsl2
+- docker-desktop add links to executables in wsl2 distros (enabled/disabled for each distro in settings -> wsl integration):
+  - /usr/bin/{docker,docker-compose} ->  /mnt/wsl/docker-desktop
+  - /usr/local/bin/kubectl -> /mnt/wsl/docker-desktop/cli-tools/usr/local/bin/kubectl
