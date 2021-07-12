@@ -37,11 +37,31 @@ windows:
     * <https://docs.docker.com/docker-for-windows/wsl/>
     * preferred method
 
-### setup (windows and linux)
+### setup (windows and wsl2 docker desktop integration)
 
 - install <https://docs.docker.com/docker-for-windows/wsl/>
-- start "C:\Program Files\Docker\Docker\Docker Desktop.exe" in wsl2 start scipt and kill it in shutdown script
+- run the following to start docker wsl integration (add to wsl-init script to run on startup)
+```
+@rem start docker cli, starting once again starts docker daemon, then you can exit
+start "C:\Program Files\Docker\Docker\Docker Desktop.exe" "C:\Program Files\Docker\Docker\Docker Desktop.exe" && exit
+```
 - once started docker executables will be visible both in windows and wsl2
 - docker-desktop add links to executables in wsl2 distros (enabled/disabled for each distro in settings -> wsl integration):
+  - /usr/bin -> usr/sbin
   - /usr/bin/{docker,docker-compose} ->  /mnt/wsl/docker-desktop
   - /usr/local/bin/kubectl -> /mnt/wsl/docker-desktop/cli-tools/usr/local/bin/kubectl
+  - these links aren't added if a file already exists in the distro with the same name, so it's safe to enable the integration
+- source completion - add to `~/.bashrc`
+```
+if [ -f /usr/share/bash-completion/completions/docker ]; then
+    source /usr/share/bash-completion/completions/docker
+fi
+```
+
+#### setup wsl2 without docker desktop
+
+- [docker can be installed just fine without systemd](<https://dev.to/bowmanjd/install-docker-on-windows-wsl-without-docker-desktop-34m9>)
+
+### alternatives
+
+- podman is a drop-in daemon-less replacement for docker

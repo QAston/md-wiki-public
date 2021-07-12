@@ -95,11 +95,13 @@ pacat < /dev/urandom
 ### setup wslu and windows browser
 
 * `pacaur -S wslu`: <https://github.com/wslutilities/wslu>
-* Add /etc/os-release with <https://github.com/QAston/wslconfig/blob/master/etc/os-release> otherwise it won’t work
+* Add /etc/os-release with <https://github.com/QAston/wslconfig/blob/master/etc/os-release> if not present
 * Usage: wslview http://google.com
-* xdg-settings set default-web-browser wslview.desktop
-    * copy .local/shared/applications from <https://github.com/QAston/wslconfig/home/.local>
+* set wslview as the default browser:
+    * copy .local/share/applications from <https://github.com/QAston/wslconfig/home/.local>
+    * run `xdg-settings set default-web-browser wslview.desktop`
     * see <https://wiki.archlinux.org/index.php/Desktop_entries>
+* test using `xdg-open http://google.com`
 
 ### set up startup script
 
@@ -108,8 +110,6 @@ Make a wsl-init.bat file:
 wsl -- echo startup done
 call start_pulseaudio.bat
 start "C:\Program Files\VcXsrv\vcxsrv.exe" multiwin.xlaunch
-@rem start docker daemon, immediately exit the command line
-start "C:\Program Files\Docker\Docker\Docker Desktop.exe" exit
 ```
 
 ### set up shutdown script
@@ -132,19 +132,20 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
 ### set up git
 
 * Follow [git](../tools/GIT.md)
+* sudo pacman -S kdiff3
 * `git config --global diff.tool kdiff3`
-* `git config --global core.autocrlf false`
 
 ### Setup gtk applications
- * `pacman -S lxappearance`
+ * `pacman -S lxappearance gnome-themes-standard`
  * Open lxappearance and set theme to dark
+    * even if it looks dark by default you should change to white and back, otherwise apps won't recognize it
  * edit.config/gtk-3.0/settings.ini to set gtk-cursor-theme-size=1
  * .bashrc:
     * `export GDK_SCALE="1"`
     * `export GDK_DPI_SCALE=1 # 2 for cygwin xwin`
 
 ### Setup kde applications
- * sudo pacman -S qt5ct qt5-xmlpatterns qt5-svg breeze breeze-icons qt5-svg gnome-themes-standard
+ * sudo pacman -S qt5ct qt5-xmlpatterns qt5-svg breeze breeze-icons qt5-svg 
  * Set `export QT_QPA_PLATFORMTHEME="qt5ct"` in .bashrc
  * Choose fushion style and breeze icons in qt5ct and apply
  * Breeze style has some widgets broken (scrolling ones)
@@ -160,9 +161,7 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
 
 ### setup docker
 
-- download and run setup from https://hub.docker.com/editions/community/docker-ce-desktop-windows/
-- select the wsl2 option
-- follow <https://docs.docker.com/docker-for-windows/wsl/>
+* follow [docker](../tools/docker.md)/setup wsl2
 
 ### set up command line utilities
 
@@ -170,11 +169,12 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
 
 ```
 sudo pacman -S ripgrep fd jq dos2unix zip tldr sd
+pacaur -S dust
 ```
 
-#### set up btree
+#### set up broot
 
-- follow [btree](../tools/btree.md)
+- follow [broot](../tools/broot.md)
 
 #### set up fzf
 
@@ -278,6 +278,8 @@ pacaur -S rr
 
 ## usage
 
+Arch and Artix shouldn't be running at the same time because the init systems change kernel settings differently and the kernel settings are shared
+
 ### vhdx 
 
 * wsl vhdx files have dynamic size by default, capped at 256gb - dynamic type isn't good for linux access
@@ -287,6 +289,9 @@ pacaur -S rr
 * wsl vhdx files use a partitionless drive, to create one:
     * use new vhdx disk creator, select fixed or dynamic
     * add the vhdx to a vm and initialize it using `mkfs.ext4 /dev/sd<letter>`
+* expanding fixed partitionless drive (theoretical, haven't done this yet):
+    * expand the vhdx file in hyperv
+    * run [resize2fs](https://man.archlinux.org/man/resize2fs.8.en)
 
 ### wsl2 issues
 
@@ -313,7 +318,7 @@ pacaur -S rr
 
  * making wsl2 coexist with a dns server:  <https://old.reddit.com/r/programming/comments/jidoyn/simple_way_to_docker_on_windows_10_home_with_wsl_2/ga65arg/>
  * you can access windows files from wsl using /mnt/c/ path, this includes starting windows applications from linux command line, this includes running linux executables on windows files
- * you can access linux files from windows using \\\\wsl$\\<distro-name>\\ path
+ * you can access linux files from windows using `\\\\wsl$\\<distro-name>\\` path
      * many applications will not like \\\\wsl$\\ path, so as a workaround you can mount the path to a drive (go to \\\\wsl$\\ in explorer, right click on a linux dir and select mount as network drive)
  * [https://github.com/wslutilities/wslu](https://github.com/wslutilities/wslu) - install using sudo apt-get install ubuntu-wsl
  * [https://docs.microsoft.com/en-us/windows/wsl/about](https://docs.microsoft.com/en-us/windows/wsl/about)
@@ -331,3 +336,4 @@ pacaur -S rr
  * `/etc/wsl.conf` configuration: <https://github.com/QAston/wslconfig/blob/master/etc/wsl.conf>
     * configures network integration, PATH variable append
     * <https://docs.microsoft.com/en-us/windows/wsl/wsl-config#interop>
+* [wsl api in wslapi.dll](https://docs.microsoft.com/en-us/windows/win32/api/wslapi/nf-wslapi-wsllaunch)

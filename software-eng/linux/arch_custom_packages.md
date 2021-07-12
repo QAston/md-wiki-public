@@ -1,3 +1,7 @@
+### set up build tools
+
+* pacman -S base-devel 
+
 ### Setup ABS
 
  * Docs
