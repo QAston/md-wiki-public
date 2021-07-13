@@ -1,3 +1,5 @@
+## nix
+
 ### Basics
 
  * Good intro: <https://nixos.org/nixos/nix-pills/why-you-should-give-it-a-try.html> 
@@ -5,13 +7,12 @@
      * Updating a lib requires rebuild of dependencies
      * But packages can coexist thanks to this
      * And less reliance on $PATHs
- * Nix profile - a composition of nix components into a single unified path
-     * By default ~/.nix-profile itself is a symbolic link to /nix/var/nix/profiles/default
-     * Generation - a version of nix profile
- * Nix expression - a description of how to build a version of a component for the particular system (derivation)
- * Nix derivation - a build action for a component(.drv file)
+ * Nix profile - a composition of nix components into a single `PATH` entry that has all the software with dependencies properly resolved
+     * By default `~/.nix-profile` itself is a symbolic link to `/nix/var/nix/profiles/default`
+     * Generation - nix profile directory at a particular point in time
+ * Nix derivation - a build action for a component(`.drv` file)
  * Nix channel profile - composes nix expressions?
-     * Added to NIX_PATH
+     * Added to `NIX_PATH`
  * Closure - recursive list of dependencies necessary to use the derivation
  * Differences from regular packaging systems:
      * nix-build is deterministic, uses sandboxing
@@ -381,3 +382,9 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
       * `nix-env` is able to merge multiple trees in `~/.nix-defexpr` by looking at all the possible derivations
       * It may also happen to you that you cannot match a derivation name when installing, because of the derivation name vs `[-A]` switch described above. Maybe `nix-env` wanted to be more friendly in this case for default user setups.
       * It may or may not make sense for you, or it's like that for historical reasons, but that's how it works currently, unless somebody comes up with a better idea.
+
+### Setup 
+
+ * `curl https://nixos.org/nix/install | sh`
+ * `mkdir -p ~/.config/nix`
+ * `echo "require-sigs = false" >> ~/.config/nix/nix.conf`

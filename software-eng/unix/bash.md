@@ -19,6 +19,7 @@
 * [writing more reliable scripts](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
 * [bash pitfals](https://mywiki.wooledge.org/BashPitfalls)
 * <https://effective-shell.com/docs/part-5-building-your-toolkit/managing-remote-git-repositories/>
+* [redirections](https://catonmat.net/bash-one-liners-explained-part-three)
 
 ### setup for linux
 
