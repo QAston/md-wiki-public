@@ -2,7 +2,13 @@
 
 ### Basics
 
- * Good intro: <https://nixos.org/nixos/nix-pills/why-you-should-give-it-a-try.html> 
+ * [understanding nix](https://nixos.org/nixos/nix-pills/why-you-should-give-it-a-try.html)
+ * Other docs:
+     * [nix manual](https://nixos.org/manual/nix/unstable/)
+     * [using nixpkgs - functions, conventions, derivations, build-system-support, etc](https://nixos.org/manual/nixpkgs/unstable/)
+     * [nix learn - a list of official guides on common tasks and links to other docs](https://nixos.org/learn.html)
+     * [wiki](https://nixos.wiki/)
+     * [opinionated guidelines and guides - pretty good](https://nix.dev/)
  * Dependencies between nix packages are hardcoded
      * Updating a lib requires rebuild of dependencies
      * But packages can coexist thanks to this
@@ -11,7 +17,8 @@
      * By default `~/.nix-profile` itself is a symbolic link to `/nix/var/nix/profiles/default`
      * Generation - nix profile directory at a particular point in time
  * Nix derivation - a build action for a component(`.drv` file)
- * Nix channel profile - composes nix expressions?
+ * Nix expression - 2 meanings: language expression and language expression returning a derivation
+ * Nix channel
      * Added to `NIX_PATH`
  * Closure - recursive list of dependencies necessary to use the derivation
  * Differences from regular packaging systems:
@@ -21,15 +28,21 @@
          * supposedly CC-wrappers are just for badly defined packages and can be disabled in favour of standard pkgconfig mechanisms
 * configuration: <https://www.mankier.com/5/nix.conf> in `~/.config/nix/nix.conf`
 
-### Useful commands
+### Usage
 
  * `ls -l ~/.nix-profile/` - inspect current profile, find it in store
- * `source ~/.nix-profile/etc/profile.d/nix.sh` - enable default profile
+    * root of a mini-unix system that has installed packages, with bin, etc and other directories
+ * `source ~/.nix-profile/etc/profile.d/nix.sh` - import default profile into bash
  * `nix-env -i` - install in current profile
  * `nix-env --list-generations` -list versions of current profile
  * `nix-env -q` - list installed derivations (packages)
+ * `nix-env -qa` - list available packages from the current channel
  * `nix-env --rollback` - switch to previous version
  * `nix-env -G 3` - switch to specified version
+ * `nix-shell expr` - switch to shell needed to build the derivation specified by expression
+   * `nix-shell -A pkgname <nixpkgs>` - nix-shell for building packages - selects pkgname from map returned by `<nixpkgs>`
+   * `nix-shell --pure` - environment which tries to pull as little as possible
+   * `nix-shell -p package1 package2` - not a derivation development shell - instead a shell with listed packages from nix packages
  * `nix-store -q --references $(which hello)` - query which derivations a derivation (follows links to find which derivation the file is part of) uses 
  * `nix-store -q --referrers $(which hello)` - query which derivations use contents of derivation
  * `nix-store -q --references path.drv` - build time dependencies of derivation
@@ -38,23 +51,23 @@
  * `nix-store -q --tree $(which hello)` - show a tree of derivations in a closure
  * `nix-store -q --tree ~/.nix-profile` - show currently used tree
  * `nix repl` - repl
-    * `<expr>`        Evaluate and print expression
-    * `<x> = <expr>`  Bind expression to variable
-    * `:a <expr>`     Add attributes from resulting set to scope
-    * `:b <expr>`     Build derivation
-    * `:i <expr>`     Build derivation, then install result into current profile
+    * `expr`        Evaluate and print expression
+    * `x = expr`  Bind expression to variable
+    * `:a expr`     Add attributes from resulting set to scope
+    * `:b expr`     Build derivation
+    * `:i expr`     Build derivation, then install result into current profile
     * `:l <path>`     Load Nix expression and add it to scope
-    * `:p <expr>`     Evaluate and print expression recursively
+    * `:p expr`     Evaluate and print expression recursively
     * `:q`            Exit nix-repl
     * `:r`            Reload all files
-    * `:s <expr>`     Build dependencies of derivation, then start nix-shell
-    * `:t <expr>`     Describe result of evaluation
-    * `:u <expr>`     Build derivation, then start nix-shell
+    * `:s expr`     Build dependencies of derivation, then start nix-shell
+    * `:t expr`     Describe result of evaluation
+    * `:u expr`     Build derivation, then start nix-shell
  * `nix show-derivation` - pretty print a .drv file
- * `nix-channel --update` - update packages to use latest
- * https://nixos.org/manual/nix/stable/#ch-upgrading-nix - upgrading nix cmdline
+ * `nix-channel --update` - update the channel
+ * `nix-channel --update; nix-env -u` - update channel and default profile with latest versions of packages
 
-### nix garbage and updates
+#### nix garbage and updates
 
 * nix gc roots are listed in `/nix/var/nix/gcroots/` (anything under that directory)
     * `profiles` symlink links to profiles and profile generations
@@ -68,6 +81,21 @@ nix-env -u --always # update all derivations in profile
 rm /nix/var/nix/gcroots/auto/* # remove all autogenerated roots
 nix-collect-garbage -d # remove old generations of all profiles from roots and run gc
 ```
+
+#### Nix search path
+
+* `NIX_PATH` is used when searching for expression files
+* `nix*` commands accept -I which prepends to nix_path on startup
+* `<name>` will search for files/dirs with this name in `$NIX_PATH` and return the path
+* `<name>` will also search for `name=/mypath` in `$NIX_PATH`, and return `/mypath`
+* In general, prefer using relative paths when possible
+* `Nix-env` doesn’t use `$NIX_PATH` variable, it uses `~/.nix-defexpr` instead
+    * This can cause different behaviour between nix-env and nix-build
+    * Why is nix-env having this different behavior? I don't know specifically by myself either, but the answers could be:
+      * `nix-env` tries to be generic, thus it does not look for nixpkgs in `NIX_PATH`, rather it looks in ~/.nix-defexpr.
+      * `nix-env` is able to merge multiple trees in `~/.nix-defexpr` by looking at all the possible derivations
+      * It may also happen to you that you cannot match a derivation name when installing, because of the derivation name vs `[-A]` switch described above. Maybe `nix-env` wanted to be more friendly in this case for default user setups.
+      * It may or may not make sense for you, or it's like that for historical reasons, but that's how it works currently, unless somebody comes up with a better idea.
 
 ### Language
 
@@ -157,11 +185,11 @@ mul 3 4 # multi arg fn call
 mul (6+7) (8+9) # parens - eval order
 
 # functions - argsets 
-mul = s: s.a*s.b # fn taking a set
+mul = s: s.a*s.b # fn taking an attrset as a single arg
 mul { a = 3; b = 4; }
 > 12
-mul = { a, b }: a*b # equivalent fn, pattern matching over the argument set, 
-mul { a = 3; b = 4; } # can only call mull with the exactly a,b provided, not more, not less
+mul = { a, b }: a*b # equivalent fn, pattern matching (destructuring) over the set taken as first and only argument, this is the only place with commas in the language
+mul { a = 3; b = 4; } # can only call mull with the exactly a,b provided, not more, not less, can't use mul 3 4 syntax to call the function
 > 12
 mul = { a, b ? 2 }: a*b # default arg, allows calling with just a
 mul = { a, b, ... }: a*b # allow other args, skip them in fn implementation
@@ -180,7 +208,7 @@ mul a b
 import a.nix {} # import always takes 1 arg, so the result of this is calling a.nix on an empty set
 ```
 
-### builtin functions 
+#### builtin functions 
 
  * <https://nixos.org/nix/manual/#ssec-builtins>
  * `builtin.trace message: value: # builtin fn for debugging` - prints a msg and returns a value
@@ -296,7 +324,20 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
 }
 ```
 
-### Nix packaging patterns
+### Nixpkgs
+
+* Nixpkgs `default.nix` (what’s returned for import `<nixpkgs>`) is a function that accepts some parameters and returns a set of all packages
+* Parameters:
+    * System, default to current system
+        * Enables cross compiling, example:
+        * `nix-build -A psmisc --argstr system i686-linux`
+    * Config, by default null, will be read from `~/.nixpkgs/config.nix`
+        * `config.packageOverrides` - configures fixed point overriding
+* Structure
+    * The `all-packages.nix` is then the file that composes all the packages. 
+    * `pkgs/` dir with package functions or expressions (if file is a function, it’ll be evaluated with default params)
+
+#### Nix packaging patterns
 
 * `nix*` command will run execute `default.nix` by default
 * `nix*` -A attrname will refer to a attr in attribute set (map) returned by executed nix expression, useful for the single repository pattern (when expr returns an attrset)
@@ -304,7 +345,7 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
     * Nix has a single repository `<nixpkgs>` with all descriptions of all packages
     * Top level expression is in default.nix and it returns an attrset of name->package pairs
 * The inputs pattern
-    * Define packages as functions in order to allow customizability
+    * Define packages as parametrized functions in order to allow customizability
     * Make package expression independent of the repository, so that they can be called individually
     * Example: <https://gist.github.com/lethalman/734b168a0258b8a38ca2/revisions>
 * The `callPackage` pattern
@@ -345,46 +386,31 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
   };
 }
 ```
-* [overlays](https://nixos.wiki/wiki/Overlays)
-* makeScope - something overlay related?
-* [pkgs.buildEnv](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/buildenv/default.nix) 
-  * creates a tree of symlinks which make a "nix environment"
-  * [example usage](https://nixos.org/manual/nixpkgs/stable/#sec-building-environment)
-
-### Nixpkgs
-
-* Nixpkgs default.nix (what’s returned for import `<nixpkgs>`) is a function that accepts some parameters and returns a set of all packages
-* Parameters:
-    * System, default to current system
-        * Enables cross compiling, example:
-        * `nix-build -A psmisc --argstr system i686-linux`
-    * Config, by default null, will be read from `~/.nixpkgs/config.nix`
-        * `config.packageOverrides` - configures fixed point overriding
-* Structure
-    * The `all-packages.nix` is then the file that composes all the packages. 
-    * `pkgs/` dir with package functions or expressions (if file is a function, it’ll be evaluated with default params)
-
-### Nixpkgs stdenv
-
-* Docs: <https://nixos.org/nixpkgs/manual/#chap-stdenv>
-
-### Nix search path
-
-* `NIX_PATH` is used when searching for expression files
-* `nix*` commands accept -I which prepends to nix_path on startup
-* `<name>` will search for files/dirs with this name in `$NIX_PATH` and return the path
-* `<name>` will also search for `name=/mypath` in `$NIX_PATH`, and return `/mypath`
-* In general, prefer using relative paths when possible
-* `Nix-env` doesn’t use `$NIX_PATH` variable, it uses `~/.nix-defexpr` instead
-    * This can cause different behaviour between nix-env and nix-build
-    * Why is nix-env having this different behavior? I don't know specifically by myself either, but the answers could be:
-      * `nix-env` tries to be generic, thus it does not look for nixpkgs in `NIX_PATH`, rather it looks in ~/.nix-defexpr.
-      * `nix-env` is able to merge multiple trees in `~/.nix-defexpr` by looking at all the possible derivations
-      * It may also happen to you that you cannot match a derivation name when installing, because of the derivation name vs `[-A]` switch described above. Maybe `nix-env` wanted to be more friendly in this case for default user setups.
-      * It may or may not make sense for you, or it's like that for historical reasons, but that's how it works currently, unless somebody comes up with a better idea.
+* [Overlays](https://nixos.org/manual/nixpkgs/unstable/#chap-overlays)
+    * [wiki](https://nixos.wiki/wiki/Overlays)
+* packaging functions
+  * [pkgs.buildEnv](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/buildenv/default.nix) 
+    * creates a tree of symlinks which make a "nix environment"
+    * [example usage](https://nixos.org/manual/nixpkgs/stable/#sec-building-environment)
+  * stdenv
+    * c++ build environment context (gnu, compiler, etc)
+    * Docs: <https://nixos.org/nixpkgs/manual/#chap-stdenv>
 
 ### Setup 
 
- * `curl https://nixos.org/nix/install | sh`
- * `mkdir -p ~/.config/nix`
- * `echo "require-sigs = false" >> ~/.config/nix/nix.conf`
+* install nix
+```
+curl -L https://nixos.org/nix/install | sh
+# set up configuration
+mkdir -p ~/.config/nix
+echo "require-sigs = false" > ~/.config/nix/nix.conf
+# initialize channel
+nix-channel --update nixpkgs
+```
+* add to bashrc:
+```
+# nix if present
+if [ -f /home/dariusza/.nix-profile/etc/profile.d/nix.sh ]; then
+    source /home/dariusza/.nix-profile/etc/profile.d/nix.sh
+fi
+```

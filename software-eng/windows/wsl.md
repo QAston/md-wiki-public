@@ -151,9 +151,8 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
  * Breeze style has some widgets broken (scrolling ones)
 
 ### setup nix (see tools/nix)
- * `curl https://nixos.org/nix/install | sh`
- * `mkdir -p ~/.config/nix`
- * `echo "require-sigs = false" >> ~/.config/nix/nix.conf` config <https://www.mankier.com/5/nix.conf>
+
+* follow [nix](../tools/nix.md)/setup
 
 ### setup vscode
 
