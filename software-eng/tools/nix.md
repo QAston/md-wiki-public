@@ -370,6 +370,13 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
     * Most important wrapper: cc wrapper
         * Handles dependency finding for nix packages using `NIX_CFLAGS_COMPILE, NIX_LDFLAGS`
 * Overriding packages using fixed point
+    * [overrides in nixpkgs](https://nixos.org/manual/nixpkgs/stable/#chap-overrides)
+    * definition - change how the package derivation is defined
+```
+helloWithDebug = pkgs.hello.overrideAttrs (oldAttrs: rec {
+  separateDebugInfo = true;
+});
+```
     * Enables overriding a package in a way that it will be picked as a dependency instead of the original
     * Explanation of the implementation: 
         * Function returning an overridable map, taking a single arg - map of packages `pkgs = self: { a = 3; b = 4; c = self.a+self.b; }`
@@ -377,17 +384,29 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
         * Fix pkgs will stabilise at `pkgs = { a = 3; b = 4; c = 7; }`
         * <http://r6.ca/blog/20140422T142911Z.html>
         * <https://nixos.org/nixos/nix-pills/nixpkgs-overriding-packages.html#idm140737315550816>
-    * In `~/.nixpkgs/config.nix`:
-        * 
+* [Overlays](https://nixos.org/manual/nixpkgs/unstable/#chap-overlays)
+    * [wiki](https://nixos.wiki/wiki/Overlays)
+    * definiton - change all the packages having a dependency to a different dependency
 ```
+# overlay-def.nix
+self: super:
 {
-  packageOverrides = pkgs: {
-    graphviz = pkgs.graphviz.override { xlibs = null; };
+  boost = super.boost.override {
+    python = self.python3;
+  };
+  rr = super.callPackage ./pkgs/rr {
+    stdenv = self.stdenv_32bit;
   };
 }
 ```
-* [Overlays](https://nixos.org/manual/nixpkgs/unstable/#chap-overlays)
-    * [wiki](https://nixos.wiki/wiki/Overlays)
+    * hooking it in:
+```
+pkgs = import nixpkgs {
+  overlays = [
+    import ./nix/overlay-def.nix
+  ];
+};
+```
 * packaging functions
   * [pkgs.buildEnv](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/buildenv/default.nix) 
     * creates a tree of symlinks which make a "nix environment"
@@ -395,6 +414,7 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
   * stdenv
     * c++ build environment context (gnu, compiler, etc)
     * Docs: <https://nixos.org/nixpkgs/manual/#chap-stdenv>
+    * [pill](https://nixos.org/guides/nix-pills/fundamentals-of-stdenv.html)
 
 ### Setup 
 
