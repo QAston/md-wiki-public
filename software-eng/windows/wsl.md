@@ -281,16 +281,37 @@ Arch and Artix shouldn't be running at the same time because the init systems ch
 
 ### vhdx 
 
+* wsl vhdx files use a partitionless drive, to create one:
+    * use new vhdx disk creator, select fixed or dynamic
+    * add the vhdx to a vm and initialize it using `sudo mkfs.ext4 /dev/sd<letter>`
 * wsl vhdx files have dynamic size by default, capped at 256gb - dynamic type isn't good for linux access
     * converting to fixed will result in 256gb fixed file, that can't be made smaller
     * the only way to make fixed drive smaller is to make a new static drive and then copy contents to the smaller drive using `cp -a` from a vm with access to both drives
+        * cd /media/{targetdriveid}
+        * sudo cp -a ../{sourcedriveid}/* .
     * make sure to remove the drive from all vms and give everyone read/write access, otherwise you'll get access is denied error on wsl startup
-* wsl vhdx files use a partitionless drive, to create one:
-    * use new vhdx disk creator, select fixed or dynamic
-    * add the vhdx to a vm and initialize it using `mkfs.ext4 /dev/sd<letter>`
 * expanding fixed partitionless drive (theoretical, haven't done this yet):
     * expand the vhdx file in hyperv
     * run [resize2fs](https://man.archlinux.org/man/resize2fs.8.en)
+
+#### mounting additional vhdx files in wsl2
+
+* you can set up a dummy wsl distro to serve as a mountable ext4 drive
+* pick a small distro, arch for example
+    * if you have arch already, rename the installer executable so the installed distro has a different name
+* set up the same users on the dummy distro as in distros you want to use it in
+    * `useradd -m -U -G wheel,adm,log,audio,disk,floppy,input,kvm,optical,storage,video dariusza`
+* configure /etc/wsl.conf
+```
+[automount]
+enabled=true # Setting to true causes your fixed drives to be mounted undrer /mnt; default=true
+crossDistro=true # allow directories, mounts and links created by this distro in /mnt/wsl/* to be visible in other distros;default false
+```
+* start it up using following script
+```
+wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind --make-private /home/dariusza "/mnt/wsl/drive" 
+```
+* add the above to the wsl bat startup scripts of distros that want this
 
 ### wsl2 issues
 
@@ -336,3 +357,5 @@ Arch and Artix shouldn't be running at the same time because the init systems ch
     * configures network integration, PATH variable append
     * <https://docs.microsoft.com/en-us/windows/wsl/wsl-config#interop>
 * [wsl api in wslapi.dll](https://docs.microsoft.com/en-us/windows/win32/api/wslapi/nf-wslapi-wsllaunch)
+* [LxRunOffline](https://github.com/DDoSolitary/LxRunOffline) is a useful tool for manipulating wsl distros, but currently it doesn't work well for wsl2
+* [wsldl](https://github.com/yuk7/wsldl) does similar things for wsl2
