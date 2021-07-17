@@ -57,11 +57,12 @@ sudo mkdir /etc/runit/runsvdir/startwsl
 ```
 runsvchdir "startwsl"
 
+rm -rf /run/runit
 mkdir -p /run/runit
 ln -s /etc/runit/runsvdir/current /run/runit/service
 
 exec env - PATH=$PATH \
-runsvdir -P /run/runit/service # optionally ad an entry that will 
+runsvdir -P /run/runit/service
 ```
 2. Install services
   * `pacman -S dbus dbus-runit openssh openssh-runit`

@@ -281,7 +281,7 @@ Arch and Artix shouldn't be running at the same time because the init systems ch
 
 ### vhdx 
 
-* wsl vhdx files use a partitionless drive, to create one:
+* wsl vhdx files use a partitionless drive, to create one in hyperv:
     * use new vhdx disk creator, select fixed or dynamic
     * add the vhdx to a vm and initialize it using `sudo mkfs.ext4 /dev/sd<letter>`
 * wsl vhdx files have dynamic size by default, capped at 256gb - dynamic type isn't good for linux access
@@ -309,7 +309,7 @@ crossDistro=true # allow directories, mounts and links created by this distro in
 ```
 * start it up using following script
 ```
-wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind --make-private /home/dariusza "/mnt/wsl/drive" 
+wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind /home/dariusza "/mnt/wsl/drive" 
 ```
 * add the above to the wsl bat startup scripts of distros that want this
 
@@ -359,3 +359,4 @@ wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind --make-p
 * [wsl api in wslapi.dll](https://docs.microsoft.com/en-us/windows/win32/api/wslapi/nf-wslapi-wsllaunch)
 * [LxRunOffline](https://github.com/DDoSolitary/LxRunOffline) is a useful tool for manipulating wsl distros, but currently it doesn't work well for wsl2
 * [wsldl](https://github.com/yuk7/wsldl) does similar things for wsl2
+* [microsoft guide for expanding dynamic vhdx files](https://docs.microsoft.com/en-us/windows/wsl/compare-versions#expanding-the-size-of-your-wsl-2-virtual-hard-disk)
