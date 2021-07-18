@@ -53,145 +53,429 @@
 ```
 {
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-
-    // You can add more global application settings here.
-    // To learn more about global settings, visit https://aka.ms/terminal-global-settings
-
-    // If enabled, selections are automatically copied to your clipboard.
-    "copyOnSelect": false,
-
-    // If enabled, formatted data is also copied to your clipboard
-    "copyFormatting": false,
-
-    "multiLinePasteWarning": false,
-
-    "windowingBehavior": "useExisting",
-    
-    // A profile specifies a command to execute paired with information about how it should look and feel.
-    // Each one of them will appear in the 'New Tab' dropdown,
-    //   and can be invoked from the commandline with `wt.exe -p xxx`
-    // To learn more about profiles, visit https://aka.ms/terminal-profile-settings
-    "profiles":
-    {
-        "defaults":
+    "actions": 
+    [
         {
-            // Put settings here that you want to apply to all profiles.
-            "fontFace": "Delugia Mono Nerd Font",
-            //"altGrAliasing": false,
+            "command": 
+            {
+                "action": "scrollDown"
+            },
+            "keys": "ctrl+down"
         },
-        "list":
+        {
+            "command": "scrollDownPage",
+            "keys": "ctrl+pgdn"
+        },
+        {
+            "command": 
+            {
+                "action": "scrollUp"
+            },
+            "keys": "ctrl+up"
+        },
+        {
+            "command": "scrollToBottom",
+            "keys": "ctrl+end"
+        },
+        {
+            "command": "scrollUpPage",
+            "keys": "ctrl+pgup"
+        },
+        {
+            "command": "scrollToTop",
+            "keys": "ctrl+home"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+insert"
+        },
+        {
+            "command": "unbound",
+            "keys": "shift+insert"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+-"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+plus"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+0"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+,"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+shift+,"
+        },
+        {
+            "command": "unbound",
+            "keys": "alt+enter"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+shift+w"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+alt+left"
+        },
+        {
+            "command": "toggleAlwaysOnTop",
+            "keys": "alt+f11"
+        },
+        {
+            "command": "closePane",
+            "keys": "alt+shift+w"
+        },
+        {
+            "command": 
+            {
+                "action": "moveFocus",
+                "direction": "previous"
+            },
+            "keys": "alt+shift+left"
+        },
+        {
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "horizontal",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+-"
+        },
+        {
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "vertical",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+plus"
+        },
+        {
+            "command": "find",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "keys": "alt+shift+d"
+        }
+    ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+    "multiLinePasteWarning": false,
+    "profiles": 
+    {
+        "defaults": {},
+        "list": 
         [
             {
-                // Make changes here to the cmd.exe profile
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "name": "cmd",
                 "commandline": "cmd.exe",
-                "hidden": false
+                "fontFace": "Delugia Nerd Font",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "cmd"
             },
             {
+                "fontFace": "Delugia Mono Nerd Font",
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
                 "hidden": false,
                 "name": "PowerShell",
                 "source": "Windows.Terminal.PowershellCore"
             },
             {
+                "commandline": "wsl.exe -d Artix",
+                "fontFace": "Delugia Mono Nerd Font",
                 "guid": "{ac73a22d-256b-58dd-8d16-749c37c3aeaa}",
                 "hidden": false,
+                "icon": "F:\\Artix\\Artix.ico",
                 "name": "Artix",
-                "commandline": "wsl.exe -d Artix"
+                "source": "Windows.Terminal.Wsl"
             },
             {
-                "guid": "{17da3cac-b318-431e-8a3e-7fcdefe6d114}",
-                "name": "MINGW64 / MSYS2",
-                "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -where %__CD__% -no-start -mingw64",
-                "icon": "C:/portable/msys/mingw64.ico"
-              },
-              {
-                "guid": "{2d51fdc4-a03b-4efe-81bc-722b7f6f3820}",
-                "name": "MINGW64-WINPATH / MSYS2",
-                "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -mingw64 -full-path",
-                "icon": "C:/portable/msys/mingw32.ico"
-              },
-              {
-                "guid": "{71160544-14d8-4194-af25-d05feeac7233}",
-                "name": "MSYS / MSYS2",
-                "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -msys",
-                "icon": "C:/portable/msys/msys2.ico"
-              },
-            {
-                // Make changes here to the powershell.exe profile
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "name": "Windows PowerShell",
                 "commandline": "powershell.exe",
-                "hidden": false
+                "fontFace": "Delugia Mono Nerd Font",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -mingw64",
+                "fontFace": "Delugia Mono Nerd Font",
+                "guid": "{17da3cac-b318-431e-8a3e-7fcdefe6d114}",
+                "icon": "C:/portable/msys/mingw64.ico",
+                "name": "MINGW64 / MSYS2"
+            },
+            {
+                "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -mingw64 -full-path",
+                "fontFace": "Delugia Mono Nerd Font",
+                "guid": "{2d51fdc4-a03b-4efe-81bc-722b7f6f3820}",
+                "icon": "C:/portable/msys/mingw32.ico",
+                "name": "MINGW64-WINPATH / MSYS2"
+            },
+            {
+                "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -msys",
+                "fontFace": "Delugia Mono Nerd Font",
+                "guid": "{71160544-14d8-4194-af25-d05feeac7233}",
+                "icon": "C:/portable/msys/msys2.ico",
+                "name": "MSYS / MSYS2"
+            },
+            {
+                "guid": "{581f6350-7f18-5b58-96d2-e8600fa2c88d}",
+                "hidden": true,
+                "name": "DriveArch",
+                "source": "Windows.Terminal.Wsl"
             },
             {
                 "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
                 "hidden": false,
                 "name": "Azure Cloud Shell",
                 "source": "Windows.Terminal.Azure"
+            },
+            {
+                "fontFace": "Delugia Mono Nerd Font",
+                "guid": "{a5a97cb8-8961-5535-816d-772efe0c6a3f}",
+                "hidden": false,
+                "icon": "F:\\Arch\\Arch.ico",
+                "name": "Arch",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "guid": "{674ddf39-3f49-501f-ac73-e5f68f362f89}",
+                "hidden": false,
+                "name": "DockerArtix",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "guid": "{6e8bfb28-6f9b-5298-8f18-9b3f5fad9ee8}",
+                "hidden": false,
+                "name": "DockerArch",
+                "source": "Windows.Terminal.Wsl"
             }
         ]
     },
-
-    // Add custom color schemes to this array.
-    // To learn more about color schemes, visit https://aka.ms/terminal-color-schemes
-    "schemes": [],
-
-    // Add custom keybindings to this array.
-    // To unbind a key combination from your defaults.json, set the command to "unbound".
-    // To learn more about keybindings, visit https://aka.ms/terminal-keybindings
-    "keybindings":
+    "schemes": 
     [
-        // scrollback config - same as my readline and vscode configs
-        { "command": "scrollDown", "keys": "ctrl+down" },
-        { "command": "scrollDownPage", "keys": "ctrl+pgdn" },
-        { "command": "scrollUp", "keys": "ctrl+up" },
-        { "command": "scrollUpPage", "keys": "ctrl+pgup" },
-        { "command": "scrollToTop", "keys": "ctrl+home" },
-        { "command": "scrollToBottom", "keys": "ctrl+end" },
         {
-            "command" : null, "keys" : ["ctrl+insert"]
+            "background": "#0C0C0C",
+            "black": "#0C0C0C",
+            "blue": "#0037DA",
+            "brightBlack": "#767676",
+            "brightBlue": "#3B78FF",
+            "brightCyan": "#61D6D6",
+            "brightGreen": "#16C60C",
+            "brightPurple": "#B4009E",
+            "brightRed": "#E74856",
+            "brightWhite": "#F2F2F2",
+            "brightYellow": "#F9F1A5",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#3A96DD",
+            "foreground": "#CCCCCC",
+            "green": "#13A10E",
+            "name": "Campbell",
+            "purple": "#881798",
+            "red": "#C50F1F",
+            "selectionBackground": "#FFFFFF",
+            "white": "#CCCCCC",
+            "yellow": "#C19C00"
         },
         {
-            "command" : null, "keys" : ["shift+insert"]
+            "background": "#012456",
+            "black": "#0C0C0C",
+            "blue": "#0037DA",
+            "brightBlack": "#767676",
+            "brightBlue": "#3B78FF",
+            "brightCyan": "#61D6D6",
+            "brightGreen": "#16C60C",
+            "brightPurple": "#B4009E",
+            "brightRed": "#E74856",
+            "brightWhite": "#F2F2F2",
+            "brightYellow": "#F9F1A5",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#3A96DD",
+            "foreground": "#CCCCCC",
+            "green": "#13A10E",
+            "name": "Campbell Powershell",
+            "purple": "#881798",
+            "red": "#C50F1F",
+            "selectionBackground": "#FFFFFF",
+            "white": "#CCCCCC",
+            "yellow": "#C19C00"
         },
         {
-            "command" : null, "keys" : ["ctrl+-"]
+            "background": "#282C34",
+            "black": "#282C34",
+            "blue": "#61AFEF",
+            "brightBlack": "#5A6374",
+            "brightBlue": "#61AFEF",
+            "brightCyan": "#56B6C2",
+            "brightGreen": "#98C379",
+            "brightPurple": "#C678DD",
+            "brightRed": "#E06C75",
+            "brightWhite": "#DCDFE4",
+            "brightYellow": "#E5C07B",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#56B6C2",
+            "foreground": "#DCDFE4",
+            "green": "#98C379",
+            "name": "One Half Dark",
+            "purple": "#C678DD",
+            "red": "#E06C75",
+            "selectionBackground": "#FFFFFF",
+            "white": "#DCDFE4",
+            "yellow": "#E5C07B"
         },
         {
-            "command" : null, "keys" : ["ctrl+plus"]
+            "background": "#FAFAFA",
+            "black": "#383A42",
+            "blue": "#0184BC",
+            "brightBlack": "#4F525D",
+            "brightBlue": "#61AFEF",
+            "brightCyan": "#56B5C1",
+            "brightGreen": "#98C379",
+            "brightPurple": "#C577DD",
+            "brightRed": "#DF6C75",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#E4C07A",
+            "cursorColor": "#4F525D",
+            "cyan": "#0997B3",
+            "foreground": "#383A42",
+            "green": "#50A14F",
+            "name": "One Half Light",
+            "purple": "#A626A4",
+            "red": "#E45649",
+            "selectionBackground": "#FFFFFF",
+            "white": "#FAFAFA",
+            "yellow": "#C18301"
         },
         {
-            "command" : null, "keys" : ["ctrl+0"]
+            "background": "#002B36",
+            "black": "#002B36",
+            "blue": "#268BD2",
+            "brightBlack": "#073642",
+            "brightBlue": "#839496",
+            "brightCyan": "#93A1A1",
+            "brightGreen": "#586E75",
+            "brightPurple": "#6C71C4",
+            "brightRed": "#CB4B16",
+            "brightWhite": "#FDF6E3",
+            "brightYellow": "#657B83",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#2AA198",
+            "foreground": "#839496",
+            "green": "#859900",
+            "name": "Solarized Dark",
+            "purple": "#D33682",
+            "red": "#DC322F",
+            "selectionBackground": "#FFFFFF",
+            "white": "#EEE8D5",
+            "yellow": "#B58900"
         },
         {
-            "command" : null, "keys" : ["ctrl+,"]
+            "background": "#FDF6E3",
+            "black": "#002B36",
+            "blue": "#268BD2",
+            "brightBlack": "#073642",
+            "brightBlue": "#839496",
+            "brightCyan": "#93A1A1",
+            "brightGreen": "#586E75",
+            "brightPurple": "#6C71C4",
+            "brightRed": "#CB4B16",
+            "brightWhite": "#FDF6E3",
+            "brightYellow": "#657B83",
+            "cursorColor": "#002B36",
+            "cyan": "#2AA198",
+            "foreground": "#657B83",
+            "green": "#859900",
+            "name": "Solarized Light",
+            "purple": "#D33682",
+            "red": "#DC322F",
+            "selectionBackground": "#FFFFFF",
+            "white": "#EEE8D5",
+            "yellow": "#B58900"
         },
         {
-            "command" : null, "keys" : ["ctrl+shift+,"]
+            "background": "#000000",
+            "black": "#000000",
+            "blue": "#3465A4",
+            "brightBlack": "#555753",
+            "brightBlue": "#729FCF",
+            "brightCyan": "#34E2E2",
+            "brightGreen": "#8AE234",
+            "brightPurple": "#AD7FA8",
+            "brightRed": "#EF2929",
+            "brightWhite": "#EEEEEC",
+            "brightYellow": "#FCE94F",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#06989A",
+            "foreground": "#D3D7CF",
+            "green": "#4E9A06",
+            "name": "Tango Dark",
+            "purple": "#75507B",
+            "red": "#CC0000",
+            "selectionBackground": "#FFFFFF",
+            "white": "#D3D7CF",
+            "yellow": "#C4A000"
         },
-        { "command": "toggleAlwaysOnTop", "keys": ["alt+f11"] },
-        
-        { "command": "closePane", "keys": "alt+shift+w" },
-        { "command": { "action": "moveFocus", "direction": "previous" }, "keys": "alt+shift+left" },
-
-
-
-        { "command": null, "keys": "ctrl+shift+w" },
-        { "command": null, "keys": "ctrl+alt+left" },
-        { "command": { "action": "splitPane", "split": "horizontal", "splitMode": "duplicate" }, "keys": "alt+shift+-" },
-        { "command": { "action": "splitPane", "split": "vertical", "splitMode": "duplicate"}, "keys": "alt+shift+plus" },
-
-        // Press Ctrl+Shift+F to open the search box
-        { "command": "find", "keys": "ctrl+shift+f" },
-
-        // Press Alt+Shift+D to open a new pane.
-        // - "split": "auto" makes this pane open in the direction that provides the most surface area.
-        // - "splitMode": "duplicate" makes the new pane use the focused pane's profile.
-        // To learn more about panes, visit https://aka.ms/terminal-panes
-        { "command": { "action": "splitPane", "split": "auto", "splitMode": "duplicate" }, "keys": "alt+shift+d" }
-    ]
-}
-```
+        {
+            "background": "#FFFFFF",
+            "black": "#000000",
+            "blue": "#3465A4",
+            "brightBlack": "#555753",
+            "brightBlue": "#729FCF",
+            "brightCyan": "#34E2E2",
+            "brightGreen": "#8AE234",
+            "brightPurple": "#AD7FA8",
+            "brightRed": "#EF2929",
+            "brightWhite": "#EEEEEC",
+            "brightYellow": "#FCE94F",
+            "cursorColor": "#000000",
+            "cyan": "#06989A",
+            "foreground": "#555753",
+            "green": "#4E9A06",
+            "name": "Tango Light",
+            "purple": "#75507B",
+            "red": "#CC0000",
+            "selectionBackground": "#FFFFFF",
+            "white": "#D3D7CF",
+            "yellow": "#C4A000"
+        },
+        {
+            "background": "#000000",
+            "black": "#000000",
+            "blue": "#000080",
+            "brightBlack": "#808080",
+            "brightBlue": "#0000FF",
+            "brightCyan": "#00FFFF",
+            "brightGreen": "#00FF00",
+            "brightPurple": "#FF00FF",
+            "brightRed": "#FF0000",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#FFFF00",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#008080",
+            "foreground": "#C0C0C0",
+            "green": "#008000",
+            "name": "Vintage",
+            "purple": "#800080",
+            "red": "#800000",
+            "selectionBackground": "#FFFFFF",
+            "white": "#C0C0C0",
+            "yellow": "#808000"
+        }
+    ],
+    "windowingBehavior": "useExisting"
+}```

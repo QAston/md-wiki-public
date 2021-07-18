@@ -259,6 +259,7 @@ pacaur -S rr
 
 ### Other stuff - todo
 
+- https://github.com/4U6U57/wsl-open
 - https://github.com/ibraheemdev/modern-unix
 - https://direnv.net/
 - https://github.com/andreafrancia/trash-cli

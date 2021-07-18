@@ -9,7 +9,7 @@
 3. Setup users (https://wsldl-pg.github.io/ArchW-docs/How-to-Setup/)
      * Configure root password
      * Configure user: 
-     * `useradd -m -U -G wheel,adm,log,audio,disk,floppy,input,kvm,optical,storage,video dariusza`
+     * `useradd -u1000 -m -U -G wheel,adm,log,audio,disk,floppy,input,kvm,optical,storage,video dariusza`
      * `passwd dariusza # set user password`
      * `passwd # set root password`
      * `sudo vim /etc/sudoers # uncomment # %wheel ALL=(ALL) ALL`
@@ -25,7 +25,7 @@
         * run `sudo pacman -Syyu`
 5. Set up basic packages, follow [neovim](../tools/neovim.md) to configure neovim
 ```
-sudo pacman -S base-devel git subversion openssh wget neovim
+sudo pacman -S base-devel git wget neovim
 ```
 6. Configure /etc/wsl.conf - copy from wslconfig repo
 7. Configure ~/.bash_profile - copy from wslconfig repo
@@ -42,11 +42,7 @@ sudo pacman -S base-devel git subversion openssh wget neovim
 ### set up systemd
 
 1. Install https://github.com/qaston/subsystemctl (fixes branch)
-    * makepkg -s 
-      * todo: there's a bug, where parser of subsystemctl exec complains about flags passed after the initial command:
-      * subsystemctl exec /bin/subsystemctl-bash-env -c asdf should be passed -c should be passed to exec command, not to subsystemctl exec
-      * as a result we get `error: Found argument '-c' which wasn't expected, or isn't valid in this context`
-      * todo: make a ticket/patch that disables flags after `--` separator or something like that
+    * `./install.sh`
 2. Build and install [subsystemctl-bash-wrapper](https://github.com/QAston/wslconfig/tree/master/bin/subsystemctl-redir)
     * run `sudo ./install.sh` from the directory, no more changes are needed
     * to bypass the wrapper run `WSLENV=%WSLENV%:SUBSYSTEMCTL_DISABLE_WRAPPER SUBSYSTEMCTL_DISABLE_WRAPPER=1 wsl.exe`
@@ -60,8 +56,11 @@ wt -p Arch -d \\wsl$\Arch\home\dariusza\
 4. Set up locale
   * Uncomment en_GB.UTF-8 UTF-8 and other needed **[locales](https://wiki.archlinux.org/index.php/Locale)** in `/etc/locale.gen`, and generate them with:
   * `sudo locale-gen`
-  * Add `export LANG=en_GB.UTF-8` to `.bashrc`
-  * Set `/etc/locale.conf LANG=<em>en_GB.UTF-8`
+  * Add `export LANG=en_GB.UTF-8` to `/etc/profile.d/00_settings.sh`
+  * Set `/etc/locale.conf LANG=en_GB.UTF-8` 
+cat <<'EOF' | sudo tee /etc/locale.conf > /dev/null
+LANG=en_GB.UTF-8
+EOF
 5. Set up journalctl
   * configure smaller log storage
 ```
@@ -72,7 +71,13 @@ cat <<'EOF' | sudo tee /etc/systemd/journald.conf.d/00-journal-size.conf > /dev/
 SystemMaxUse=50M
 EOF
 ```
-6. Remove services which don't work well with wsl
+6. Set up kernel params
+```
+cat <<'EOF' | sudo tee /etc/sysctl.conf > /dev/null
+fs.inotify.max_user_watches=524288
+EOF
+```
+7. Remove services which don't work well with wsl
 ```
 sudo mkdir -p /etc/systemd/wsl2-incompatible/user/sockets.target.wants/ /lib/systemd/wsl2-incompatible/system/sysinit.target.wants/ /usr/lib/systemd/wsl2-incompatible/system/
 # remove binfmt mounting done by systemd because it doesn't work and triggers 'too many simlinks error

@@ -95,14 +95,15 @@ endif
 ### setup wsl2
 
 ```
-pacaur -S neovim-nightly-bin
-mkdir ~/.config/nvim/
+pacman -S neovim
+mkdir -p ~/.config/nvim/
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
 # sync windows and linux config
 cp "/mnt/c/Users/qasto/AppData/Local/nvim/init.vim" ~/.config/nvim/init.vim
 dos2unix ~/.config/nvim/init.vim
+cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
 # in vim
 :PlugInstall
 ```

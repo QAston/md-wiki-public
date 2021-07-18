@@ -9,7 +9,7 @@
      * <https://wiki.archlinux.org/index.php/Makepkg>
      * <https://wiki.archlinux.org/index.php/PKGBUILD>
      * <https://wiki.archlinux.org/index.php/Patching_packages>
- * sudo pacman -S asp
+ * sudo pacman -S asp subversion
  * Add IgnoreGroup = modified to /etc/pacman.conf
  * Add Packages to ignore updates for here: 
  * Modify `/etc/makepkg.conf`
