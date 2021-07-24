@@ -166,6 +166,7 @@ trap unmount_all EXIT
 
 mkdir -p /mnt/wsl
 chmod 777 /mnt/wsl
+systemd-notify --ready
 
 # SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 - make kernel filesystems writeable - needed for docker in a container
 SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind-ro=/etc/resolv.conf:/etc.resolv.conf --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
@@ -184,6 +185,7 @@ Requires=systemd-modules-load.service
 After=systemd-modules-load.service
 
 [Service]
+Type=notify
 ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" --boot # Artix: "/root/startdocker_init" Arch: --boot
 Restart=no
 
@@ -197,11 +199,12 @@ sudo systemctl enable mount-wsl2-docker.service
 cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2.service > /dev/null
 [Unit]
 Description=Wsl2 mount service
-RequiresMountsFor=/home/dariusza/wsl2-ntfs /home/dariusza/wsl2-docker-vhd /tmp
-Requires=systemd-modules-load.service
+RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp
+Requires=systemd-modules-load.service mount-wsl2-docker.service
 After=systemd-modules-load.service mount-wsl2-docker.service
 
 [Service]
+Type=notify
 ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" --bind=/home/dariusza/wsl2-docker-vhd/home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=/home/dariusza/wsl2-docker-vhd:/mnt/wsl/docker-linux-wsl/root --boot #Artix: "/home/dariusza/bin/init" Arch: --boot
 Restart=no
 
