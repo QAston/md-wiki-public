@@ -168,7 +168,7 @@ mkdir -p /mnt/wsl
 chmod 777 /mnt/wsl
 
 # SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 - make kernel filesystems writeable - needed for docker in a container
-SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
+SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind-ro=/etc/resolv.conf:/etc.resolv.conf --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
 
 # --resolv-conf=bind-host
 EOF
@@ -197,7 +197,7 @@ sudo systemctl enable mount-wsl2-docker.service
 cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2.service > /dev/null
 [Unit]
 Description=Wsl2 mount service
-RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp
+RequiresMountsFor=/home/dariusza/wsl2-ntfs /home/dariusza/wsl2-docker-vhd /tmp
 Requires=systemd-modules-load.service
 After=systemd-modules-load.service mount-wsl2-docker.service
 
