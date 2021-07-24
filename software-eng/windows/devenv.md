@@ -129,14 +129,13 @@ fsutil hardlink create $profile.CurrentUserCurrentHost $env:USERPROFILE\Document
     - PATH_APPEND_MSYS_COMMON - msys+mingw
     - PATH_APPEND_MSYS - 
     - PATH_APPEND_MINGW - 
-    - PATH_APPEND_WSL ; unimplemented
+    - PATH_APPEND_WSL ; unimplemented - not needed
     - PATH_APPEND_POSIX_COMMON - msys+wsl
     - PATH_APPEND_BASH_COMMON - all bash shells 
 - the variable loading should be already implemented in the shell profile files
 2. example script
 ```
 todo: this is out of date
-New-ItemProperty -Name PATH_VAR_ALL -PropertyType String -Value "C:\Users\qasto\AppData\Local\Programs\Microsoft VS Code\bin;" -Path HKCU:\Environment
 New-ItemProperty -Name PATH_VAR_WINDOWS -PropertyType String -Value "C:\Users\qasto\.cargo\bin;C:\Program Files\PowerShell\7\;C:\Program Files\dotnet\;C:\portable\msys\cmd;" -Path HKCU:\Environment
 New-ItemProperty -Name PATH_VAR_WINDOWS -PropertyType String -Value "C:\ProgramData\chocolatey\bin;C:\portable\SysinternalsSuite;C:\Program Files (x86)\GitExtensions\;" -Path HKCU:\Environment
 

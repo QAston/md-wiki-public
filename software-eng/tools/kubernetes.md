@@ -18,7 +18,7 @@
 - tilt - docker compose but for k8s - easy deploymetns and cleanup
     - pacaur -S tilt-bin?
 
-### setup (windows and wsl2) - docker-desktop
+### setup - docker-desktop (windows and wsl2)
 
 1. setup [docker](./docker.md) 
 2. enable k8s in docker-desktop for wsl
@@ -32,3 +32,9 @@ if command -v kubectl &> /dev/null; then
  rm -f "$cmd_file"
 fi
 ```
+
+### setup docker-linux-wsl
+
+* follow [wsl2_docker](../windows/wsl2_docker.md)
+* install minikube
+* todo: find a way to connect remotely to minikube on another container (minikube --apiserver?)

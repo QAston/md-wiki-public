@@ -238,7 +238,17 @@
 
 ## setup/configuration - windows
 
-- add code to ALL path variable
+- remove code from PATH variable
+- add the following script to portable/bin/windows/code.cmd:
+```
+@echo off
+call "C:\Users\qasto\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd" %*
+```
+- add the following script to portable/bin/windows/code
+```
+#!/usr/bin/env bash
+exec "/c/Users/qasto/AppData/Local/Programs/Microsoft VS Code/bin/code" "$@"
+```
 - terminal
     - unbind all global keybindings which interfere with terminal
     - bind all navigation keybindings to key shortcuts terminal doesn't care about (ctrl-shift, ctrl-num) or bind them only when not in terminalFocus
