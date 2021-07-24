@@ -170,12 +170,11 @@ chmod 777 /mnt/wsl
 # SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 - make kernel filesystems writeable - needed for docker in a container
 SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
 
-#sleep infinity
 # --resolv-conf=bind-host
 EOF
 chmod a+x /home/dariusza/mount-wsl2.sh
 ```
-- add services (Artix)
+- add services (Arch, replace Arch with Artix for Artix)
 ```
 cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2-docker.service > /dev/null
 [Unit]
@@ -185,7 +184,7 @@ Requires=systemd-modules-load.service
 After=systemd-modules-load.service
 
 [Service]
-ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArtix/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" "/root/startdocker_init"
+ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" --boot # Artix: "/root/startdocker_init" Arch: --boot
 Restart=no
 
 [Install]
@@ -203,7 +202,7 @@ Requires=systemd-modules-load.service
 After=systemd-modules-load.service mount-wsl2-docker.service
 
 [Service]
-ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/Artix/ext4.vhdx" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" --bind=/home/dariusza/wsl2-docker-vhd/home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=/home/dariusza/wsl2-docker-vhd:/mnt/wsl/docker-linux-wsl/root "/home/dariusza/bin/init"
+ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" --bind=/home/dariusza/wsl2-docker-vhd/home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=/home/dariusza/wsl2-docker-vhd:/mnt/wsl/docker-linux-wsl/root --boot #Artix: "/home/dariusza/bin/init" Arch: --boot
 Restart=no
 
 [Install]
@@ -221,7 +220,6 @@ sudo systemctl enable mount-wsl2.service
 cat << 'EOF' | gcc -o /home/dariusza/bash-wsl2.sh -xc -
 #include <unistd.h>
 #include <stdio.h>
-#
 
 // execute as root:
 // nsenter --target=$(machinectl show --property Leader wsl2-vhd | sed "s/^Leader=//") -a su dariusza
@@ -248,7 +246,6 @@ sudo chmod u+sw,g+s,a+rx /home/dariusza/bash-wsl2.sh
 cat << 'EOF' | gcc -o /home/dariusza/bash-wsl2-docker.sh -xc -
 #include <unistd.h>
 #include <stdio.h>
-#
 
 // execute as root:
 // nsenter --target=$(machinectl show --property Leader wsl2-vhd | sed "s/^Leader=//") -a su dariusza
@@ -269,9 +266,11 @@ int main(int argc, char** argv) {
 }
 EOF
 sudo chown root /home/dariusza/bash-wsl2-docker.sh
-sudo chgrp root /home/dariusza/bash-wsl2-docker.sh
-sudo chmod u+sw,g+s,a+rx /home/dariusza/bash-wsl2-docker.sh
+sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2-docker.sh
 ```
+- set up a login shell script (Arch)
+    - the one for artix will work, alternatively you can use `machinectl shell --uid 1000 wsl2-vhd`
+
 
 #### configure the host system
 
@@ -294,11 +293,17 @@ cp wsl2-vhd/home/dariusza/.bashrc ~/.bashrc
 nano ~/.bashrc # remove settings which depend on utilities
 sudo pacman -S neovim
 ```
-- set up host sysctl config from host.conf (Artix-only)
+- set up host sysctl config from host.conf
 ```
-sudo cp wsl2-vhd/home/dariusza/bin/host.conf /etc/sysctl.d/60-wslhost.conf
+# artix - only:
+sudo cp /home/dariusza/wsl2-vhd/home/dariusza/bin/host.conf /etc/sysctl.d/60-wslhost.conf
 sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
 mkdir /tmp/cores
+```
+```
+# arch-only:
+sudo cp /home/dariusza/wsl2-vhd/etc/sysctl.conf /etc/sysctl.d/60-wslhost.conf
+sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
 ```
 - configure konsole and yakuake
   - change appearance to use breeze-silver scheme
