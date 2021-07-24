@@ -219,6 +219,12 @@ sudo systemctl enable mount-wsl2.service
 exec ssh localhost "$@"
 ```
 
+### entering the container (looks like not everything is set in this env?)
+
+```
+nsenter   --target=$(machinectl show --property Leader wsl2-vhd | sed "s/^Leader=//") --mount --uts --ipc --net --pid -S1000 -G1000
+```
+
 ### todos
 
 - docker? run on the host instead?
