@@ -130,7 +130,7 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
 ```
 cat <<'EOF' | sudo tee /etc/profile.d/distroid.sh > /dev/null
 #!/bin/bash
-if [ -n "$WSL_DISTRO_NAME" ]; then
+if ! [ -n "$WSL_DISTRO_NAME" ]; then
     export DISTRO_ID=ArchContainer
 fi
 EOF
