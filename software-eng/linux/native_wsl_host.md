@@ -299,7 +299,7 @@ DOCKER_SUFFIX="" # DOCKER_SUFFIX="-docker" for the docker container
 cat << EOF | gcc -o /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh -xc -
 #include <unistd.h>
 int main(int argc, char** argv) {
-  return execlp("machinectl", "machinectl", "shell", "--uid", "1000", "wsl2-vhd$DOCKER_SUFFIX", (char *) NULL);
+  return execlp("machinectl", "machinectl", "shell", "--quiet", "--uid", "1000", "wsl2-vhd$DOCKER_SUFFIX", (char *) NULL);
 }
 EOF
 sudo chown root /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
