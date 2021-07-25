@@ -86,6 +86,10 @@ sudo systemctl enable wslinit.service
 - update packages
 - configure display settings for 2 monitors
     - search for display settings/manager
+- install an editor
+```
+sudo pacman -S neovim xclip
+```
 - set up clock sync with windows
 ```
 sudo timedatectl set-local-rtc true # set windows clock
@@ -134,7 +138,7 @@ UID=AC481B43481B0BA8 /home/dariusza/wsl2-ntfs ntfs-3g auto,rw,defaults,uid=1000,
 
 - install drivers
 ```
-sudo pacman nvidia-libgl noto-fonts-emoji
+sudo pacman -S nvidia-libgl noto-fonts-emoji
 ```
 - configure x server - in `sudo nano /etc/sddm.conf`
 ```
@@ -143,9 +147,9 @@ ServerArguments=-nolisten tcp +iglx
 ```
 - allow connecting to the x server from the container
 ```
-echo "xhost +local:" >> ~/.bash_profile
+echo "xhost +local:" > /etc/profile.d/03_x11wsl.sh
 ```
-- configure pulseaudio - in `sudo nano /etc/pulse/default.pa`
+- configure pulseaudio - in `sudo nvim /etc/pulse/default.pa`
 ```
 # add ip auth for the host
 load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1
