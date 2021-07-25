@@ -260,17 +260,18 @@ sudo systemctl enable mount-wsl2.service
 # use nsenter instead of machinectl/systemd-run becuase they require systemd in the container
 # nsenter needs to be run as root
 # use setuid to bypass permissions, bash ignores suid, so use an executable instead
-cat << 'EOF' | gcc -o /home/dariusza/bash-wsl2.sh -xc -
+#
+# nsenter --target=$(machinectl show --property Leader wsl2-vhd | sed "s/^Leader=//") -a su dariusza
+DOCKER_SUFFIX="" # DOCKER_SUFFIX="-docker" for the docker container
+cat << EOF | gcc -o /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh -xc -
 #include <unistd.h>
 #include <stdio.h>
 
-// execute as root:
-// nsenter --target=$(machinectl show --property Leader wsl2-vhd | sed "s/^Leader=//") -a su dariusza
 int main(int argc, char** argv) {
   FILE *output;
   char arg1[1024];
 
-  output = popen("machinectl show --property Leader wsl2-vhd | sed 's/^Leader=//' | sed 's/^/--target=/' | tr --delete '\n'", "r");
+  output = popen("machinectl show --property Leader wsl2-vhd$DOCKER_SUFFIX | sed 's/^Leader=//' | sed 's/^/--target=/' | tr --delete '\n'", "r");
   if (output == NULL) {
     printf("Failed to run command\n" );
     return 1;
@@ -282,53 +283,40 @@ int main(int argc, char** argv) {
   return execlp("nsenter", "nsenter", arg1, "-a", "-S0", "su", "-", "dariusza", (char *) NULL);
 }
 EOF
-sudo chown root /home/dariusza/bash-wsl2.sh
-sudo chgrp root /home/dariusza/bash-wsl2.sh
-sudo chmod u+sw,g+s,a+rx /home/dariusza/bash-wsl2.sh
-
-# set login script for DockerArtix/DockerArch container (if any)
-cat << 'EOF' | gcc -o /home/dariusza/bash-wsl2-docker.sh -xc -
-#include <unistd.h>
-#include <stdio.h>
-
-// execute as root:
-// nsenter --target=$(machinectl show --property Leader wsl2-vhd | sed "s/^Leader=//") -a su dariusza
-int main(int argc, char** argv) {
-  FILE *output;
-  char arg1[1024];
-
-  output = popen("machinectl show --property Leader wsl2-docker-vhd | sed 's/^Leader=//' | sed 's/^/--target=/' | tr --delete '\n'", "r");
-  if (output == NULL) {
-    printf("Failed to run command\n" );
-    return 1;
-  }
-
-  // read the output
-  fgets(arg1, sizeof(arg1), output);
-
-  return execlp("nsenter", "nsenter", arg1, "-a", "-S0", "su", "-", "dariusza", (char *) NULL);
-}
-EOF
-sudo chown root /home/dariusza/bash-wsl2-docker.sh
-sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2-docker.sh
+sudo chown root /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
+sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
 ```
 - set up a login shell script (Arch)
     - the one for artix will work, alternatively you can use `machinectl shell --uid 1000 wsl2-vhd`
-
+```
+DOCKER_SUFFIX="" # DOCKER_SUFFIX="-docker" for the docker container
+cat << EOF | gcc -o /home/dariusza/launcher.sh -xc -
+#include <unistd.h>
+int main(int argc, char** argv) {
+  return execlp("machinectl", "machinectl", "shell", "--uid", "1000", "wsl2-vhd$DOCKER_SUFFIX", (char *) NULL);
+}
+EOF
+sudo chown root /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
+sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
+```
 
 #### configure the host system
 
+- make a distro id
+```
+cat <<'EOF' | sudo tee /etc/profile.d/distroid.sh > /dev/null
+#!/bin/bash
+if [ -n "$WSL_DISTRO_NAME" ]; then
+    export DISTRO_ID=ManjaroHost
+fi
+EOF
+```
 - copy ssh keys
 ```
 mkdir ~/.ssh
 paste keys from backup
 chmod 700 ~/.ssh
 chmod 0600 /home/dariusza/.ssh/id_rsa
-```
-- set up convenience links
-```
-ln -s ~/wsl2-vhd/home/dariusza ~/home-wsl
-ln -s ~/wsl2-docker-vhd/home/dariusza ~/home-wsl-docker
 ```
 - set up basic utilities by copying the wsl config
 ```

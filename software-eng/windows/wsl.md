@@ -125,6 +125,17 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
 
 ## setup other linux software
 
+### make a distro id
+
+```
+cat <<'EOF' | sudo tee /etc/profile.d/distroid.sh > /dev/null
+#!/bin/bash
+if [ -n "$WSL_DISTRO_NAME" ]; then
+    export DISTRO_ID=ArchContainer
+fi
+EOF
+```
+
 ### setup bash
 
 * Follow [bash](../unix/bash.md)
