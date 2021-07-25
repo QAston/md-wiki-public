@@ -28,6 +28,10 @@ powercfg.exe /hibernate off
 
 - the partition editor is a bit dumb, create it in partition settings instead, doesn't need to be big as the host system doesn't need much space
 
+#### set up windows time
+
+- https://wiki.archlinux.org/title/System_time
+
 ### setup wsl2 vhdx contents
 
 - set up drivers
@@ -100,6 +104,7 @@ EOF
 - install packages
 ```
 sudo pacman -S neovim xclip base-devel noto-fonts-emoji
+pacaur -S noto-color-emoji-fontconfig
 ```
 - set up clock sync with windows
 ```
