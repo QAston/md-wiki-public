@@ -86,9 +86,9 @@ sudo systemctl enable wslinit.service
 - update packages
 - configure display settings for 2 monitors
     - search for display settings/manager
-- install an editor
+- install packages
 ```
-sudo pacman -S neovim xclip
+sudo pacman -S neovim xclip base-devel noto-fonts-emoji
 ```
 - set up clock sync with windows
 ```
@@ -138,7 +138,7 @@ UID=AC481B43481B0BA8 /home/dariusza/wsl2-ntfs ntfs-3g auto,rw,defaults,uid=1000,
 
 - install drivers
 ```
-sudo pacman -S nvidia-libgl noto-fonts-emoji
+sudo pacman -S nvidia-libgl
 ```
 - configure x server - in `sudo nano /etc/sddm.conf`
 ```
