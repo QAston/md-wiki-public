@@ -48,6 +48,34 @@ export __GLX_VENDOR_LIBRARY_NAME=nvidia
 export LIBGL_DEBUG=verbose
 fi
 ```
+- add an etc/resolv.conf service (Arch only)
+```
+cat << 'EOF' | sudo tee /root/wslinit > /dev/null
+#!/bin/bash
+if [ -n "$WSL_DISTRO_NAME" ]; then
+        ln -sf /run/resolvconf/resolv.conf /etc/resolv.conf
+else
+        ln -sf /mnt/host/etc/resolv.conf /etc/resolv.conf
+fi
+EOF
+sudo chmod a+x /root/wslinit
+
+cat << 'EOF' | sudo tee /etc/systemd/system/wslinit.service > /dev/null
+[Unit]
+Description=Wsl2 init service
+
+[Service]
+Type=oneshot
+ExecStart=/root/wslinit
+Restart=no
+
+[Install]
+WantedBy=local-fs.target
+EOF
+
+# enable autostart
+sudo systemctl enable wslinit.service
+```
 
 ### setup manjaro (native host system)
 
@@ -106,7 +134,7 @@ UID=AC481B43481B0BA8 /home/dariusza/wsl2-ntfs ntfs-3g auto,rw,defaults,uid=1000,
 
 - install drivers
 ```
-sudo pacman nvidia-libgl
+sudo pacman nvidia-libgl noto-fonts-emoji
 ```
 - configure x server - in `sudo nano /etc/sddm.conf`
 ```
@@ -169,13 +197,17 @@ chmod 777 /mnt/wsl
 systemd-notify --ready
 
 # SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 - make kernel filesystems writeable - needed for docker in a container
-SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind-ro=/etc/resolv.conf:/etc.resolv.conf --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
+# SYSTEMD_SECCOMP=0 - disable capability checks
+# SYSTEMD_NSPAWN_USE_CGNS=0 - https://wiki.archlinux.org/title/systemd-nspawn#Run_docker_in_systemd-nspawn
+SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
 
-# --resolv-conf=bind-host
+# --resolv-conf=bind-host - binds too early before the file is populated by network manager
 EOF
 chmod a+x /home/dariusza/mount-wsl2.sh
 ```
-- add services (Arch, replace Arch with Artix for Artix)
+- set up docker container or service (Arch, replace Arch with Artix for Artix)
+    - follow steps from [wsl2_docker](../windows/wsl2_docker.md) on the host if you want to run docker natively on the host
+    - or setup the service below to mount a wsl2 container instead (todo: not everything works in a container)
 ```
 cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2-docker.service > /dev/null
 [Unit]
@@ -185,8 +217,10 @@ Requires=systemd-modules-load.service
 After=systemd-modules-load.service
 
 [Service]
+Environment="SYSTEMD_NSPAWN_USE_CGNS=0"
+Environment="SYSTEMD_NSPAWN_API_VFS_WRITABLE=1"
 Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" --boot # Artix: "/root/startdocker_init" Arch: --boot
+ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" --bind=/sys/fs/cgroup --boot # Artix: "/root/startdocker_init" Arch: --boot
 Restart=no
 
 [Install]
@@ -195,12 +229,18 @@ EOF
 
 # enable autostart
 sudo systemctl enable mount-wsl2-docker.service
+```
+- add wsl container mount service (Arch, replace Arch with Artix for Artix)
+```
+# this sets up docker based on the DockerArch/DockerArtix container
+# use wsl2_docker.md service instead if you want a to run on the host
+
 
 cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2.service > /dev/null
 [Unit]
 Description=Wsl2 mount service
 RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp
-Requires=systemd-modules-load.service mount-wsl2-docker.service
+Requires=systemd-modules-load.service
 After=systemd-modules-load.service mount-wsl2-docker.service
 
 [Service]
@@ -246,6 +286,7 @@ sudo chown root /home/dariusza/bash-wsl2.sh
 sudo chgrp root /home/dariusza/bash-wsl2.sh
 sudo chmod u+sw,g+s,a+rx /home/dariusza/bash-wsl2.sh
 
+# set login script for DockerArtix/DockerArch container (if any)
 cat << 'EOF' | gcc -o /home/dariusza/bash-wsl2-docker.sh -xc -
 #include <unistd.h>
 #include <stdio.h>
@@ -314,6 +355,7 @@ sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
 
 ### todos
 
+- use nspawn and mount config files instead of a script service?
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk (currently in insider only)
     - alternatively try to make ext4 partition be visible as a special vhdx file? by somehow implementing [device files](https://en.wikipedia.org/wiki/Device_file) on windows? possibly by implementing it in linux and loading wsl partition from wsl share?
