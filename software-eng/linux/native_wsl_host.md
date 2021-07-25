@@ -240,6 +240,7 @@ sudo systemctl enable mount-wsl2-docker.service
 # use wsl2_docker.md service instead if you want a to run on the host
 WSL_INIT_SCRIPT=--boot # Artix: "/home/dariusza/bin/init" Arch: --boot
 DOCKER_FS_PATH=/ # Native host: / Docker distro: /home/dariusza/wsl2-docker-vhd/
+WSL_DISTRO_PATH=/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx # Artix: 
 
 cat << EOF | sudo tee /etc/systemd/system/mount-wsl2.service > /dev/null
 [Unit]
@@ -250,7 +251,7 @@ After=systemd-modules-load.service mount-wsl2-docker.service
 
 [Service]
 Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/docker-linux-wsl/root
+ExecStart=/home/dariusza/mount-wsl2.sh "${WSL_DISTRO_PATH}" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/docker-linux-wsl/root ${WSL_INIT_SCRIPT}
 Restart=no
 
 [Install]
