@@ -77,6 +77,17 @@ EOF
 sudo systemctl enable wslinit.service
 ```
 
+### make a distro id for display on the host
+
+```
+cat <<'EOF' | sudo tee /etc/profile.d/distroid.sh > /dev/null
+#!/bin/bash
+if ! [ -n "$WSL_DISTRO_NAME" ]; then
+    export DISTRO_ID=ArchContainer
+fi
+EOF
+```
+
 ### setup manjaro (native host system)
 
 - install manjaro from a usb drive
@@ -317,19 +328,15 @@ if ! [ -n "$WSL_DISTRO_NAME" ]; then
 fi
 EOF
 ```
-- copy ssh keys
+- copy configuration from wsl
 ```
-mkdir ~/.ssh
-paste keys from backup
-chmod 700 ~/.ssh
-chmod 0600 /home/dariusza/.ssh/id_rsa
-```
-- set up basic utilities by copying the wsl config
-```
-cp wsl2-vhd/home/dariusza/.inputrc ~/.inputrc
-cp wsl2-vhd/home/dariusza/.bashrc ~/.bashrc
-nano ~/.bashrc # remove settings which depend on utilities
-sudo pacman -S neovim
+cp -ar ~/wsl2-vhd/home/dariusza/.ssh/ .
+cp -r ~/wsl2-vhd/home/dariusza/.git* ~
+git clone git@github.com:QAston/wslconfig.git 
+ln -s /home/dariusza/wslconfig/home/bin/ bin
+cd ~/wslconfig
+./native-host-install.bash
+sudo pacman -S broot fzf bash-completion
 ```
 - set up host sysctl config from host.conf
 ```
