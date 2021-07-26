@@ -106,10 +106,6 @@ EOF
 sudo pacman -S neovim xclip base-devel noto-fonts-emoji
 pacaur -S noto-color-emoji-fontconfig
 ```
-- set up clock sync with windows
-```
-sudo timedatectl set-local-rtc true # set windows clock
-```
 - set up mounting tools for vhd
 ```
 sudo pacman -S qemu-headless nbd
