@@ -28,10 +28,6 @@ powercfg.exe /hibernate off
 
 - the partition editor is a bit dumb, create it in partition settings instead, doesn't need to be big as the host system doesn't need much space
 
-#### set up windows time
-
-- https://wiki.archlinux.org/title/System_time
-
 ### setup wsl2 vhdx contents
 
 - set up drivers
@@ -108,7 +104,7 @@ pacaur -S noto-color-emoji-fontconfig
 ```
 - set up clock sync with windows
 ```
-sudo timedatectl set-local-rtc true # set windows clock
+sudo timedatectl set-local-rtc 1 # set windows clock, cat /etc/adjtime to verify
 ```
 - set up mounting tools for vhd
 ```
