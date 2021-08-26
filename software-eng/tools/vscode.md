@@ -346,6 +346,35 @@ pacaur -S code-marketplace code-features
     - custom normal mode mappings [should be done from neovim](https://github.com/asvetliakov/vscode-neovim#custom-keymaps-for-scrollingwindowtabetc-management)
         - [all bindings](https://github.com/asvetliakov/vscode-neovim/tree/master/vim)
 
+#### vscode neovim development
+
+- handling integration:
+    - insert mode is all handled within vscode plugin
+        (commands_controller)
+    - other modes are handled through sending data from vscode to neovim using the neovim nodejs package (node-client repository)
+    - syncing data is done when doing `<esc>` or `<c-o>`
+        - (typing manager)
+- patterns
+    - to "debounce" means to replace multiple sequential calls which would potentially cause the ui to change state repeatedly in a short time, with a single call
+- insert mode patch
+    - problem - switching files while in insert mode triggers an update from neovim that contains obsolete cursor positon
+    - ideas:
+        - always send cursor position so that the positon neovim sends back isn't out of date
+        - don't update the cursor position when switching files
+        - don't trigger the update from neovim when switching while in insert mode
+            - sounds most sensible because the plugin seems to be able to recover
+            - it can't recover on it's own if the layout (buffer_manager) is desynced, how do we sync back?
+                - we try to sync whenever there's a change in the mode
+- packaging
+```
+npx vsce package
+```
+- todo: frankenvim?
+    - merge vscode-neovim's integration with vscodevim's insert mode?
+- better binding generation
+    - run nvim's init script, then ask what's bound to what key and generate vscode bindings based on that?
+- somehow use nvim in insert mode too, and simply propagate changes made in nvim to vscode (like scroll and things)
+
 ### c++
 
 - [default cpp extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)

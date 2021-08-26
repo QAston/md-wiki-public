@@ -60,6 +60,7 @@
 
 ## linux tools
 
+* [convert .o file to .h](https://sr.ht/~taiite/protodump/)
 * [strace](https://strace.io/) - trace all syscalls of a process
     * `strace <cmd>`
 * [ltrace](https://ltrace.org/) - trace all dllcalls of a process
@@ -130,6 +131,7 @@ perf script
     * [load a method detour dll without modifying executable](https://github.com/microsoft/Detours/wiki/SampleWithdll)
     * [modify an executable to load a detour dll](https://github.com/microsoft/Detours/wiki/OverviewPayloads)
     * [other samples](https://github.com/microsoft/Detours/wiki/Samples) - includes tracing various win32 functions: io, memory, etc
+* [process dump](https://github.com/glmcdona/Process-Dump)
 
 ## documentation
 

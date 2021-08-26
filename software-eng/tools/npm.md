@@ -2,9 +2,20 @@
 
 Files: <https://docs.npmjs.com/files/folders>
 
-## setup
+## setup windows
 
 download zip to portable and add `C:\portable\node` to `PATH_APPEND_WINDOWS`
+
+## setup linux
+
+```
+sudo pacman -S nodejs npm
+```
+add configuration to where install packages
+```
+PATH="$HOME/.npmconfig/bin:$PATH"
+export npm_config_prefix="$HOME/.npmconfig"
+```
 
 ## usage
 
@@ -52,3 +63,18 @@ Npx:
 {"start": "node server.js"} // if there's a server.js
 {"install": "node-gyp rebuild"} // if there's a binding.gyp
 ```
+
+### yarn 
+
+- yarn does the same job as npm, uses the same package.json format and shares most of the commands
+- install in the current npm global install directory using (it's fine to install globally for this particular package because it's just as rare for the project to need an old version of yarn as it is for the project to need an old version of npm)
+```
+npm -g install yarn
+```
+- npx will use yarn if yarn.lock is present
+
+### nvm
+
+- like pyenv but for selecting a verion of node.js?
+- linux/macos <https://github.com/nvm-sh/nvm>
+- windows <https://github.com/coreybutler/nvm-windows>

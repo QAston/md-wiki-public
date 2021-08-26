@@ -11,7 +11,7 @@
      * <https://wiki.archlinux.org/index.php/Patching_packages>
  * sudo pacman -S asp subversion
  * Add IgnoreGroup = modified to /etc/pacman.conf
- * Add Packages to ignore updates for here: 
+ * Add Packages to ignore updates for to /etc/pacman.conf IgnorePkgs, or use --assume-installed flag for pacman
  * Modify `/etc/makepkg.conf`
     * set MAKEFLAGS="-j12"
     * change -march=x86_64 to march=native # note this will break executables if you upgrade hardware
