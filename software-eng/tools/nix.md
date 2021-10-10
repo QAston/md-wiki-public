@@ -139,6 +139,8 @@ s.a-b
 > "baz"
 s."123"
 > "num"
+s ? foo # check if contains foo
+> true
 
 rec { a = 3; b = a+4; } # recursive attribute set - can refer to other keys in a map
 > { a = 3; b = 7; }
@@ -403,7 +405,7 @@ self: super:
 ```
 pkgs = import nixpkgs {
   overlays = [
-    import ./nix/overlay-def.nix
+    (import ./nix/overlay-def.nix) # () make sure the import is interpreted as a single list element
   ];
 };
 ```

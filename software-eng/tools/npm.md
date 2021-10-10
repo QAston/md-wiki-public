@@ -27,8 +27,8 @@ Global instals:
 
 Local installs (directory with package.json, a.k.a `$prefix` directory):
 
-- `npm install <package-name> --save-dev` - adds to devDependencies, which is for devtools (like for build), available from $prefix/node_modules/.bin
-- `npm install <package-name>` adds to dependencies, available from $prefix/node_modules/.bin
+- `npm install <package-name> --save-dev` - adds to devDependencies, which is for devtools (like for build), available from `$prefix/node_modules/.bin`
+- `npm install <package-name>` (`--save` is implicitly default) adds to dependencies, available from `$prefix/node_modules/.bin`
 
 Npx:
 

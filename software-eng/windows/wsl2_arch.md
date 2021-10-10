@@ -4,6 +4,7 @@
 
 ## set up os
 
+1. Set up wsl2 itself [setup wsl](./wsl.md)/setup wsl2
 1. Download and unpack the zip from <https://github.com/yuk7/ArchWSL>
 2. Run the Arch executable to install and unpack
 3. Setup users (https://wsldl-pg.github.io/ArchW-docs/How-to-Setup/)

@@ -20,6 +20,9 @@
 * [bash pitfals](https://mywiki.wooledge.org/BashPitfalls)
 * <https://effective-shell.com/docs/part-5-building-your-toolkit/managing-remote-git-repositories/>
 * [redirections](https://catonmat.net/bash-one-liners-explained-part-three)
+* bash builtins cd and pwd handle symlinks differently than external commands
+    * for external commands symlink/.. will go to the parent directory of the symlinked directory
+    * because bash tracks how you've got to current pwd, bash builtins will resolve symlink/.. to the directory where symlink is contained
 
 ### setup for linux
 

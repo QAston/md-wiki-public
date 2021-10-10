@@ -1,3 +1,10 @@
+## setup wsl
+
+1. Configure wsl2
+     * `wsl --set-default-version 2`
+     * Configure wsl2: in `%USER_PROFILE%/.wslconfig`: <https://github.com/QAston/wslconfig/blob/master/winusrprofile/.wslconfig>
+     * `wsl --update` to update the kernel to latest version
+
 ## setup windows - wsl integration
 
 ### Setup X on the windows side
@@ -38,7 +45,7 @@
 2. Modify `.bashrc` to configure x variables
      * `export __GLX_VENDOR_LIBRARY_NAME=mesa`
      * `export LIBGL_ALWAYS_INDIRECT=0`
-     * `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0`
+     * `export DISPLAY=$(ip route | awk '/^default/{print $3; exit}'):0.0`
 3. relogin
 4. sudo pacman -S xterm mesa-demos noto-fonts ttf-cascadia-code xorg-xrdb xclip
 5. pacaur -S nerd-fonts-complete
@@ -84,7 +91,7 @@ sudo pacman -S pulseaudio pulseaudio-alsa
 ```
 2. set up pulseaudio connection to windows - add to bashrc
 ```
-export PULSE_SERVER=tcp:$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}')
+export PULSE_SERVER=tcp:$(ip route | awk '/^default/{print $3; exit}')
 ```
 3. test
 ```

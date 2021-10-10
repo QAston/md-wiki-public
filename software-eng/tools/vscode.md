@@ -304,7 +304,7 @@ pacman -S code
 pacaur -S code-marketplace code-features
 ```
 
-## interesting settings extensions
+## interesting settings and extensions
 
 - settings sync allows syncing config files
     - each part of the config can be commented out and disabled on a machine: <https://github.com/shanalikhan/code-settings-sync/wiki/Sync-Pragmas>
@@ -318,10 +318,94 @@ pacaur -S code-marketplace code-features
 - multi-command - bind multiple commands to a single command name
 - commands - allows binding any command to status bar and to display custom text (sadly doesn't evaluate variables)
 - differently colored windows for easy distinguishing: https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock
-- remote container development plugin automatically starts a container defined in .devcontainer directory/file - use remote container open directory command
+- [nix-env-selector](https://marketplace.visualstudio.com/items?itemName=arrterian.nix-env-selector) - same as starting code from nix-shell but more automated and allows dynamic switching between environments
+
+### developing using containers
+
+#### docker extension - develop and build on host system, package to a container, attach debugger to an application running in a container
+
+- [docker extension](https://code.visualstudio.com/docs/containers/overview)
+- provides utilities for generating Dockerfile for the project, browsing containers, tasks, etc
+- the default config generated with docker file detects exposed services and allows attaching a debugger to the container
+- looks like you can attach to any container as long as you expose the port and launch a debugger with a launcher configured to use that port
+- can attach the vscode integrated terminal to a container using: `Docker Containers Attach Shell`
+
+#### remote container - development and build inside a container
+
+- benefits:
+    - development containers give a reproducible environment for everyone to use
+- drawbacks:
+    - the containers won't have all of my custom devtools unless I create my own containers
+    - bareness of the containers can be partially mitigated by running a [custom dotfile install script with a custom repo](https://code.visualstudio.com/docs/remote/ containers#_personalizing-with-dotfile-repositories) - could install all sorts of software throught this?
+- provided by remote continers extension, see `remote containers:` commands list
+- only a single container connection pair per window
+- `devcontainer.json` configures what container to start up for newly opened project ([reference](https://code.visualstudio.com/docs/remote/devcontainerjson-reference))
+    - `build.target` option specifies the stage to build in a multistage build
+        - allows using a single docker file for both dev/build env and for building the final build using that container
+            - devenv stage: FROM a devcontainer, runs steps to set up build
+            - devenv-build: FROM devenv stage, runs the build command
+            - deployment: FROM deploymentcontainer, copy build results from devenv-build
+    - `workspaceFolder` path to source code in the container
+    - `remoteUser` + `remoteEnv` user and env vars in the container for vscode and vscode initiated commands
+    - `forwardPorts` ports to forward to the host
+    - uses either a Dockerfile, docker-compose.yml or a base image to specify which container to run
+        - `image` - name of existing image
+        - `build.dockerfile` - path to dockerfile, build with `build.context` path
+        - `dockerComposeFile` + `service` + `runServices` - path to docker-compose.yml, name of the container service to attach and additional services to run
+    - `shutdownAction` - what to do when vscode is closed
+        -  `none`, `stopCompose` or `stopDocker`
+    - vscode settings:
+        - `extensions` - array of extensions to install in the container, empty by default
+        - `settings` - map of settings.json settings to use by default in the container
+    - script hooks:
+        - `initializeCommand` - run locally before anything else 
+        - `onCreateCommand` - creating a container
+        - `updateContentCommand` - currently unused
+        - `postCreateCommand` - container created
+        - `postStartCommand` - started container
+        - `postAttachCommand` - vscode attached
+        - `waitFor` - configure when vscode attaches, by default after `onCreateCommand` is executed
+    - remote containers: open container file has some useful examples:
+        - a [configuration](https://code.visualstudio.com/docs/remote/containers-advanced#_using-docker-or-kubernetes-from-a-container) that allows using docker from inside the devcontainer, or create child containers while in docker
+        - minikube inside docker
+        - configuration for accessing local kubernetes
+        - environments for a ton of languages under "show all" option
+- `remote containers: open workspace/folder/reopen` in a container opens a new project window for selected project and a creator for making a development container
     - vscode installs a remote module in the container, similar to wsl, and executes plugins there
-- there's an option to just attach to an existing container and also configure steps vscode would do automatically for that container
+    - if there's no devcontainer.json it a creator is started in workspace dir
+    - the source code is passed to the dev container via a docker mount:
+        - `"workspaceMount": "source=${localWorkspaceFolder}/sub-folder,target=/workspace,type=bind,consistency=cached"`
+        - to make it work with docker in external container this need to be changed to point to
+- `remote containers: clone repository/clone PR in a container volume/try a container sample`
+    - sets up a project inside a docker volume instead of a disk
+    - projects can only be accessed by using the recent list by using recent list
+    - recent list can be accessed in .config/Code/storage.json
+    - you can copy the volume out using:
+        - `docker run --rm --mount type=bind,source=$(pwd),target=/dest -v vscode-remote-try-node-6789fd329eb29bc56aab44eb27506206:/src busybox cp -r /src /dest`
+        - remember that volume mounts will write to the container/host that actually runs docker
+- `remote containers: attach to running container`
+    - attaching to existing containers (devcointainer config file isn't needed, in fact it isn't used even if present)
+    - by default opens /home/username directory
     - <https://code.visualstudio.com/docs/remote/attach-container>
+    - can attach to a kube pod with k8s extension
+    - a subset of devcontainer config can be saved/restored using "attached container config files"
+    - will disconnect once container shuts down
+- `explore a volume in a development containers` - browses a volume with some default container, doesn't work for opening volume-based remote container projects
+- [definitions of example project configurations](https://github.com/microsoft/vscode-dev-containers)
+    - [rust example](https://github.com/microsoft/vscode-dev-containers/tree/main/containers/rust)
+    - [rust dev container definition](https://github.com/microsoft/vscode-dev-containers/blob/main/containers/rust/.devcontainer/base.Dockerfile)
+- nix
+    - [nix devcontainer - doesn't work with oktet?](https://github.com/zimbatm/vscode-devcontainer-nix)  nixpkgs/devcontainer:nixos-20.03
+    - [debian nix devcontainer](https://github.com/xtruder/debian-nix-devcontainer) xtruder/debian-nix-devcontainer:latest
+    - install nix environment select extension to run vscode in shell
+
+### remote kubernetes - okteto extension
+
+- see [kubernetes/okteto](./kubernetes.md) for setup, config and overview
+- install kubernetes, remote kubernetes and remote ssh extensions to use remote kubernetes
+- `okteto up` command swaps the deployed k8s container with a container specified in the manifest
+    - the vscode extension is not needed for file editing (since they're synced), but very useful because it provides easy debugging setup with extensions 
+- use one of the vscode devcontainer images as the base for the image, so that vscode and lang tools work well
 
 ### vim integration
 
