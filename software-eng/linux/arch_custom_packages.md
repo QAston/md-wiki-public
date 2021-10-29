@@ -1,4 +1,4 @@
-### set up build tools
+sd### set up build tools
 
 * pacman -S base-devel 
 
@@ -46,6 +46,19 @@
      * First need to install auracle-git and expac-git from AUR
      * Build and install pacaur package
      * add to ~/.bashrc: `export EDITOR=neovim`
+```
+mkdir ~/aur
+cd ~/aur
+git clone https://aur.archlinux.org/expac-git.git
+git clone https://aur.archlinux.org/auracle-git.git
+git clone https://aur.archlinux.org/pacaur.git
+cd auracle-git
+makepkg -si
+cd ../expac-git
+makepkg -si
+cd ../pacaur
+makepkg -si
+```
 
 ### Set up appimages
 
