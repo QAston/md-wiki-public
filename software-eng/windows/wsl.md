@@ -299,9 +299,9 @@ Arch and Artix shouldn't be running at the same time because the init systems ch
         * cd /media/{targetdriveid}
         * sudo cp -a ../{sourcedriveid}/* .
     * make sure to remove the drive from all vms and give everyone read/write access, otherwise you'll get access is denied error on wsl startup
-* expanding fixed partitionless drive (theoretical, haven't done this yet):
+* expanding fixed partitionless drive:
     * expand the vhdx file in hyperv
-    * run [resize2fs](https://man.archlinux.org/man/resize2fs.8.en)
+    * run `resize2fs /dev/sda` which will automatically expand to largest size
 
 #### mounting additional vhdx files in wsl2
 

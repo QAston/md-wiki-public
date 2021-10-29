@@ -14,8 +14,10 @@
 * interactive vs login shell
     * login (interactive or not) runs /etc/profile, then first readable of ~/.bash_profile, ~/.bash_login, and ~/.profile
         * often ~/.bash_profile imports ~/.bashrc if shell is interactive
-    * interactive non-login shell runs ~/.bashrc on startup
-    * noninteractive shells run contents of $BASH_ENV on startup
+        * bash invoked as `-bash` is set as a login shell
+    * interactive non-login shell runs /etc/bash.bashrc and ~/.bashrc on startup
+    * noninteractive bash runs contents of $BASH_ENV on startup 
+    * when run as `sh` it runs /etc/profile and contents of $ENV on startup (counts as noninteractive nonlogin)
 * [writing more reliable scripts](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
 * [bash pitfals](https://mywiki.wooledge.org/BashPitfalls)
 * <https://effective-shell.com/docs/part-5-building-your-toolkit/managing-remote-git-repositories/>

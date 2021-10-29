@@ -390,6 +390,7 @@ pacaur -S code-marketplace code-features
     - can attach to a kube pod with k8s extension
     - a subset of devcontainer config can be saved/restored using "attached container config files"
     - will disconnect once container shuts down
+    - can connect to minikube if vscode is run inside `minikube docker-env`
 - `explore a volume in a development containers` - browses a volume with some default container, doesn't work for opening volume-based remote container projects
 - [definitions of example project configurations](https://github.com/microsoft/vscode-dev-containers)
     - [rust example](https://github.com/microsoft/vscode-dev-containers/tree/main/containers/rust)
