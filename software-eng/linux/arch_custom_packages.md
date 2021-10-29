@@ -53,11 +53,11 @@ git clone https://aur.archlinux.org/expac-git.git
 git clone https://aur.archlinux.org/auracle-git.git
 git clone https://aur.archlinux.org/pacaur.git
 cd auracle-git
-makepkg -si
+makepkg -si --noconfirm
 cd ../expac-git
-makepkg -si
+makepkg -si --noconfirm
 cd ../pacaur
-makepkg -si
+makepkg -si --noconfirm
 ```
 
 ### Set up appimages
