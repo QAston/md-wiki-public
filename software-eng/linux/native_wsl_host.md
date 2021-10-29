@@ -365,11 +365,20 @@ sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
 ### todos
 
 - use nspawn and mount config files instead of a script service?
+  - could use blockdev@.target for /dev/dri? and maybe ndb?
+  - ndb client should be configured using ndbtab and connect to qemu-nbd using a unix socket
+    - this would probably refresh things on sleep?
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk (currently in insider only)
     - alternatively try to make ext4 partition be visible as a special vhdx file? by somehow implementing [device files](https://en.wikipedia.org/wiki/Device_file) on windows? possibly by implementing it in linux and loading wsl partition from wsl share?
       - could make a wrapper wsl2 distro that mounts the main one like on linux?
     - linux kernel should get the new ntfs driver realtively soon, hopefully that'd make things run faster?
+- todo; qemu-nbd shuts down on sleep, this doesn't work well with laptops, so need to unpack the image instead
+  - set up nbd server to prevent this?
+    - qemu-nbd works both as client and server in the above setup
+    - maybe running it as a server and running separate nbd-client process would help?
+    - sleep is done through systemctl suspend
+      - systemctl-suspend.service
 
 ### references
 
