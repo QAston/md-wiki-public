@@ -9,6 +9,8 @@
 
 ### setup on windows
 
+#### change windows to use utc bios time
+
 #### convert the image to a fixed vhdx
 
 - open the file in hyperv manager  (right click on a vm -> edit image)
@@ -30,10 +32,6 @@ powercfg.exe /hibernate off
 
 ### setup wsl2 vhdx contents
 
-- set up drivers
-```
-pacman -S nvidia-libgl
-```
 - set up env variables
 ```
 if [ -n "$WSL_DISTRO_NAME" ]; then
@@ -42,10 +40,10 @@ else
 export DISPLAY=:0
 export PULSE_SERVER=tcp:127.0.0.1
 unset LIBGL_ALWAYS_INDIRECT
-export __NV_PRIME_RENDER_OFFLOAD=0
-export __GL_SYNC_TO_VBLANK=1
-export __GLX_VENDOR_LIBRARY_NAME=nvidia
-export LIBGL_DEBUG=verbose
+#export __NV_PRIME_RENDER_OFFLOAD=0
+#export __GL_SYNC_TO_VBLANK=1
+#export __GLX_VENDOR_LIBRARY_NAME=nvidia
+#export LIBGL_DEBUG=verbose
 fi
 ```
 - add an etc/resolv.conf service (Arch only)
@@ -104,10 +102,6 @@ EOF
 sudo pacman -S neovim xclip base-devel noto-fonts-emoji
 pacaur -S noto-color-emoji-fontconfig
 ```
-- set up clock sync with windows
-```
-sudo timedatectl set-local-rtc 1 # set windows clock, cat /etc/adjtime to verify
-```
 - set up mounting tools for vhd
 ```
 sudo pacman -S qemu-headless nbd
@@ -150,7 +144,7 @@ UID=AC481B43481B0BA8 /home/dariusza/wsl2-ntfs ntfs-3g auto,rw,defaults,uid=1000,
 
 #### set up audio/video support
 
-- install drivers
+- install drivers (nvidia)
 ```
 sudo pacman -S nvidia-libgl
 ```
