@@ -56,6 +56,8 @@ if [ -n "$WSL_DISTRO_NAME" ]; then
         ln -sf /run/resolvconf/resolv.conf /etc/resolv.conf
 else
         ln -sf /mnt/host/etc/resolv.conf /etc/resolv.conf
+        # link to linux graphics drivers on host machine
+        ln -sf /mnt/host/dev/dri/ /dev/dri
 fi
 EOF
 sudo chmod a+x /root/wslinit
@@ -179,8 +181,9 @@ set -e
 VHDX_IMG="$1"
 MOUNT_POINT="$2"
 NBD_DEVICE="$3"
+MACHINECTL_SERVICE="$4"
 
-shift 3
+shift 4
 
 function unmount_device {
   qemu-nbd -d $NBD_DEVICE
@@ -192,8 +195,15 @@ function unmount_partition {
 }
 
 function unmount_all {
+  echo "unmount_all"
   unmount_partition
   unmount_device
+}
+
+function shutdown_all {
+  echo "shutdown_all"
+  machinectl stop $MACHINECTL_SERVICE || true
+  unmount_all
 }
 
 # mount block device
@@ -210,12 +220,15 @@ trap unmount_all EXIT
 
 mkdir -p /mnt/wsl
 chmod 777 /mnt/wsl
+
 systemd-notify --ready
+
+trap shutdown_all EXIT
 
 # SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 - make kernel filesystems writeable - needed for docker in a container
 # SYSTEMD_SECCOMP=0 - disable capability checks
 # SYSTEMD_NSPAWN_USE_CGNS=0 - https://wiki.archlinux.org/title/systemd-nspawn#Run_docker_in_systemd-nspawn
-SYSTEMD_SECCOMP=0 systemd-nspawn -D "$MOUNT_POINT" --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
+SYSTEMD_SECCOMP=0 systemd-nspawn -M "$MACHINECTL_SERVICE" -D "$MOUNT_POINT" --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
 
 # --resolv-conf=bind-host - binds too early before the file is populated by network manager
 EOF
@@ -228,19 +241,19 @@ chmod a+x /home/dariusza/mount-wsl2.sh
 cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2-docker.service > /dev/null
 [Unit]
 Description=Wsl2 Docker mount service
-RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp
-Requires=systemd-modules-load.service
-After=systemd-modules-load.service
+RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp /dev/dri
+Requires=systemd-modules-load.service sddm.service
+After=systemd-modules-load.service sddm.service
 
 [Service]
 Environment="SYSTEMD_NSPAWN_USE_CGNS=0"
 Environment="SYSTEMD_NSPAWN_API_VFS_WRITABLE=1"
 Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" --bind=/sys/fs/cgroup --boot # Artix: "/root/startdocker_init" Arch: --boot
+ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" wsl2-docker-vhd --bind=/sys/fs/cgroup --boot # Artix: "/root/startdocker_init" Arch: --boot
 Restart=no
 
 [Install]
-WantedBy=local-fs.target
+WantedBy=graphical.target # to mount /dev/dri
 EOF
 
 # enable autostart
@@ -252,18 +265,18 @@ sudo systemctl enable mount-wsl2-docker.service
 # use wsl2_docker.md service instead if you want a to run on the host
 WSL_INIT_SCRIPT=--boot # Artix: "/home/dariusza/bin/init" Arch: --boot
 DOCKER_FS_PATH=/ # Native host: / Docker distro: /home/dariusza/wsl2-docker-vhd/
-WSL_DISTRO_PATH=/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx # Artix: 
+WSL_DISTRO_PATH=/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx # Artix:
 
 cat << EOF | sudo tee /etc/systemd/system/mount-wsl2.service > /dev/null
 [Unit]
 Description=Wsl2 mount service
-RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp
+RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp /dev/dri
 Requires=systemd-modules-load.service
-After=systemd-modules-load.service mount-wsl2-docker.service
+After=systemd-modules-load.service
 
 [Service]
 Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "${WSL_DISTRO_PATH}" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" --bind=/dev/dri --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/docker-linux-wsl/root ${WSL_INIT_SCRIPT}
+ExecStart=/home/dariusza/mount-wsl2.sh "${WSL_DISTRO_PATH}" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" wsl2-vhd  --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/docker-linux-wsl/root ${WSL_INIT_SCRIPT}
 Restart=no
 
 [Install]
@@ -333,7 +346,7 @@ EOF
 ```
 cp -ar ~/wsl2-vhd/home/dariusza/.ssh/ .
 cp -r ~/wsl2-vhd/home/dariusza/.git* ~
-git clone git@github.com:QAston/wslconfig.git 
+git clone git@github.com:QAston/wslconfig.git
 ln -s /home/dariusza/wslconfig/home/bin/ bin
 cd ~/wslconfig
 ./native-host-install.bash
