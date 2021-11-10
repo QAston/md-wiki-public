@@ -370,8 +370,15 @@ sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
     - this would probably refresh things on sleep?
 - faster io on linux by moving the image out of vhdx into a real ext4 partition which can be simply mounted:
     - https://docs.microsoft.com/en-us/windows/wsl/wsl2-mount-disk (currently in insider only)
+      - would need to make a "host" distro that chroots into the mounted drive?
+        - a dummy distro with just a fake /bin/bash would work
+          - ideally would only depend on the kernel
+          - i'd need to invoke chroot to set the paths properly
+            - could use the executable on the target distro's drive
+        - make docker distro a "host distro"?
+          - probably bad, would have to always start docker's bash to get to wsl itself
+    - would have to make a usb stick with ext4 to move files between machines and make backups
     - alternatively try to make ext4 partition be visible as a special vhdx file? by somehow implementing [device files](https://en.wikipedia.org/wiki/Device_file) on windows? possibly by implementing it in linux and loading wsl partition from wsl share?
-      - could make a wrapper wsl2 distro that mounts the main one like on linux?
     - linux kernel should get the new ntfs driver realtively soon, hopefully that'd make things run faster?
 - todo; qemu-nbd shuts down on sleep, this doesn't work well with laptops, so need to unpack the image instead
   - set up nbd server to prevent this?
@@ -379,7 +386,7 @@ sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
     - maybe running it as a server and running separate nbd-client process would help?
     - sleep is done through systemctl suspend
       - systemctl-suspend.service
-
+   
 ### references
 
 - <https://wiki.archlinux.org/index.php/chroot>
