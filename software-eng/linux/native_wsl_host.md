@@ -144,7 +144,7 @@ UID=AC481B43481B0BA8 /home/dariusza/wsl2-ntfs ntfs-3g auto,rw,defaults,uid=1000,
 
 #### set up audio/video support
 
-- install drivers (nvidia)
+- install drivers (nvidia machines)
 ```
 sudo pacman -S nvidia-libgl
 ```
@@ -386,6 +386,10 @@ sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
     - maybe running it as a server and running separate nbd-client process would help?
     - sleep is done through systemctl suspend
       - systemctl-suspend.service
+- cleanup links/mounts between host and the container
+  - replace some symlinks with mount --bind (mounts parent directory handling is better)
+    - can also configure sharing using --make-shared and --make-rshared, see <https://linux.die.net/man/8/mount>
+  - rename chorusone dir to host-workspace
    
 ### references
 

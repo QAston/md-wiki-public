@@ -420,6 +420,33 @@ pkgs = import nixpkgs {
 
 ### Setup 
 
+* if running in a hosted container (wsl or native), optionally mount host /nix directory for sharing
+```
+sudo mkdir /nix
+sudo chown dariusza /nix
+sudo chgrp dariusza /nix
+# create a service
+cat << 'EOF' | sudo tee /etc/systemd/system/nix.mount > /dev/null
+[Unit]
+Description=Link for the docker.socket from /mnt/wsl
+After=local-fs.target umount.target
+
+[Mount]
+What=/mnt/wsl/docker-linux-wsl/root/nix/
+Where=/nix
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
+EOF
+sudo systemctl enable nix.mount
+sudo systemctl start nix.mount
+
+# might need to add additonal users
+cd /nix/var/nix/profiles/per-user
+ln -s dariusza user
+```
 * install nix
 ```
 curl -L https://nixos.org/nix/install | sh
