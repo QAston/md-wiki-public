@@ -228,7 +228,7 @@ SYSTEMD_SECCOMP=0 systemd-nspawn -M "$MACHINECTL_SERVICE" -D "$MOUNT_POINT" --bi
 EOF
 chmod a+x /home/dariusza/mount-wsl2.sh
 ```
-- set up docker container or service (Arch, replace Arch with Artix for Artix)
+- set up docker container or service
     - follow steps from [wsl2_docker](../windows/wsl2_docker.md) on the host if you want to run docker natively on the host
     - or setup the service below to mount a wsl2 container instead (todo: not everything works in a container)
 ```
@@ -243,7 +243,7 @@ After=systemd-modules-load.service sddm.service
 Environment="SYSTEMD_NSPAWN_USE_CGNS=0"
 Environment="SYSTEMD_NSPAWN_API_VFS_WRITABLE=1"
 Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" wsl2-docker-vhd --bind=/sys/fs/cgroup --boot # Artix: "/root/startdocker_init" Arch: --boot
+ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" wsl2-docker-vhd --bind=/sys/fs/cgroup --boot
 Restart=no
 
 [Install]
@@ -257,9 +257,9 @@ sudo systemctl enable mount-wsl2-docker.service
 ```
 # this sets up docker based on the DockerArch/DockerArtix container
 # use wsl2_docker.md service instead if you want a to run on the host
-WSL_INIT_SCRIPT=--boot # Artix: "/home/dariusza/bin/init" Arch: --boot
+WSL_INIT_SCRIPT=--boot
 DOCKER_FS_PATH=/ # Native host: / Docker distro: /home/dariusza/wsl2-docker-vhd/
-WSL_DISTRO_PATH=/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx # Artix:
+WSL_DISTRO_PATH=/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx
 
 cat << EOF | sudo tee /etc/systemd/system/mount-wsl2.service > /dev/null
 [Unit]
@@ -280,39 +280,7 @@ EOF
 # enable autostart
 sudo systemctl enable mount-wsl2.service
 ```
-- set up a login shell script (Artix)
-```
-# use nsenter instead of machinectl/systemd-run becuase they require systemd in the container
-# nsenter needs to be run as root
-# use setuid to bypass permissions, bash ignores suid, so use an executable instead
-#
-# nsenter --target=$(machinectl show --property Leader wsl2-vhd | sed "s/^Leader=//") -a su dariusza
-DOCKER_SUFFIX="" # DOCKER_SUFFIX="-docker" for the docker container
-cat << EOF | gcc -o /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh -xc -
-#include <unistd.h>
-#include <stdio.h>
-
-int main(int argc, char** argv) {
-  FILE *output;
-  char arg1[1024];
-
-  output = popen("machinectl show --property Leader wsl2-vhd$DOCKER_SUFFIX | sed 's/^Leader=//' | sed 's/^/--target=/' | tr --delete '\n'", "r");
-  if (output == NULL) {
-    printf("Failed to run command\n" );
-    return 1;
-  }
-
-  // read the output
-  fgets(arg1, sizeof(arg1), output);
-
-  return execlp("nsenter", "nsenter", arg1, "-a", "-S0", "su", "-", "dariusza", (char *) NULL);
-}
-EOF
-sudo chown root /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
-sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
-```
 - set up a login shell script (Arch)
-    - the one for artix will work, alternatively you can use `machinectl shell --uid 1000 wsl2-vhd`
 ```
 DOCKER_SUFFIX="" # DOCKER_SUFFIX="-docker" for the docker container
 cat << EOF | gcc -o /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh -xc -
@@ -347,12 +315,6 @@ cd ~/wslconfig
 sudo pacman -S broot fzf bash-completion
 ```
 - set up host sysctl config from host.conf
-```
-# artix - only:
-sudo cp /home/dariusza/wsl2-vhd/home/dariusza/bin/host.conf /etc/sysctl.d/60-wslhost.conf
-sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
-mkdir /tmp/cores
-```
 ```
 # arch-only:
 sudo cp /home/dariusza/wsl2-vhd/etc/sysctl.conf /etc/sysctl.d/60-wslhost.conf

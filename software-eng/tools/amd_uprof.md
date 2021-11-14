@@ -25,4 +25,4 @@ uprof = [
 - hyperv/wsl being enabled breaks hardware counter support :( (ibs is disabled message, even though it's enabled)
     - since 3.4 guest vms have support for time based profiling but nothing more
     - to enable full counters in host system disable hyperv and wsl2 features in windows feature dialog
-        - to reenable, reenable the settings and run artix.exe
+        - to reenable, reenable the settings and run arch.exe

@@ -184,69 +184,69 @@
         [
             {
                 "commandline": "cmd.exe",
-                "fontFace": "Delugia Nerd Font",
+                "font": 
+                {
+                    "face": "Delugia Nerd Font"
+                },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "hidden": false,
                 "name": "cmd"
             },
             {
-                "fontFace": "Delugia Mono Nerd Font",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
                 "hidden": false,
                 "name": "PowerShell",
                 "source": "Windows.Terminal.PowershellCore"
             },
             {
-                "commandline": "wsl.exe -d Artix",
-                "fontFace": "Delugia Mono Nerd Font",
-                "guid": "{ac73a22d-256b-58dd-8d16-749c37c3aeaa}",
-                "hidden": false,
-                "icon": "F:\\Artix\\Artix.ico",
-                "name": "Artix",
-                "source": "Windows.Terminal.Wsl"
-            },
-            {
                 "commandline": "powershell.exe",
-                "fontFace": "Delugia Mono Nerd Font",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": false,
                 "name": "Windows PowerShell"
             },
             {
                 "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -mingw64",
-                "fontFace": "Delugia Mono Nerd Font",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
                 "guid": "{17da3cac-b318-431e-8a3e-7fcdefe6d114}",
                 "icon": "C:/portable/msys/mingw64.ico",
                 "name": "MINGW64 / MSYS2"
             },
             {
                 "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -mingw64 -full-path",
-                "fontFace": "Delugia Mono Nerd Font",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
                 "guid": "{2d51fdc4-a03b-4efe-81bc-722b7f6f3820}",
                 "icon": "C:/portable/msys/mingw32.ico",
                 "name": "MINGW64-WINPATH / MSYS2"
             },
             {
                 "commandline": "C:/portable/msys/msys2_shell.cmd -defterm -here -no-start -msys",
-                "fontFace": "Delugia Mono Nerd Font",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
                 "guid": "{71160544-14d8-4194-af25-d05feeac7233}",
                 "icon": "C:/portable/msys/msys2.ico",
                 "name": "MSYS / MSYS2"
             },
             {
-                "guid": "{581f6350-7f18-5b58-96d2-e8600fa2c88d}",
-                "hidden": true,
-                "name": "DriveArch",
-                "source": "Windows.Terminal.Wsl"
-            },
-            {
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "hidden": false,
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
-            },
-            {
-                "fontFace": "Delugia Mono Nerd Font",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
                 "guid": "{a5a97cb8-8961-5535-816d-772efe0c6a3f}",
                 "hidden": false,
                 "icon": "F:\\Arch\\Arch.ico",
@@ -254,15 +254,55 @@
                 "source": "Windows.Terminal.Wsl"
             },
             {
-                "guid": "{674ddf39-3f49-501f-ac73-e5f68f362f89}",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
+                "guid": "{6e8bfb28-6f9b-5298-8f18-9b3f5fad9ee8}",
                 "hidden": false,
+                "name": "DockerArch",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            },
+            {
+                "commandline": "wsl.exe -d Artix",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
+                "guid": "{ac73a22d-256b-58dd-8d16-749c37c3aeaa}",
+                "hidden": true,
+                "icon": "F:\\Artix\\Artix.ico",
+                "name": "Artix",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
+                "guid": "{674ddf39-3f49-501f-ac73-e5f68f362f89}",
+                "hidden": true,
                 "name": "DockerArtix",
                 "source": "Windows.Terminal.Wsl"
             },
             {
-                "guid": "{6e8bfb28-6f9b-5298-8f18-9b3f5fad9ee8}",
-                "hidden": false,
-                "name": "DockerArch",
+                "font": 
+                {
+                    "face": "Delugia Mono Nerd Font"
+                },
+                "guid": "{581f6350-7f18-5b58-96d2-e8600fa2c88d}",
+                "hidden": true,
+                "name": "DriveArch",
                 "source": "Windows.Terminal.Wsl"
             }
         ]

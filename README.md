@@ -15,7 +15,7 @@ Relevant XKCD:
 I've documented the configuration of my development environment which I'm very fond of:
 - [windows environment](software-eng/windows/devenv.md#setup-steps)
 - [msys2](software-eng/windows/msys2.md)
-- [wsl2](software-eng/windows/wsl2_artix.md)
+- [wsl2](software-eng/windows/wsl2_arch.md)
 - [native linux host for the wsl2 container](software-eng/linux/native_wsl_host.md)
 
 ### Caveats

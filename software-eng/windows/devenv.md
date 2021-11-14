@@ -449,7 +449,7 @@ $env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
 
 ### set up wsl2 and docker
 
-- see [wsl2_artix](./wsl2_artix.md)
+- see [wsl2_arch](./wsl2_arch.md)
 
 ### set up "everything search"
 
