@@ -32,9 +32,15 @@ wsl.exe -d DockerArch -u root -e subsystemctl start
 
 ### configure the host system
 
-2. setup packages
+1. setup sshd for logging in from the guest container
 ```
-pacman -S docker minikube kubectl
+sudo pacman -S openssh
+sudo systemctl enable sshd
+sudo systemctl start sshd
+```
+2. setup docker
+```
+sudo pacman -S docker minikube kubectl
 ```
 3. set up users
 ```
@@ -171,6 +177,10 @@ fi
 if [ -f  /mnt/wsl/docker-linux-wsl/root/usr/share/bash-completion/completions/docker ]; then
   source /mnt/wsl/docker-linux-wsl/root/usr/share/bash-completion/completions/docker
 fi
+```
+6. add key to the host
+```
+cat ~/.ssh/id_rsa.pub | /mnt/wsl/docker-linux-wsl/root/home/dariusza/.ssh/authorized_keys
 ```
 
 #### switching between integration with docker-host container and docker-for-windows
