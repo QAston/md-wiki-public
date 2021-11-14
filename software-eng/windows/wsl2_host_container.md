@@ -54,7 +54,6 @@ sudo ln -s /mnt/wsl/docker-linux-wsl/root/bin/docker /home/dariusza/docker-bin/d
 sudo ln -s /mnt/wsl/docker-linux-wsl/root/bin/kubectl /home/dariusza/docker-bin/kubectl
 ```
 5. add an init script
-* arch (and native host if not using a container):
 ```
 # create a service to handle mounts
 cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2-docker.service > /dev/null
@@ -85,7 +84,6 @@ sudo chmod a+x /root/wsl2-docker-mounts.sh
 sudo systemctl enable mount-wsl2-docker.service
 ```
 6. set up and configure services
-* arch (and native host if not using a container):
 ```
 # create an override that configures socket location and group
 sudo mkdir -p /etc/systemd/system/docker.socket.d/
@@ -117,11 +115,87 @@ cat << 'EOF' | sudo tee /etc/docker/daemon.json > /dev/null
 }
 EOF
 ```
+8. Set up a host workspace directory, so that bindmounts work
+```
+mkdir /home/dariusza/host-workspace
+```
 
 ### configure host integration in the guest container
 
-1. set up [nix store on host](../tools/nix.md)
-2. set up [rust cache on host](../rust/tools.md)
+1.  set up sharing /nix directory with the host (so that's it's accessible as a docker bindmount)
+```
+sudo rm -rf /nix
+sudo mkdir /nix
+sudo chown dariusza /nix
+sudo chgrp dariusza /nix
+# create a service
+cat << 'EOF' | sudo tee /etc/systemd/system/nix.mount > /dev/null
+[Unit]
+Description=Link for the docker.socket from /mnt/wsl
+After=local-fs.target umount.target
+
+[Mount]
+What=/mnt/wsl/docker-linux-wsl/root/nix/
+Where=/nix
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
+EOF
+sudo systemctl enable nix.mount
+sudo systemctl start nix.mount
+
+# might need to add additonal users
+cd /nix/var/nix/profiles/per-user
+ln -s dariusza user
+```
+2. set up sharing rust build cache with the host (so that's it's accessible as a docker bindmount)
+```
+# create on host system or copy from guess system
+mkdir /home/dariusza/.cargo
+
+# create a service on guest system
+cat << 'EOF' | sudo tee /etc/systemd/system/home-dariusza-.cargo.mount > /dev/null
+[Unit]
+Description=Bindmount for /home/dariusza/.cargo to host system
+After=local-fs.target umount.target
+
+[Mount]
+What=/mnt/wsl/docker-linux-wsl/root/home/dariusza/.cargo
+Where=/home/dariusza/.cargo
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
+EOF
+sudo systemctl enable home-dariusza-.cargo.mount
+sudo systemctl start home-dariusza-.cargo.mount
+```
+3. set up shared workspace with the host (so that's it's accessible as a docker bindmount)
+```
+# create on host system or copy from guess system
+mkdir /home/dariusza/host-workspace
+
+# create a service on guest system
+cat << 'EOF' | sudo tee /etc/systemd/system/home-dariusza-host\\x2dworkspace.mount > /dev/null
+[Unit]
+Description=Bindmount for /home/dariusza/host-workspace to host system
+After=local-fs.target umount.target
+
+[Mount]
+What=/mnt/wsl/docker-linux-wsl/root/home/dariusza/host-workspace
+Where=/home/dariusza/host-workspace
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
+EOF
+sudo systemctl enable home-dariusza-host\\x2dworkspace.mount
+sudo systemctl start home-dariusza-host\\x2dworkspace.mount
+```
 
 #### configure docker host integration - need to also do these on host if you want to use docker from host
 
