@@ -35,7 +35,7 @@ fi
 
 ### setup - docker-linux-wsl (native linux docker/k8s)
 
-* follow [wsl2_docker](../windows/wsl2_docker.md)
+* follow [wsl2_host_container](../windows/wsl2_host_container.md)
 * install minikube in docker-arch
 ```
 pacman -S minikube

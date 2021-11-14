@@ -286,8 +286,6 @@ pacaur -S rr
 
 ## usage
 
-Arch and Artix shouldn't be running at the same time because the init systems change kernel settings differently and the kernel settings are shared
-
 ### vhdx 
 
 * wsl vhdx files use a partitionless drive, to create one in hyperv:
@@ -325,7 +323,6 @@ wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind /home/da
 ### wsl2 issues
 
  * lack of official systemd support - WSL2 uses it’s own init daemon, so systemd commands won’t work. In most cases this can be worked-around by using init.d scripts, for example instead of: `sudo systemctl start ssh` you need to use `/etc/init.d/ssh start`. Some daemons (for example udev) can’t be started this way and there seems to be no workaround for that, but then some of the daemons aren't needed (for example udev)
-     * wsl2_artix uses kernel config to change fix this
      * wsl2_arch enables custom systemd support
  * issues releasing memory back to windows - sometimes wsl2 doesn’t free the requested memory properly, there’s a workaround available here ([https://github.com/microsoft/WSL/issues/4166](https://github.com/microsoft/WSL/issues/4166) )
  * there _might_ be issues with opengl rendering or missing opengl features, although I didn’t have any problems so far, in that case the workaround is to use opengl clients built natively on windows

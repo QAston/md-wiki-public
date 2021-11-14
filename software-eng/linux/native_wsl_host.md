@@ -228,37 +228,10 @@ SYSTEMD_SECCOMP=0 systemd-nspawn -M "$MACHINECTL_SERVICE" -D "$MOUNT_POINT" --bi
 EOF
 chmod a+x /home/dariusza/mount-wsl2.sh
 ```
-- set up docker container or service
-    - follow steps from [wsl2_docker](../windows/wsl2_docker.md) on the host if you want to run docker natively on the host
-    - or setup the service below to mount a wsl2 container instead (todo: not everything works in a container)
+- add wsl container mount service
 ```
-cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2-docker.service > /dev/null
-[Unit]
-Description=Wsl2 Docker mount service
-RequiresMountsFor=/home/dariusza/wsl2-ntfs /tmp /dev/dri
-Requires=systemd-modules-load.service sddm.service
-After=systemd-modules-load.service sddm.service
-
-[Service]
-Environment="SYSTEMD_NSPAWN_USE_CGNS=0"
-Environment="SYSTEMD_NSPAWN_API_VFS_WRITABLE=1"
-Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "/home/dariusza/wsl2-ntfs/DockerArch/ext4.vhdx" "/home/dariusza/wsl2-docker-vhd/" "/dev/nbd0" wsl2-docker-vhd --bind=/sys/fs/cgroup --boot
-Restart=no
-
-[Install]
-WantedBy=graphical.target # to mount /dev/dri
-EOF
-
-# enable autostart
-sudo systemctl enable mount-wsl2-docker.service
-```
-- add wsl container mount service (Arch, replace Arch with Artix for Artix)
-```
-# this sets up docker based on the DockerArch/DockerArtix container
-# use wsl2_docker.md service instead if you want a to run on the host
 WSL_INIT_SCRIPT=--boot
-DOCKER_FS_PATH=/ # Native host: / Docker distro: /home/dariusza/wsl2-docker-vhd/
+DOCKER_FS_PATH=/ # Native host
 WSL_DISTRO_PATH=/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx
 
 cat << EOF | sudo tee /etc/systemd/system/mount-wsl2.service > /dev/null
@@ -292,6 +265,7 @@ EOF
 sudo chown root /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
 sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
 ```
+- [configure the host to mimic the wsl2 container host](../windows/wsl2_host_container.md)
 
 #### configure the host system
 

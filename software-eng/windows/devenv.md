@@ -447,9 +447,10 @@ $env:SHELL_LANG=(Get-Process -Id $PID).ProcessName
 
 - see [sysinternals](./sysinternals.md)
 
-### set up wsl2 and docker
+### set up wsl2
 
-- see [wsl2_arch](./wsl2_arch.md)
+- see [wsl2 development container](./wsl2_arch.md)
+- see [wsl2 host container](./wsl2_host_container.md)
 
 ### set up "everything search"
 
