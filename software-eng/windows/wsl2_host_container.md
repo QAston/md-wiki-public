@@ -35,6 +35,7 @@ wsl.exe -d DockerArch -u root -e subsystemctl start
 1. setup sshd for logging in from the guest container
 ```
 sudo pacman -S openssh
+echo "AcceptEnv FOO WSL_DISTRO_NAME" | sudo tee -a /etc/ssh/sshd_config
 sudo systemctl enable sshd
 sudo systemctl start sshd
 ```
