@@ -42,7 +42,7 @@ pacman -S minikube
 ```
 * point kubectl in arch to docker-arch minikube (possibly needs redoing every kube startup)
 ```
-cat /mnt/wsl/docker-linux-wsl/root/home/dariusza/.kube/config | sed s@/home/dariusza@/mnt/wsl/docker-linux-wsl/root/home/dariusza@ > /home/dariusza/.kube/config
+cat /mnt/wsl/host-arch/root/home/dariusza/.kube/config | sed s@/home/dariusza@/mnt/wsl/host-arch/root/home/dariusza@ > /home/dariusza/.kube/config
 ```
 
 #### minikube usage

@@ -243,7 +243,7 @@ After=systemd-modules-load.service
 
 [Service]
 Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "${WSL_DISTRO_PATH}" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" wsl2-vhd  --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/docker-linux-wsl/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/docker-linux-wsl/root ${WSL_INIT_SCRIPT}
+ExecStart=/home/dariusza/mount-wsl2.sh "${WSL_DISTRO_PATH}" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" wsl2-vhd  --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/host-arch/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/host-arch/root ${WSL_INIT_SCRIPT}
 Restart=no
 
 [Install]

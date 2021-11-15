@@ -17,11 +17,12 @@
     * before installing, rename Arch.exe to DockerArch.exe to install a new distro instead of override and existing one
     * can copy some files over for arch instead of building them locally
 ```
-cp -r /mnt/wsl/Arch/home/dariusza/portable/ .
-sudo cp -afr /mnt/wsl/Arch/bin/subsystemctl* /usr/bin
+sudo cp -r /mnt/wsl/arch/root/home/dariusza/portable/ .
+sudo cp -afr /mnt/wsl/arch/root/bin/subsystemctl* /usr/bin
 sudo sed -i 's|:/bin/bash|:/bin/subsystemctl-bash|g' /etc/passwd
-sudo cp /mnt/wsl/Arch/etc/locale.conf  /etc/locale.conf
-sudo cp /mnt/wsl/Arch/etc/locale.gen  /etc/locale.gen
+sudo cp /mnt/wsl/arch/root/etc/locale.conf  /etc/locale.conf
+sudo cp /mnt/wsl/arch/root/etc/locale.gen  /etc/locale.gen
+sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.ssh  /home/dariusza/.ssh
 ```
 2. Add a windows startup script (wsl containers)
 * docker_arch.bat:
@@ -50,51 +51,55 @@ sudo gpasswd -a dariusza docker-linux
 ```
 4. set up ~/docker-bin directory for integration
 ```
-sudo mkdir -p /home/dariusza/docker-bin/
-sudo ln -s /mnt/wsl/docker-linux-wsl/root/bin/docker /home/dariusza/docker-bin/docker
-sudo ln -s /mnt/wsl/docker-linux-wsl/root/bin/kubectl /home/dariusza/docker-bin/kubectl
+mkdir -p /home/dariusza/docker-bin/
+ln -s /mnt/wsl/host-arch/root/bin/docker /home/dariusza/docker-bin/docker
+ln -s /mnt/wsl/host-arch/root/bin/kubectl /home/dariusza/docker-bin/kubectl
 ```
-5. add an init script
+5. set up mounts for usage from the guest system
 ```
-# create a service to handle mounts
-cat << 'EOF' | sudo tee /etc/systemd/system/mount-wsl2-docker.service > /dev/null
+cat << 'EOF' | sudo tee /etc/systemd/system/mnt-wsl-host\\x2darch-root.mount > /dev/null
 [Unit]
-Description=Wsl2 mount service for docker containers
-DefaultDependencies=no
-After=sysinit.target system.slice
+Description=Bindmount for /mnt/wsl/host-arch/root to host system
 
-[Service]
-ExecStart=/root/wsl2-docker-mounts.sh
-Restart=no
-Type=oneshot
+[Mount]
+What=/
+Where=/mnt/wsl/host-arch/root
+Type=none
+Options=bind,uid=1000,gid=1000
+
+[Install]
+WantedBy=local-fs.target
 EOF
-# script for the service
-cat << 'EOF' | sudo tee /root/wsl2-docker-mounts.sh > /dev/null
-#!/bin/bash
-mkdir -pm o=rx,ug=rwx /mnt/wsl/docker-linux-wsl/docker
-mkdir -pm o=rx,ug=rwx /mnt/wsl/docker-linux-wsl/bin
-mkdir -pm o=rx,ug=rwx /mnt/wsl/docker-linux-wsl/root
-chgrp docker-linux /mnt/wsl/docker-linux-wsl /mnt/wsl/docker-linux-wsl/docker /mnt/wsl/docker-linux-wsl/bin
+sudo systemctl enable mnt-wsl-host\\x2darch-root.mount
+sudo systemctl start mnt-wsl-host\\x2darch-root.mount
 
-mount --bind /home/dariusza/docker-bin "/mnt/wsl/docker-linux-wsl/bin"
-mount --bind / "/mnt/wsl/docker-linux-wsl/root"
+cat << 'EOF' | sudo tee /etc/systemd/system/mnt-wsl-host\\x2darch-bin.mount > /dev/null
+[Unit]
+Description=Bindmount for /mnt/wsl/host-arch/bin to host system
+
+[Mount]
+What=/home/dariusza/docker-bin
+Where=/mnt/wsl/host-arch/bin
+Type=none
+Options=bind,uid=1000,gid=1500
+
+[Install]
+WantedBy=local-fs.target
 EOF
-sudo chmod a+x /root/wsl2-docker-mounts.sh
-
-# run the service
-sudo systemctl enable mount-wsl2-docker.service
+sudo systemctl enable mnt-wsl-host\\x2darch-bin.mount
+sudo systemctl start mnt-wsl-host\\x2darch-bin.mount
 ```
 6. set up and configure services
 ```
 # create an override that configures socket location and group
 sudo mkdir -p /etc/systemd/system/docker.socket.d/
 cat << 'EOF' | sudo tee /etc/systemd/system/docker.socket.d/override.conf > /dev/null
-[Unit]
-Requires=mount-wsl2-docker.service
-After=mount-wsl2-docker.service
 [Socket]
-ListenStream=/mnt/wsl/docker-linux-wsl/docker/docker.sock
+ListenStream=/mnt/wsl/host-arch/docker/docker.sock
 SocketGroup=docker-linux
+SocketUser=dariusza
+DirectoryMode=0775
+Writable=true
 EOF
 # create an override that configures the docker group
 sudo mkdir -p /etc/systemd/system/docker.service.d/
@@ -105,7 +110,9 @@ ExecStart=/usr/bin/dockerd -H fd:// -G docker-linux
 EOF
 sudo systemctl daemon-reload
 sudo systemctl enable docker.service
+sudo systemctl enable docker.socket
 sudo systemctl start docker.service
+sudo systemctl start docker.socket
 ```
 7. Configure docker to use windows dns for dns in the default network (wsl host container only)
 ```
@@ -135,13 +142,12 @@ sudo chgrp dariusza /nix
 cat << 'EOF' | sudo tee /etc/systemd/system/nix.mount > /dev/null
 [Unit]
 Description=Link for the docker.socket from /mnt/wsl
-After=local-fs.target umount.target
 
 [Mount]
-What=/mnt/wsl/docker-linux-wsl/root/nix/
+What=/mnt/wsl/host-arch/root/nix/
 Where=/nix
 Type=none
-Options=bind
+Options=bind,uid=1000,gid=1000
 
 [Install]
 WantedBy=local-fs.target
@@ -162,13 +168,12 @@ mkdir /home/dariusza/.cargo
 cat << 'EOF' | sudo tee /etc/systemd/system/home-dariusza-.cargo.mount > /dev/null
 [Unit]
 Description=Bindmount for /home/dariusza/.cargo to host system
-After=local-fs.target umount.target
 
 [Mount]
-What=/mnt/wsl/docker-linux-wsl/root/home/dariusza/.cargo
+What=/mnt/wsl/host-arch/root/home/dariusza/.cargo
 Where=/home/dariusza/.cargo
 Type=none
-Options=bind
+Options=bind,uid=1000,gid=1000
 
 [Install]
 WantedBy=local-fs.target
@@ -181,19 +186,22 @@ sudo systemctl start home-dariusza-.cargo.mount
 cat << 'EOF' | sudo tee /etc/systemd/system/mnt-wsl-arch-root.mount > /dev/null
 [Unit]
 Description=Bindmount for /mnt/wsl/arch/root to host system
-After=local-fs.target umount.target
 
 [Mount]
 What=/
 Where=/mnt/wsl/arch/root
 Type=none
-Options=bind
+Options=bind,uid=1000,gid=1000
 
 [Install]
 WantedBy=local-fs.target
 EOF
 sudo systemctl enable mnt-wsl-arch-root.mount
 sudo systemctl start mnt-wsl-arch-root.mount
+```
+4. add key to the host
+```
+cat ~/.ssh/id_rsa.pub | /mnt/wsl/host-arch/root/home/dariusza/.ssh/authorized_keys
 ```
 
 #### configure docker host integration - need to also do these on host if you want to use docker from host
@@ -210,7 +218,7 @@ sudo gpasswd -a dariusza docker-linux
 # arch - add a service to configure the socket
 cat << 'EOF' | sudo tee /root/docker_client_socket.sh > /dev/null
 #!/bin/bash
-ln -s /mnt/wsl/docker-linux-wsl/docker/docker.sock /var/run/docker.sock 
+ln -s /mnt/wsl/host-arch/docker/docker.sock /var/run/docker.sock 
 chmod g+rwx /var/run/docker.sock
 chgrp docker-linux /var/run/docker.sock
 EOF
@@ -235,25 +243,21 @@ sudo systemctl start docker-client-socket.service
 ```
 * alternatively - add the following to .bashrc - don't do this as some applications don't work with DOCKER_HOST set, like tilt + minikube
 ```
-if [ -e /mnt/wsl/docker-linux-wsl/docker/docker.sock ]; then
-  export DOCKER_HOST="unix:///mnt/wsl/docker-linux-wsl/docker/docker.sock"
+if [ -e /mnt/wsl/host-arch/docker/docker.sock ]; then
+  export DOCKER_HOST="unix:///mnt/wsl/host-arch/docker/docker.sock"
 fi
 ```
 4. update .bash_profile
 ```
-if [ -d /mnt/wsl/docker-linux-wsl/bin ]; then 
-PATH="$PATH:/mnt/wsl/docker-linux-wsl/bin"
+if [ -d /mnt/wsl/host-arch/bin ]; then 
+PATH="$PATH:/mnt/wsl/host-arch/bin"
 fi
 ```
 5. update .bashrc
 ```
-if [ -f  /mnt/wsl/docker-linux-wsl/root/usr/share/bash-completion/completions/docker ]; then
-  source /mnt/wsl/docker-linux-wsl/root/usr/share/bash-completion/completions/docker
+if [ -f  /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/docker ]; then
+  source /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/docker
 fi
-```
-6. add key to the host
-```
-cat ~/.ssh/id_rsa.pub | /mnt/wsl/docker-linux-wsl/root/home/dariusza/.ssh/authorized_keys
 ```
 
 #### switching between integration with docker-host container and docker-for-windows
