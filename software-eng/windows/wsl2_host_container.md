@@ -115,9 +115,11 @@ cat << 'EOF' | sudo tee /etc/docker/daemon.json > /dev/null
 }
 EOF
 ```
-8. Set up a host workspace directory, so that bindmounts work
+8. Set up links to the guest filesystem so that docker running on host can still see them for bindmount purposes
 ```
-mkdir /home/dariusza/host-workspace
+# use links instead of mount to not introduce an order dependency on guest
+cd /home/dariusza/
+ln -s -T /mnt/wsl/arch/root/home/dariusza/workspace workspace
 ```
 
 ### configure host integration in the guest container
@@ -173,28 +175,24 @@ EOF
 sudo systemctl enable home-dariusza-.cargo.mount
 sudo systemctl start home-dariusza-.cargo.mount
 ```
-3. set up shared workspace with the host (so that's it's accessible as a docker bindmount)
+3. publish the guest filesytem to the host
 ```
-# create on host system or copy from guess system
-mkdir /home/dariusza/host-workspace
-
-# create a service on guest system
-cat << 'EOF' | sudo tee /etc/systemd/system/home-dariusza-host\\x2dworkspace.mount > /dev/null
+cat << 'EOF' | sudo tee /etc/systemd/system/mnt-wsl-arch-root.mount > /dev/null
 [Unit]
-Description=Bindmount for /home/dariusza/host-workspace to host system
+Description=Bindmount for /mnt/wsl/arch/root to host system
 After=local-fs.target umount.target
 
 [Mount]
-What=/mnt/wsl/docker-linux-wsl/root/home/dariusza/host-workspace
-Where=/home/dariusza/host-workspace
+What=/
+Where=/mnt/wsl/arch/root
 Type=none
 Options=bind
 
 [Install]
 WantedBy=local-fs.target
 EOF
-sudo systemctl enable home-dariusza-host\\x2dworkspace.mount
-sudo systemctl start home-dariusza-host\\x2dworkspace.mount
+sudo systemctl enable mnt-wsl-arch-root.mount
+sudo systemctl start mnt-wsl-arch-root.mount
 ```
 
 #### configure docker host integration - need to also do these on host if you want to use docker from host
