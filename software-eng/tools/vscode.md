@@ -90,6 +90,7 @@
         - ctrl+shift+l - multiple cursors to all occurences of selection
         - ctrl+d - add cursor to next occurence of selection (can be pressed multiple times)
         - shift+alt+mouse - select column block of text, adds multiple cursors to the end of the line
+        - middle mouse drag - multiple cursors selection
     - manipulate line
         - shift+alt+up/down - copy current line to above/below
         - alt+up/down - move current line to above/below
@@ -346,11 +347,10 @@ pacaur -S code-marketplace code-features
             - devenv-build: FROM devenv stage, runs the build command
             - deployment: FROM deploymentcontainer, copy build results from devenv-build
     - `workspaceFolder` path to source code in the container
-    - `remoteUser` + `remoteEnv` user and env vars in the container for vscode and vscode initiated commands
-    - `forwardPorts` ports to forward to the host
+    - `userEnvProbe` setting chooses which env variables should be loaded by vscode, with a choice of login/interactive shell available, so if nix is set as login shell it should use nix?
     - uses either a Dockerfile, docker-compose.yml or a base image to specify which container to run
         - `image` - name of existing image
-        - `build.dockerfile` - path to dockerfile, build with `build.context` path
+        - `build.dockerfile` - path to dockerfile, build with `build.context` path and `build.args` args and `build.cacheFrom` cache
         - `dockerComposeFile` + `service` + `runServices` - path to docker-compose.yml, name of the container service to attach and additional services to run
     - `shutdownAction` - what to do when vscode is closed
         -  `none`, `stopCompose` or `stopDocker`
@@ -358,13 +358,24 @@ pacaur -S code-marketplace code-features
         - `extensions` - array of extensions to install in the container, empty by default
         - `settings` - map of settings.json settings to use by default in the container
     - script hooks:
-        - `initializeCommand` - run locally before anything else 
-        - `onCreateCommand` - creating a container
+        - `initializeCommand` - run on host before anything else 
+        - `onCreateCommand` - creating a container, run inside container
         - `updateContentCommand` - currently unused
         - `postCreateCommand` - container created
         - `postStartCommand` - started container
         - `postAttachCommand` - vscode attached
         - `waitFor` - configure when vscode attaches, by default after `onCreateCommand` is executed
+    - docker settings
+        - `containerUser` - override USER directive for built container. Requires the container be recreated / rebuilt to take effect. When not set just uses container's USER directive.
+        - `containerEnv` - additional ENV var directives for built container. Requires the container be recreated / rebuilt to take effect.
+        - `updateRemoteUserUID` (true by default) - override `containerUser`/`remoteUser`'s uid:gid to match the one on the linux host system (linux only). Requires the container be recreated / rebuilt to take effect.
+        - `remoteUser` + `remoteEnv` user and env vars in the container for vscode and vscode initiated commands, set at runtime, default to 
+        - `mounts` - `--mount` flags to pass to docker run
+        - `forwardPorts` - ports to forward from inside container to local machine
+            - `portsAttributes` - forwarding settings for each port (`label`, `protocol`, `onAutoForward`, `requireLocalPort`, `elevateIfNeeded`)
+            - `otherPortsAttributes` - defaults for which `portsAttributes` is not set
+        - `runArgs` - additional args to pass to `docker run` command that starts the image
+        - `overrideCommand` (true by default, false in docker-compose) - override the default entrypoint command of the image with `/bin/sh -c "while sleep 1000; do :; done`, vscode does this to keep the container alive while attached
     - remote containers: open container file has some useful examples:
         - a [configuration](https://code.visualstudio.com/docs/remote/containers-advanced#_using-docker-or-kubernetes-from-a-container) that allows using docker from inside the devcontainer, or create child containers while in docker
         - minikube inside docker
@@ -372,7 +383,7 @@ pacaur -S code-marketplace code-features
         - environments for a ton of languages under "show all" option
 - `remote containers: open workspace/folder/reopen` in a container opens a new project window for selected project and a creator for making a development container
     - vscode installs a remote module in the container, similar to wsl, and executes plugins there
-    - if there's no devcontainer.json it a creator is started in workspace dir
+    - if there's no devcontainer.json a creator is started in workspace dir
     - the source code is passed to the dev container via a docker mount:
         - `"workspaceMount": "source=${localWorkspaceFolder}/sub-folder,target=/workspace,type=bind,consistency=cached"`
         - to make it work with docker in external container this need to be changed to point to
@@ -389,6 +400,7 @@ pacaur -S code-marketplace code-features
     - <https://code.visualstudio.com/docs/remote/attach-container>
     - can attach to a kube pod with k8s extension
     - a subset of devcontainer config can be saved/restored using "attached container config files"
+        - <https://code.visualstudio.com/docs/remote/devcontainerjson-reference#_attached-container-configuration-reference>
     - will disconnect once container shuts down
     - can connect to minikube if vscode is run inside `minikube docker-env`
 - `explore a volume in a development containers` - browses a volume with some default container, doesn't work for opening volume-based remote container projects
@@ -396,9 +408,10 @@ pacaur -S code-marketplace code-features
     - [rust example](https://github.com/microsoft/vscode-dev-containers/tree/main/containers/rust)
     - [rust dev container definition](https://github.com/microsoft/vscode-dev-containers/blob/main/containers/rust/.devcontainer/base.Dockerfile)
 - nix
-    - [nix devcontainer - doesn't work with oktet?](https://github.com/zimbatm/vscode-devcontainer-nix)  nixpkgs/devcontainer:nixos-20.03
+    - [nix devcontainer - doesn't work with okteto?](https://github.com/zimbatm/vscode-devcontainer-nix)  nixpkgs/devcontainer:nixos-20.03
     - [debian nix devcontainer](https://github.com/xtruder/debian-nix-devcontainer) xtruder/debian-nix-devcontainer:latest
     - install nix environment select extension to run vscode in shell
+    - idea: figure out what vscode is using to run in the container and override it to first execute nix shell
 
 ### remote kubernetes - okteto extension
 
@@ -491,6 +504,18 @@ npx vsce package
 - [alternative cmake integration](https://marketplace.visualstudio.com/items?itemName=go2sh.cmake-integration-vscode)
     - less updated
     - 1 step build, similar to editors which read cmake directly
+
+### rust
+
+- rust plugin - don't install
+    - completion
+    - build tasks
+- rust analyzer
+    - better than rust plugin, incompatible with it
+- code lldb - debugger
+- rust doc viewer - view locally built docs
+- crates - show/edit versions of dependencies from crates.io
+- cargo - don't install - runs cargo check (can be disabled), commands to add deps
 
 ### Markdown
 

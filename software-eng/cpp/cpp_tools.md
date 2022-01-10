@@ -210,3 +210,4 @@ perf script
 - [utility for enum reflection](https://github.com/aantron/better-enums)
 - [utility for multimethods](https://github.com/jll63/yomm2)
 - [sane encoding conversion, validation and implementation](https://ztdtext.readthedocs.io/en/latest/)
+- [libwinsane - fixes for cpp stdlib on windows (encodings mostly)](https://nullprogram.com/blog/2021/12/30/)

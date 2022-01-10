@@ -436,3 +436,44 @@ if [ -f /home/dariusza/.nix-profile/etc/profile.d/nix.sh ]; then
     source /home/dariusza/.nix-profile/etc/profile.d/nix.sh
 fi
 ```
+
+### Rust
+
+packages.nix:
+```
+# default evaluation of nix-packages for the project
+{ sources ? import ./sources.nix
+, mozilla ? import sources.nixpkgs-mozilla
+, pkgs ? import sources.nixpkgs {
+  overlays = [
+    mozilla
+    (self: super: {
+      rustc = super.latest.rustChannels.nightly.rust;
+      rust-src = super.latest.rustChannels.nightly.rust-src;
+      cargo = super.latest.rustChannels.nightly.cargo;
+    })
+    (import ./openapi.nix)
+  ];
+}
+}: pkgs
+```
+
+shell.nix
+```
+{ pkgs ? import ./nix/packages.nix {}
+, sources ? import ./nix/sources.nix
+}:
+let
+  crate2nix = import sources.crate2nix {inherit pkgs;};
+in
+pkgs.mkShell {
+  nativeBuildInputs = (
+    with pkgs; [
+      rustc
+      rust-src
+      cargo
+    ]
+    );
+  RUST_SRC_PATH="${pkgs.rust-src}/lib/rustlib/src/rust/library/";
+}
+```

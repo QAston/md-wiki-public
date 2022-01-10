@@ -267,6 +267,7 @@ pacaur -S rr
 ### Other stuff - todo
 
 - https://github.com/4U6U57/wsl-open - for windows
+- https://github.com/wader/fq
 - https://github.com/kitsunyan/xdg-open-server - for native wsl host
 - https://github.com/ibraheemdev/modern-unix
 - https://direnv.net/

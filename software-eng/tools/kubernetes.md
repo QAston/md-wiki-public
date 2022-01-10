@@ -11,12 +11,24 @@
 - ctlpl - yaml config for a cluster
     - https://github.com/tilt-dev/ctlptl#features
     - pacaur -S ctlptl-bin
-    
+- kustomize
+    - make configuration variants declaratively without templates
+    - can refer to files in other git repositories!
+    - https://www.youtube.com/watch?v=1fCAwFGX38U
+- helm
+    - package manager + horrible templating engine
+    - `helm upgrade --install` - idempotent install command
+    - `helm install -f <file>` - values file, individual values can be set using `--set`
+    - `helm template` evaluate the template
 
 ### automation
 
 - tilt - docker compose but for k8s - easy deploymetns and cleanup
     - pacaur -S tilt-bin?
+    - has support for nix: https://github.com/tilt-dev/tilt-extensions/tree/master/nix
+    - extensions: https://github.com/tilt-dev/tilt-extensions
+    - has suport for kustomize
+    - has some live-reload capability: https://docs.tilt.dev/tutorial/5-live-update.html
 
 ### setup - docker-desktop (windows and wsl2)
 
@@ -47,7 +59,28 @@ cat /mnt/wsl/host-arch/root/home/dariusza/.kube/config | sed s@/home/dariusza@/m
 
 #### minikube usage
 
+- [nginx ingress](https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/)
+- [haproxy ingress](https://haproxy-ingress.github.io/docs/getting-started/)
 - [pushing images](https://minikube.sigs.k8s.io/docs/handbook/pushing/)
+```
+minikube dashboard # start a web dashboard, very useful for investigating
+
+minikube service hopper-auth --url # temporarily expose a port of an internal service
+
+kubectl logs service/hopper-router # show logs from a service
+
+kubectl get service hopper-router -o yaml # show object yml
+
+kubectl apply -k path/to/dir/with/kustomization.yml # deploy manifests referenced/configured by kustomizaton.yml 
+
+kubectl delete -k path/to/dir/with/kustomization.yml # undeploy
+
+minikube delete # delete the cluster
+
+minikube stop # stop the cluster
+
+echo "http://$(minikube ip):$(kubectl get service -n ingress-nginx ingress-nginx-controller -o json | jq -r .spec.ports[0].nodePort)" # ingress url
+```
 
 ## devcontainers in k8s - okteto
 
