@@ -1,6 +1,12 @@
 Dockerizing Applications
 ================
 
+In order to properly dockerize an application you need to be aware of how exactly the application uses its resources and IO.
+
+## Configuring applications
+
+To properly configure your application in docker you first need to be aware of the resources used by your application and you need to know how to configure the resource usage.
+
 ### Filesystem
 
 Docker uses a [CopyOnWrite filesystem](https://docs.docker.com/storage/storagedriver/) by default, which has the following effects:
@@ -17,35 +23,46 @@ To configure the volumes you can use:
 
 ### Network
 
-#### External services
+#### Docker networks
 
-All services from outside Ocado (for example: aws, google big data) that your application connects to count as external services. PROD/CIT servers don't allow connecting to external services except through `proxy.ocado.com` which is an http proxy.
+Docker has different networking modes:
+- default `bridge` network - containers can see each other through IPs but not through dns names
+    - /etc/resolv.conf and other dns config is inherited from host
+- `docker network create -d bridge name` `--network=name` - named bridge network, containers can see each other through container names if they're part of the same network
+- `--network=host` - share network interfaces with the host, fastest network io
+- `--network=container-id|name` - share network interfaces with a specific container
+- `--network=none` - no network access
 
-To globally configure http/https proxy for a jvm you can use the following system properties: `-Dhttp.proxyHost=proxy.ocado.com -Dhttp.proxyPort=8080 -Dhttps.proxyHost=proxy.ocado.com -Dhttps.proxyPort=8080`. Many java http client libraries also allow configuring the proxy http request instead of globally if needed.
-
-#### Exposed services
-
-All incoming connections accepted by your application count as exposed services. 
-
-There are several patterns that services follow:
-* **Recommended**: If possible your service should simply listen on a static port (which is the case most of the time). If that's the case all you need to do is [adding an EXPOSE directive to the dockerfile](#dockerizing-applications_writing-dockerfiles_container-processes_entrypoint-declaration) and maybe document what service the port is providing.
-* If your service listens to random ports, change the service to listen to a static port instead as there's no way to make exposing random ports work in as ports are being exposed before the application is started.
-
+Communicating with the host:
+- on linux add: `--add-host=host.docker.internal:host-gateway`, then use host.docker.internal dns name to connect to host
+    - on windows/mac don't need to add the flag, the host dns is added automatically
+- use -p/-P flags to expose ports to host
+Communicating with other containers:
+- all containers that are share the network are accessible (docker network connect to add a container to multiple networks)
+- containers within network can connect to any port without the need to publish/expose
 
 #### Network references
 
-To allow your application to be deployed in any network configuration (docker-compose, service-inventory, mixed environments) you need to make sure that all variable network references used (URLs, IPs, DNSes, ports, etc) are configurable using env variables. **Failure to make network references configurable will make your docker image unusable outside of it's hardcoded network layout**.
+To allow your containers to be deployed in any network configuration (docker-compose, service-inventory, mixed environments) you need to make sure that all variable network references used (URLs, IPs, DNSes, ports, etc) are configurable, for example by using env variables.
 The configuration should be done through [environment variables](#dockerizing-applications_configuring-applications_environment-configuration) and follow the naming conventions:
-* URLs should be configurable using `<NAME>_URL` env variable convention, example: `ACTIVEMQ_URL`, `DB_URL`
-* Hostnames(DNS names/IPs) and ports should be configurable using `<NAME>_HOST` and `<NAME>_PORT` env variable convention, example: `THUG_HOST`, `THUG_PORT`.
+* URLs should be configurable using `<NAME>_URL` env variable convention:
+* Hostnames(DNS names/IPs) and ports should be configurable using `<NAME>_HOST` and `<NAME>_PORT` env variable convention
 * References (URLs/Hostnames/ports) which are sent to clients outside of the docker network should be configurable using env variables with `PUBLIC_` prefix. This reference can then be configured to the NAT/ingress adress or the mapped port and allow sending the clients links that work from their network.
     * Example: 2 reporting services are in a single compose network. If one service wants to query another it uses `<SERVICENAME>_URL`. If the service wants to send a link to another service to the client browser, it sends the `PUBLIC_<SERVICENAME>_URL` link, as browsers are never in the docker network. Alternatively a setup with a reverse-proxy can be used (see http/https reverse proxy headers: https://www.nginx.com/resources/wiki/start/topics/examples/forwarded/ )
     * This solution has a limitation - a single NAT/ingress/port-mapping has to work for all clients. To work around that you need to know which client is coming from which network and send appropriate reference accordingly.
 * Back-references to the container itself are a special case:
     * Back-references used privately by the container itself should be done as usual using `localhost` and [exposed port](#dockerizing-applications_writing-dockerfiles_container-processes_entrypoint-declaration) numbers, no need for configuration
     * Back-references sent to other containers within the same docker network should use container hostname (in java `InetAddress.getLocalHost().getHostName()`). This value is configured automatically by most docker environments (`--hostname`).
-    * Back-references sent to **HTTP/HTTPS** clients should use a reverse proxy which sets forwarding headers, the application needs to be configured to handle the headers, see: https://www.nginx.com/resources/wiki/start/topics/examples/forwarded/ and [nautilus ingress configuration (search for "configuring ingress")](/infrastructure/nautilus#nautilus_system-definitions_adding-a-system)
-    * Back-references sent to other clients outside the docker network should be configurable using `PUBLIC_HOSTNAME` (also `PUBLIC_<NAME>_PORT` or `PUBLIC_<NAME>_URL` if needed).
+    * Back-references sent to **HTTP/HTTPS** clients should use a reverse proxy which sets forwarding headers, the application needs to be configured to handle the headers, see: https://www.nginx.com/resources/wiki/start/topics/examples/forwarded/
+    * Back-references sent to other clients outside the docker network should be configurable using `PUBLIC_HOSTNAME` (also `PUBLIC_<NAME>_PORT` or `PUBLIC_<NAME>_URL` if needed)
+
+### Docker daemon configuration
+
+todo: elaborate on considerations for each fo these:
+* standard docker - docker daemon on local machine
+* remote docker - docker accessed through a docker socket
+* docker-from-docker - docker daemon accessed from inside of a docker container through a docker docket
+* docker-in-docker - docker daemon spawned inside a container
 
 ## Writing dockerfiles
 
@@ -56,38 +73,16 @@ Typical Dockerfiles follow this structure:
 1. [Base image declaration](#dockerizing-applications_writing-dockerfiles_base-image)
 2. [Populating the image's filesystem](#dockerizing-applications_writing-dockerfiles_filesystem)
 3. [Configuration of the main process](#dockerizing-applications_writing-dockerfiles_container-processes)
-4. [Metadata declaration](#dockerizing-applications_writing-dockerfiles_metadata)
 
-An example Dockerfile looks like this:
-```
-FROM mirror-releases.docker.ocean.tech.lastmile.com/ocean_cfc/sun-jre-1.6.0_26-debian-lenny:1.2.1
+### Base image
 
-ADD target/ApplicationMonitor.tar.gz /app
-ADD docker/docker-entrypoint.sh /app
+There are several interesting options for chosing base images:
+* [distroless images - no distro at all](https://github.com/GoogleContainerTools/distroless)
+* [alpine images - very small distro using musl instead of glibc](https://hub.docker.com/_/alpine)
+* [vscode devcontainers - dev environments usable from vscode](https://github.com/microsoft/vscode-dev-containers)
+* [nix containers - only include what you use](https://nix.dev/tutorials/building-and-running-docker-images)
 
-RUN ln -s /logs /app/logs && chown -R 65534:65534 /app
-
-# Ports: JMXMP: 9002
-EXPOSE 9002
-USER 65534
-WORKDIR /app
-ENTRYPOINT ["./docker-entrypoint.sh"]
-
-# Put this at the end to let the statements above be cached (as BUILD_DATE changes with every build)
-ARG GIT_URL=unspecified
-ARG GIT_COMMIT=unspecified
-ARG BUILD_DATE=unspecified
-ARG APP_VERSION=unspecified
-LABEL org.label-schema.schema-version="1.0" \
-  org.label-schema.name="ApplicationMonitor"\
-  org.label-schema.description="ApplicationMonitor"\
-  org.label-schema.vendor="Ocean CFC Systems"\
-  org.label-schema.maintainer="classic-control-systems-developers-xd@ocado.com" \
-  org.label-schema.build-date="$BUILD_DATE" \
-  org.label-schema.vcs-ref="$GIT_COMMIT" \
-  org.label-schema.vcs-url="$GIT_URL" \
-  org.label-schema.version="$APP_VERSION"
-```
+Make sure to declare an exact base image version instead of latest, so that the container build is deterministic
 
 ### Filesystem
 
@@ -148,6 +143,17 @@ RUN <command1> <arg1> && \
     * VOLUMEs can't be modified in derived images, all modifications to the directories are silently discarded 
     * Deleting the container will not delete the volume, the volume needs to be deleted explicitly after the container is deleted (`docker volume prune -f`, `docker compose down -v`, `docker run --rm`)
     * Each new container with an anonymous volume gets one created from scratch, they’re not reused unless refered-to by name explicitly, which may result in lots of orphaned volumes
+* ONBUILD `<NORMAL INSTRUCTION>` - run the instruction when the image is used as a base, not inherited transitively by grandchildren
+* SHELL - override shell used for shell-form entrypoint definitions
+* STOPSIGNAL - define signal sent to container when it's stopped, by default it's SIGTERM
+
+### Env variables
+
+For linux containers docker sets the following variables:
+- HOME
+- HOSTNAME
+- PATH
+- TERM
 
 ### Container processes
 
@@ -173,7 +179,7 @@ To properly configure the main process first you need to:
     * `--volume`/`--mount` - declare mountpoints for volumes
     * `--shm-size` - size of /dev/shm which allows using ram instead of filesystem
     * `-p=<hostport>:<containerport>` - publish a port to host
-    * `--expose=<containerport>` - expose port to the docker network in which container is running
+    * `--expose=<containerport>` - same as EXPOSE directive
     * `--hostname` - override hostname of the container
     * `--pid=` - override PID of the process(`1` by default)
     * `--user=<uid>[:<gid>]` - override USER running the process
@@ -212,6 +218,8 @@ The entrypoint declaration consists of the following clauses:
     * usually a [./docker-entrypoint.sh script](#dockerizing-applications_writing-dockerfiles_container-processes_entrypoint-script), can be inlined into the ENTRYPOINT clause if small
     * Remember to use `["./docker-entrypoint.sh"]` (array form) or `ENTRYPOINT exec ./docker-entrypoint.sh` (shell form with exec), `ENTRYPOINT ./docker-entrypoint.sh` - shell form without exec will wrap the declared process in a shell process (even if that process is itself a shell process), which will prevent your application from receiving signals correctly (which is necessary for handling process cleanup)
     * Prefer using ENTRYPOINT over CMD for applications (see [entrypoint and cmd interaction](https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact)), CMD is meant for tools (where you need to change startup command)
+    * you must specify either CMD or ENTRYPOINT, otherwise build will be rejected
+    * if cmd is defined in base image, setting entrypoint will reset it to empty value
 * EXPOSE - declare the ports your application is going to listen on (wcs port, jmx...)
     * Docker-compose will automatically expose those ports to other services in the compose network
     * `docker run -P` will expose these ports to the host operating system 
@@ -228,32 +236,6 @@ ENTRYPOINT ["./docker-entrypoint.sh"]
 # Ports exposed by the process
 EXPOSE 9002
 ```
-
-#### Entrypoint script
-
-By docker convention the script is usually named `docker-entrypoint.sh`.
-
-Tasks performed by the entrypoint script (the [main process of the container](#dockerizing-applications_writing-dockerfiles_container-processes_main-container-process)):
-
-1. Setting configuration and defaults which aren't configured elsewhere:
-    * setting defaults for each $MODE
-        * make sure the defaults are overridable by only setting them if the variable is undefined, this can be done using `${VARNAME:-"PUT DEFAULTS HERE"}` syntax
-        * defaults should be grouped in env variables contained related settings to enable overriding each value separately
-        * mode-specific defaults can be handled using a `case` statement
-    * setting java flags, for example:
-        * classpath, config file paths, system properties, etc.
-        * `-Duser.name=` and `-Duser.home=` if your application relies on `user.name` or `user.home` system properties (otherwise `nobody` user name and an OS-dependent path will be used which probably isn't what you want)
-        * [cpu](#dockerizing-applications_configuring-applications_cpu) and [memory](#dockerizing-applications_configuring-applications_memory) flags
-        * other performance tweaks like `-Djava.security.egd=file:/dev/./urandom` [(why is "." needed)](http://www.thezonemanager.com/2015/07/whats-so-special-about-devurandom.html)
-        * [jmx configuration for monitoring/profiling](/tools/JMX#jmx_connecting-to-a-docker-image-or-through-any-nat-port-forwarder)
-        * if in `prod` or `cit`: [newrelic agent](/tools/NewRelic/development-config)
-        * if application is running in cit and uses opennnms: [opennms udp forwarder](https://gitlab.tech.lastmile.com/classic-control-systems/opennms-forwarder) (needed because Nautilus doesn't support exposing udp ports)
-        * set proxy flags if you need to connect to [external services](/tools/docker/dockerizing-applications#dockerizing-applications_configuring-applications_network_external-services)
-        * other flags, testing environments should aim to match production flags if possible
-2. Starting the application process(es), waiting until the processes are finished, and forwarding signals to the processes to signal termination 
-    * The recommended method is using `exec <process>` as the last command in the script, see [exec declaration](http://wiki.bash-hackers.org/commands/builtin/exec)
-    * If `exec <process>` can't be used you need to start the process in the background, trap SIGINT and SITGERM, and trigger process cleanup upon receiving those signals, see [forwarding signals in bash](https://unix.stackexchange.com/questions/146756/forward-sigterm-to-child-in-bash)
-    * If you fail to use the above methods your process will not be asked to shut down before container termination because bash (and other shells) doesn't forward signals to subprocesses by default
 
 #### Configuring healthcheck
 
@@ -286,4 +268,15 @@ docker run --rm -it --entrypoint=/bin/bash <new-image-name>
 5. Copying files from a (running or stopped) container to the host system
 ```
 docker cp <container-ref>:/path/to/source/ /path/to/target
+```
+
+## Usage tips
+
+```bash
+# getting container id
+CID=$(docker run -d ubuntu:18.04) # outside container
+docker run -d ubuntu:18.04 --cidfile=cidfile 
+cat /cidfile # outside container, blocks container startup if same file exists
+cat /proc/1/cpuset | cut -c9- # inside container (impl dependent?)
+hostname # inside container, impl independent but can be broken by hostname renaming
 ```

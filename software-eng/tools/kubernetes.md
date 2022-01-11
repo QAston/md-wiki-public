@@ -63,6 +63,8 @@ cat /mnt/wsl/host-arch/root/home/dariusza/.kube/config | sed s@/home/dariusza@/m
 - [haproxy ingress](https://haproxy-ingress.github.io/docs/getting-started/)
 - [pushing images](https://minikube.sigs.k8s.io/docs/handbook/pushing/)
 ```
+minikube start --driver=none # run minikube on host system and use host docker daemon (requires linux, no hypervisor, ideally debian docker package)
+
 minikube dashboard # start a web dashboard, very useful for investigating
 
 minikube service hopper-auth --url # temporarily expose a port of an internal service

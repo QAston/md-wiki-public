@@ -3,7 +3,7 @@
 ### Docs/Overview
 
  * <https://kchard.github.io/runit-quickstart/>
- * <https://wiki.artixlinux.org/Main/Runit>
+* <https://wiki.artixlinux.org/Main/Runit>
  * Runit manages services in `/etc/runit/runsvdir`
  * Runit manages system startup/shutdown 
      * currently unused in WSL2 because wsl's init does most these things already and because we're not running the `runit-init` command on startup
