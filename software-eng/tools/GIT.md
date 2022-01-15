@@ -2,21 +2,7 @@
 
 ## setup
 
-* `git config --global mergetool.keepBackup false` disable orig files generation
-* set up always ignored files:
-```
-touch ~/.gitignore_global
-git config --global core.excludesfile ~/.gitignore_global
-echo '*-gitignore' > ~/.gitignore_global
-echo '*-gitignore.*' >> ~/.gitignore_global
-```
-* set up aliases
-```
-git config --global alias.st status
-git config --global alias.unstage 'reset HEAD --'
-git config --global alias.lg "log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr %an)%Creset' --abbrev-commit --date=relative"
-```
-* set up crlf handling to cooperate well with linux users
+* windows only - set up crlf handling to cooperate well with linux users
 ```
 git config --global core.autocrlf false
 
@@ -25,12 +11,24 @@ git config --global core.attributesFile ~/.gitattributes_global
 # convert most files to core.eol line ending, with platform specific files having their endings preserved:
 wget -O - https://raw.githubusercontent.com/alexkaratarakis/gitattributes/master/{Common,C++,VisualStudio,Java,CSharp}.gitattributes > ~/.gitattributes_global
 ```
-* other config 
+* set up always ignored files:
 ```
-git config --global push.default simple
+touch ~/.gitignore_global
+echo '*-gitignore' > ~/.gitignore_global
+echo '*-gitignore.*' >> ~/.gitignore_global
+# gitignore global
+git config --global core.excludesfile ~/.gitignore_global
+```
+* other config
+```
+# config
 git config --global mergetool.keepBackup false
+git config --global push.default simple
+# aliases
+git config --global alias.st status
+git config --global alias.unstage 'reset HEAD --'
+git config --global alias.lg "log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr %an)%Creset' --abbrev-commit --date=relative"
 ```
-
 
 ## usage
 
@@ -39,11 +37,11 @@ git config --global mergetool.keepBackup false
 
 ## commands
 
-* `git update-index --chmod=+x <your_file>` make executable
+* `git update-index --chmod=+x <your_file>` make executable
 * `git config submodule.recurse true` download submodules
 * `git grep ` searches in history
 * `git config credential.helper store` stop confirming pass
-* `git update-index \--[no-]assume-unchanged] [target]` - stop tracking file
+* `git update-index \--[no-]assume-unchanged] [target]` - stop tracking file
 * `git add --renormalize .` - normalize line endings of text files in the repository
 
 ## links

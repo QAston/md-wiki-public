@@ -34,7 +34,7 @@ Docker has different networking modes:
 - `--network=none` - no network access
 
 Communicating with the host:
-- on linux add: `--add-host=host.docker.internal:host-gateway`, then use host.docker.internal dns name to connect to host
+- [ ] on linux add: `--add-host=host.docker.internal:host-gateway`, then use host.docker.internal dns name to connect to host
     - on windows/mac don't need to add the flag, the host dns is added automatically
 - use -p/-P flags to expose ports to host
 Communicating with other containers:

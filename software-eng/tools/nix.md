@@ -9,6 +9,8 @@
      * [nix learn - a list of official guides on common tasks and links to other docs](https://nixos.org/learn.html)
      * [wiki](https://nixos.wiki/)
      * [opinionated guidelines and guides - pretty good](https://nix.dev/)
+     * [new nix shell commands (todo)](https://blog.ysndr.de/posts/guides/2021-12-01-nix-shells/)
+     * [nix flakes](https://blog.ysndr.de/posts/internals/2021-01-01-flake-ification/)
  * Dependencies between nix packages are hardcoded
      * Updating a lib requires rebuild of dependencies
      * But packages can coexist thanks to this
@@ -66,6 +68,11 @@
  * `nix show-derivation` - pretty print a .drv file
  * `nix-channel --update` - update the channel
  * `nix-channel --update; nix-env -u` - update channel and default profile with latest versions of packages
+
+#### utilities
+
+* <https://github.com/nix-community/lorri> - nix shell env outside of nix shell
+* <https://github.com/numtide/devshell> - nix shell alternative?
 
 #### nix garbage and updates
 
@@ -435,6 +442,7 @@ nix-channel --update nixpkgs
 if [ -f /home/dariusza/.nix-profile/etc/profile.d/nix.sh ]; then
     source /home/dariusza/.nix-profile/etc/profile.d/nix.sh
 fi
+export NIX_BUILD_SHELL=/bin/bash # by default nix runs it's own bash which doesn't seem to work well with my configs, running system bash fixes the issues
 ```
 
 ### Rust

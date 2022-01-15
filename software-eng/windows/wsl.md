@@ -266,6 +266,7 @@ pacaur -S rr
 
 ### Other stuff - todo
 
+- https://github.com/target/lorri - nix shell without nix-shell wrapper call
 - https://github.com/4U6U57/wsl-open - for windows
 - https://github.com/wader/fq
 - https://github.com/kitsunyan/xdg-open-server - for native wsl host

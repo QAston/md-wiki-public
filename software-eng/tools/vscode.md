@@ -366,13 +366,12 @@ pacaur -S code-marketplace code-features
         - `postAttachCommand` - vscode attached
         - `waitFor` - configure when vscode attaches, by default after `onCreateCommand` is executed
     - docker runtime settings
-        - `remoteUser` + `remoteEnv` user and env vars in the container for vscode and vscode initiated commands, set at runtime, default to 
+        - `remoteUser` + `remoteEnv` user and env vars in the container for vscode and vscode initiated commands, set at runtime, default to containerUser/containerEnv
         - `mounts` - `--mount` flags to pass to docker run
         - `forwardPorts` - ports to forward from inside container to local machine
             - `portsAttributes` - forwarding settings for each port (`label`, `protocol`, `onAutoForward`, `requireLocalPort`, `elevateIfNeeded`)
             - `otherPortsAttributes` - defaults for which `portsAttributes` is not set
         - `runArgs` - additional args to pass to `docker run` command that starts the container
-        - `overrideCommand` (true by default, false in docker-compose) - override the default entrypoint command of the image with `/bin/sh -c "while sleep 1000; do :; done`, vscode does this to keep the container alive while attached; run `ps aut` and find pid1 to see the entrypoint command 
     - docker layer settings
          - these settings are applied by vscode by modifying the last image layer, vscode docs call this "Requires the container be recreated / rebuilt to take effect."
             - applied when you're using a dockerfile build definition and you rebuild the image (vscode will prompt you on changes)
@@ -380,6 +379,7 @@ pacaur -S code-marketplace code-features
         - `containerUser` - override USER directive for built container.  When not set just uses container's USER directive.
         - `containerEnv` - additional ENV var directives for built container.
         - `updateRemoteUserUID` (true by default, linux-only setting?) - override `containerUser`/`remoteUser`'s uid:gid to match the one on the linux host system to make bindmounts work better
+        - `overrideCommand` (true by default, false in docker-compose) - override the default ENTRYPOINT and CMD of the image with `/bin/sh -c "while sleep 1000; do :; done`, vscode does this to keep the container alive while attached; run `ps aux` and find pid1 to see the entrypoint command 
     - remote containers: open container file has some useful examples:
         - a [configuration](https://code.visualstudio.com/docs/remote/containers-advanced#_using-docker-or-kubernetes-from-a-container) that allows using docker from inside the devcontainer, or create child containers while in docker
         - minikube inside docker
