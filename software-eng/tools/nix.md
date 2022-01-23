@@ -71,8 +71,9 @@
 
 #### utilities
 
-* <https://github.com/nix-community/lorri> - nix shell env outside of nix shell
-* <https://github.com/numtide/devshell> - nix shell alternative?
+* <https://github.com/nix-community/lorri> - nix-shell env outside of nix shell
+* <https://github.com/nix-community/nix-direnv> - alternative to lorri, but without a daemon
+* <https://github.com/numtide/devshell> - nix-shell alternative?
 
 #### nix garbage and updates
 

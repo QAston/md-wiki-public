@@ -319,7 +319,6 @@ pacaur -S code-marketplace code-features
 - multi-command - bind multiple commands to a single command name
 - commands - allows binding any command to status bar and to display custom text (sadly doesn't evaluate variables)
 - differently colored windows for easy distinguishing: https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock
-- [nix-env-selector](https://marketplace.visualstudio.com/items?itemName=arrterian.nix-env-selector) - same as starting code from nix-shell but more automated and allows dynamic switching between environments
 
 ### developing using containers
 
@@ -338,6 +337,7 @@ pacaur -S code-marketplace code-features
 - drawbacks:
     - the containers won't have all of my custom devtools unless I create my own containers
     - bareness of the containers can be partially mitigated by running a [custom dotfile install script with a custom repo](https://code.visualstudio.com/docs/remote/ containers#_personalizing-with-dotfile-repositories) - could install all sorts of software throught this?
+    - I've set up a "install into devcontainer" script for wslconfig which solves this issue
 - provided by remote continers extension, see `remote containers:` commands list
 - only a single container connection pair per window
 - `devcontainer.json` configures what container to start up for newly opened project ([reference](https://code.visualstudio.com/docs/remote/devcontainerjson-reference))
@@ -347,7 +347,7 @@ pacaur -S code-marketplace code-features
             - devenv-build: FROM devenv stage, runs the build command
             - deployment: FROM deploymentcontainer, copy build results from devenv-build
     - `workspaceFolder` path to source code in the container
-    - `userEnvProbe` setting chooses which env variables should be loaded by vscode, with a choice of login/interactive shell available, so if nix is set as login shell it should use nix?
+    - `userEnvProbe` setting chooses which env variables should be loaded by vscode, with a choice of login/interactive shell available (loginInteractiveShell is the default), so if nix is set as login shell it should use nix?
     - uses either a Dockerfile, docker-compose.yml or a base image to specify which container to run
         - `image` - name of existing image
         - `build.dockerfile` - path to dockerfile, build with `build.context` path and `build.args` args and `build.cacheFrom` cache
@@ -366,7 +366,7 @@ pacaur -S code-marketplace code-features
         - `postAttachCommand` - vscode attached
         - `waitFor` - configure when vscode attaches, by default after `onCreateCommand` is executed
     - docker runtime settings
-        - `remoteUser` + `remoteEnv` user and env vars in the container for vscode and vscode initiated commands, set at runtime, default to containerUser/containerEnv
+        - `remoteUser` + `remoteEnv` user and env vars in the container for vscode and vscode initiated commands, set at runtime, default to containerUser/containerEnv. Used to start all processes that aren't entrypoint?
         - `mounts` - `--mount` flags to pass to docker run
         - `forwardPorts` - ports to forward from inside container to local machine
             - `portsAttributes` - forwarding settings for each port (`label`, `protocol`, `onAutoForward`, `requireLocalPort`, `elevateIfNeeded`)
@@ -376,7 +376,7 @@ pacaur -S code-marketplace code-features
          - these settings are applied by vscode by modifying the last image layer, vscode docs call this "Requires the container be recreated / rebuilt to take effect."
             - applied when you're using a dockerfile build definition and you rebuild the image (vscode will prompt you on changes)
             - when you're referring to an image directly using `image`, vscode will prompt you that the container needs to rebuilt and modify the layer for you, making you use a modified version of the referenced image
-        - `containerUser` - override USER directive for built container.  When not set just uses container's USER directive.
+        - `containerUser` - override USER directive for built container.  When not set just uses container's USER directive. Used to start the entrypoint process?
         - `containerEnv` - additional ENV var directives for built container.
         - `updateRemoteUserUID` (true by default, linux-only setting?) - override `containerUser`/`remoteUser`'s uid:gid to match the one on the linux host system to make bindmounts work better
         - `overrideCommand` (true by default, false in docker-compose) - override the default ENTRYPOINT and CMD of the image with `/bin/sh -c "while sleep 1000; do :; done`, vscode does this to keep the container alive while attached; run `ps aux` and find pid1 to see the entrypoint command 
@@ -411,19 +411,44 @@ pacaur -S code-marketplace code-features
 - [definitions of example project configurations](https://github.com/microsoft/vscode-dev-containers)
     - [rust example](https://github.com/microsoft/vscode-dev-containers/tree/main/containers/rust)
     - [rust dev container definition](https://github.com/microsoft/vscode-dev-containers/blob/main/containers/rust/.devcontainer/base.Dockerfile)
-- nix
-    - [nix devcontainer - doesn't work with okteto?](https://github.com/zimbatm/vscode-devcontainer-nix)  nixpkgs/devcontainer:nixos-20.03
-    - [debian nix devcontainer](https://github.com/xtruder/debian-nix-devcontainer) xtruder/debian-nix-devcontainer:latest
-    - install nix environment select extension to run vscode in shell
-    - idea: figure out what vscode is using to run in the container and override it to first execute nix shell
 
-### remote kubernetes - okteto extension
+### okteto devcontainers
 
-- see [kubernetes/okteto](./kubernetes.md) for setup, config and overview
-- install kubernetes, remote kubernetes and remote ssh extensions to use remote kubernetes
-- `okteto up` command swaps the deployed k8s container with a container specified in the manifest
-    - the vscode extension is not needed for file editing (since they're synced), but very useful because it provides easy debugging setup with extensions 
+- see [kubernetes/okteto](./kubernetes.md) for setup of okteto and starting a container
+- no vscode remote extension is needed for file editing (since they're synced), but one can be used to have remote debugging support
+- install `remote ssh extension` to connect to okteto
+    - use `.vscode/` directory to configure project specific settings that will be configured in the container:
+        - `settings.json` - setting files for workspace (sadly, can't have "remote.SSH.defaultExtensions")
+        - `extensions.json` - a list of default plugins for workspace, will install them when prompted
+    - use `remote ssh connect to host` command to connect to the host entry added by okteto, then select project directory
+    - `add ssh connection` command looks like it'd accept any custom command, but it doesn't it just uses the command to generate a config file and drops the given command
+    - vscode installs the vscode server inside `~/.vscode-server` (includes remote-specific settings) can be made into a volume to persist extensions and stuff
+    - remote ssh tips: <https://code.visualstudio.com/docs/remote/troubleshooting#_ssh-tips>
+    - documentation: <https://code.visualstudio.com/docs/remote/ssh>
+- there's also a `remote kubernetes` extension which is just an okteto-specific launcher for remote-ssh and k8s extensions
+    - doesn't seem to work anymore :(, so don't use it
 - use one of the vscode devcontainer images as the base for the image, so that vscode and lang tools work well
+
+### nix-shell integration
+
+- run `code .` from nix shell for easiest integration; sadly not always possible
+- [nix-env-selector](https://marketplace.visualstudio.com/items?itemName=arrterian.nix-env-selector)
+    - tries to edit vscode env to match a nix-shell environment; sadly doesn't always work (for example, for remote ssh)
+    - `nix select env` command selects which shell to switch to, sets workspace setting `"nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix",`
+        - tries to switch env dynamically without restarting
+    - `nix hit env` command restarts vscode, hopefully successfully applying the new environment
+        - seems to work for standard devcontainer? but not for remote ssh
+- devcontainers - integration attempts
+    - my attempt: hopper-build-container
+    - <https://github.com/zimbatm/vscode-devcontainer-nix>
+        - container definition: <https://github.com/nix-community/docker-nixpkgs/tree/master/images/devcontainer>
+    - <https://github.com/xtruder/nix-devcontainer>
+        - has some interesting tricks: extensions reordering to load nix-env-selector, among others
+    - <https://levelup.gitconnected.com/vs-code-remote-containers-with-nix-2a6f230d1e4e>
+    - <https://github.com/swdunlop/nix-dev-container>
+    - I distinctly remember there being a solution based on bashrc, direnv and probing of env done by vscode, but can't find it anymore
+    - idea: figure out what vscode is using to run in the container and override it to first execute nix shell
+    - maybe this remote server could be used? <https://nixos.wiki/wiki/Visual_Studio_Code>
 
 ### vim integration
 
@@ -516,6 +541,14 @@ npx vsce package
     - build tasks
 - rust analyzer
     - better than rust plugin, incompatible with it
+    - if the analyzer build conflicts/blocks regular build, move it to a separate dir using local `.vscode/settings.json`:
+```json
+{
+    // use a separate target directory for rustanalyzer builds
+    "rust-analyzer.checkOnSave.extraArgs": ["--target-dir", "rustanalyzer-target"],
+    "rust-analyzer.runnables.extraArgs": ["--target-dir", "rustanalyzer-target"],
+}
+```
 - code lldb - debugger
 - rust doc viewer - view locally built docs
 - crates - show/edit versions of dependencies from crates.io

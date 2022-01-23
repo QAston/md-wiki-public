@@ -171,11 +171,11 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
 
 ### set up command line utilities
 
-#### set up ripgrep, fd, jq, sd
+#### set up ripgrep (rg - grep replacement), fd (find replacement), jq, sd (sed replacement), dust (du replacement), ctop (top for docker)
 
 ```
 sudo pacman -S ripgrep fd jq dos2unix zip tldr sd
-pacaur -S dust
+pacaur -S dust ctop-bin
 ```
 
 #### set up broot
@@ -266,7 +266,9 @@ pacaur -S rr
 
 ### Other stuff - todo
 
-- https://github.com/target/lorri - nix shell without nix-shell wrapper call
+- nix shell env evaluator:
+    - https://github.com/nix-community/nix-direnv
+    - https://github.com/target/lorri - nix shell without nix-shell wrapper call
 - https://github.com/4U6U57/wsl-open - for windows
 - https://github.com/wader/fq
 - https://github.com/kitsunyan/xdg-open-server - for native wsl host
