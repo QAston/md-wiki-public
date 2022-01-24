@@ -34,7 +34,7 @@ Docker has different networking modes:
 - `--network=none` - no network access
 
 Communicating with the host:
-- [ ] on linux add: `--add-host=host.docker.internal:host-gateway`, then use host.docker.internal dns name to connect to host
+- on linux add: `--add-host=host.docker.internal:host-gateway`, then use host.docker.internal dns name to connect to host
     - on windows/mac don't need to add the flag, the host dns is added automatically
 - use -p/-P flags to expose ports to host
 Communicating with other containers:
@@ -61,8 +61,14 @@ The configuration should be done through [environment variables](#dockerizing-ap
 todo: elaborate on considerations for each fo these:
 * standard docker - docker daemon on local machine
 * remote docker - docker accessed through a docker socket
-* docker-from-docker - docker daemon accessed from inside of a docker container through a docker docket
+* docker-from-docker - docker daemon accessed from inside of a docker container through a docker socket
+    * "docker-from-docker" is going to use the daemon on your host machine, which means that the nested (started from the devcontainer) containers  will see your host machine as the host, not the devcontainer you started them from, specifically:
+        * "bindmounts" will bind the nested container filesystem to host, not to the devcontainer it was started from
+        * ports "published" by the nested container will be published on the host network interface, not inside the devcontainer
+    * you can work around the issue with published ports by starting the devcontainer with the `--network=host` if possible, this makes the devcontainer see the ports exposed to the host, this is required for some software (like minikube) to work in the devcontainer
+    * you can work around the issue of "bindmounts" by bindmounting the filesystem in both the devcontainer and in the nested one
 * docker-in-docker - docker daemon spawned inside a container
+    * a hack - requires a privileged container and modifies cgroups in a sketchy way
 
 ## Writing dockerfiles
 
@@ -243,6 +249,27 @@ You can optionally declare a healthcheck helper process to be periodically run t
 * this declaration is optional, as standalone docker uses the main process to verify that container is running. Status of HEALTHCHECK is displayed in docker ps, but ignored by docker process.
 * Nautilus (service-inventory) [has it's own healthcheck declaration](https://sre.pages.tech.lastmile.com/platform/checks.html) which probably overrides the ones defined in Dockerfiles.
 * [docker-compose v2.1](https://docs.docker.com/compose/compose-file/compose-file-v2/#depends_on) will delay startup of dependent containers until dependencies are started, if requested using `depends_on.condition: service_healthy` clause. 
+
+#### Volumes
+
+* named volumes are reused between containers refering to the same name
+* uid/gid flags don't work for setting volume uid/gid in the container - it's set as root for volume mounts (it takes the setting from the directory on the host)
+    * `--mount 'source=target_dir,target=/home/user/app/target,type=volume,volume-driver=local,volume-opt=device=,volume-opt=type=,"volume-opt=o=uid=user,gid=user"'` should assign uid/gid, but doesn't, it also doesn't work if uid/git is replaced by numbers
+    * this can be fixed using a script:
+```
+uid=1000
+gid=1000
+volume_names=("name1" "name2")
+for name in ${volume_names[@]}; do
+  docker volume create $name
+done
+for name in ${volume_names[@]}; do
+  sudo chown $uid /var/lib/docker/volumes/$name/_data
+  sudo chgrp $gid /var/lib/docker/volumes/$name/_data
+done
+```
+* if mountpoint is created in the image ahead of time, then volume will [inherit the uid/gid](https://github.com/moby/moby/issues/2259#issuecomment-916886813) from the host
+* bindmounts have the same uid/git as they have on the host system
 
 ## Debugging
 

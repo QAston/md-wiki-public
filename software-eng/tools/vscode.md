@@ -422,11 +422,13 @@ pacaur -S code-marketplace code-features
         - `extensions.json` - a list of default plugins for workspace, will install them when prompted
     - use `remote ssh connect to host` command to connect to the host entry added by okteto, then select project directory
     - `add ssh connection` command looks like it'd accept any custom command, but it doesn't it just uses the command to generate a config file and drops the given command
-    - vscode installs the vscode server inside `~/.vscode-server` (includes remote-specific settings) can be made into a volume to persist extensions and stuff
+    - vscode installs the vscode server inside `~/.vscode-server` (includes remote-specific settings) can be made into a volume to persist extensions and settings
     - remote ssh tips: <https://code.visualstudio.com/docs/remote/troubleshooting#_ssh-tips>
     - documentation: <https://code.visualstudio.com/docs/remote/ssh>
 - there's also a `remote kubernetes` extension which is just an okteto-specific launcher for remote-ssh and k8s extensions
-    - doesn't seem to work anymore :(, so don't use it
+    - will not work if there's a container from a different okteto version already started/stopped
+    - to fix this remove the auto-installed ~/.okteto-vscode and link it to `which okteto`, then both will use the same version and work well
+- it is also possible to attach using `remote devcontainer extension` if local docker cli is pointing at the cluster's docker daemon
 - use one of the vscode devcontainer images as the base for the image, so that vscode and lang tools work well
 
 ### nix-shell integration
@@ -438,17 +440,66 @@ pacaur -S code-marketplace code-features
         - tries to switch env dynamically without restarting
     - `nix hit env` command restarts vscode, hopefully successfully applying the new environment
         - seems to work for standard devcontainer? but not for remote ssh
-- devcontainers - integration attempts
-    - my attempt: hopper-build-container
-    - <https://github.com/zimbatm/vscode-devcontainer-nix>
-        - container definition: <https://github.com/nix-community/docker-nixpkgs/tree/master/images/devcontainer>
-    - <https://github.com/xtruder/nix-devcontainer>
-        - has some interesting tricks: extensions reordering to load nix-env-selector, among others
-    - <https://levelup.gitconnected.com/vs-code-remote-containers-with-nix-2a6f230d1e4e>
-    - <https://github.com/swdunlop/nix-dev-container>
-    - I distinctly remember there being a solution based on bashrc, direnv and probing of env done by vscode, but can't find it anymore
-    - idea: figure out what vscode is using to run in the container and override it to first execute nix shell
-    - maybe this remote server could be used? <https://nixos.wiki/wiki/Visual_Studio_Code>
+- okteto's ssh server is a custom one with shell hardcoded to bash/sh, so there's no way to override it with nix-shell
+    - with sshd it'd be possible to add a user variant of the `user` that has the same uid/gids but has nix-shell as a startup shell (this could possibly still work for regular devcontainer which probes user env)
+    - nix-shell can be triggered using `ssh name.okteto -t "cd /home/user/app/;exec nix-shell"` but looks like there's no way to have vscode invoke that when probing for environment
+- devcontainers/ssh - integration attempts
+    - hopper-build-container - works! - override the vscode-server launch script to use nix-shell 
+        - connect with vscode to install server inside the container
+        - run a script that overrides `./vscode-server/bin/x/start.sh` with a variant that wraps it in nix-shell
+```bash
+#!/bin/bash
+
+set -eou pipefail
+
+PROGRAM_DIR="$( cd "$( dirname "$0" )" && pwd)"
+
+if [ ! -f $PROGRAM_DIR/app/shell.nix ]; then
+    echo "missing $PROGRAM_DIR/app/shell.nix file, aborting"
+    exit 1
+fi
+
+echo "initializing nix-shell"
+cd $PROGRAM_DIR/app
+touch shell.nix
+cached-nix-shell --run "nix shell initialized" || true
+
+echo "patching vscode server binaries to start in nix-shell"
+for server_dir in $PROGRAM_DIR/.vscode-server/bin/*/; do
+    if [ ! -f $server_dir/wrapped-server.sh ]; then
+        mv $server_dir/server.sh $server_dir/wrapped-server.sh
+    fi
+    if [ ! -f $server_dir/server.sh ]; then
+cat <<'EOF' > $server_dir/server.sh
+#!/bin/bash
+PROGRAM_DIR="$( cd "$( dirname "$0" )" && pwd)"
+cd /home/user/app
+COMMAND_ARGS="$@"
+START_COMMAND="cached-nix-shell --run '$PROGRAM_DIR/wrapped-server.sh $COMMAND_ARGS'"
+eval $START_COMMAND
+EOF
+        chmod a+x $server_dir/server.sh
+        echo "patched $server_dir"
+    fi
+done
+nohup bash $PROGRAM_DIR/vscode-server-shutdown.sh >/dev/null 2>&1 &
+```
+        - restart window with vscode, with killing the server
+```bash
+echo "shutting down vscode server"
+kill -9 `ps ax | grep "remoteExtensionHostAgent.js" | grep -v grep | awk '{print $1}'`
+kill -9 `ps ax | grep "watcherService" | grep -v grep | awk '{print $1}'`
+kill -9 `ps ax | grep ".vscode-server/bin/[0-9a-z]*/node"  | grep -v grep | awk '{print $1}'`
+kill -9 `ps ax | grep ".vscode-server/bin/[0-9a-z]*/server.sh"  | grep -v grep | awk '{print $1}'`
+echo "vscode shut down"
+```
+    - alternatives (they don't work very well)
+        - <https://github.com/zimbatm/vscode-devcontainer-nix>
+            - container definition: <https://github.com/nix-community/docker-nixpkgs/tree/master/images/devcontainer>
+        - <https://github.com/xtruder/nix-devcontainer>
+            - has some interesting tricks: extensions reordering to load nix-env-selector, among others
+        - <https://levelup.gitconnected.com/vs-code-remote-containers-with-nix-2a6f230d1e4e>
+        - <https://github.com/swdunlop/nix-dev-container>
 
 ### vim integration
 

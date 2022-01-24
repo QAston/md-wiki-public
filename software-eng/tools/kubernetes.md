@@ -150,6 +150,12 @@ echo "http://$(minikube ip):$(kubectl get service -n ingress-nginx ingress-nginx
 - [container examples and source](https://github.com/okteto/devenv)
     - looks like the containers don't need ANY addtional setup (other than devtools so that you can actually run commands)
 - [rust full project example](https://github.com/okteto/rust-getting-started)
+- how it works:
+    - okteto sets up an ssh server using https://github.com/okteto/remote
+        - searches for first bash/sh https://github.com/okteto/remote/blob/main/pkg/os/os.go
+        - https://github.com/okteto/remote/blob/99de42c0414824ace9f8f93b99ac7dd35f212fb2/pkg/ssh/ssh.go#L325
+    - okteto sets up standard ssh client configuration pointing at the server
+    - okteto forwards ports using k8s port forwarding
 
 ### setup
 
@@ -164,7 +170,7 @@ okteto analytics --disable
 name: deployment-name-to-override
 image: devcontainer-image
 workdir: /home/user/app # workdir for command
-command: ["bash", "--login"] # the command to run by default when starting the container?
+command: ["bash", "--login"] # the command executed when running okteto up (not when connecting to the ssh server or using okteto exec or using remote k8s extension)
 sync:
  - .:/home/user/app # files to synchronize; todo could use host volumes instead?
 forward:
@@ -200,6 +206,6 @@ okteto down -v # undeploy the image, -v removes the volumes for full cleanup
 ```
 - files changed locally will be uploaded, unless added to .stignore
     - okteto up -l debug to see upload debugging
-    - upload issues are usually caused by weird/big directories
+    - upload issues are usually caused by weird/big directories, remove unnecessary dirs and try again
 - ports defined in manifest will be forwarded to local machine
 - see [okteto in vscode](./vscode.md) to debug from inside a container instead of using port forwarding, as well as using container build env and others

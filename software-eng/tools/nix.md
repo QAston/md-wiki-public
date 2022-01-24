@@ -11,6 +11,7 @@
      * [opinionated guidelines and guides - pretty good](https://nix.dev/)
      * [new nix shell commands (todo)](https://blog.ysndr.de/posts/guides/2021-12-01-nix-shells/)
      * [nix flakes](https://blog.ysndr.de/posts/internals/2021-01-01-flake-ification/)
+     * [nix develop - replacement for standard nix tooling optimized for development](https://gitlab.com/mightybyte/nix-develop)
  * Dependencies between nix packages are hardcoded
      * Updating a lib requires rebuild of dependencies
      * But packages can coexist thanks to this
