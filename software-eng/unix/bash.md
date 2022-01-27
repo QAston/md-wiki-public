@@ -25,6 +25,8 @@
 * bash builtins cd and pwd handle symlinks differently than external commands
     * for external commands symlink/.. will go to the parent directory of the symlinked directory
     * because bash tracks how you've got to current pwd, bash builtins will resolve symlink/.. to the directory where symlink is contained
+* [special bash variables](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html)
+    * BASH_ARGC, BASH_ARGV, etc..
 
 ### setup for linux
 

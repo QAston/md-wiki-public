@@ -340,7 +340,7 @@ pacaur -S code-marketplace code-features
     - I've set up a "install into devcontainer" script for wslconfig which solves this issue
 - provided by remote continers extension, see `remote containers:` commands list
 - only a single container connection pair per window
-- `devcontainer.json` configures what container to start up for newly opened project ([reference](https://code.visualstudio.com/docs/remote/devcontainerjson-reference))
+- `devcontainer.json` configures what container to start up for `rebuild and reopen in devcontainer` command family ([reference](https://code.visualstudio.com/docs/remote/devcontainerjson-reference))
     - `build.target` option specifies the stage to build in a multistage build
         - allows using a single docker file for both dev/build env and for building the final build using that container
             - devenv stage: FROM a devcontainer, runs steps to set up build
@@ -385,24 +385,30 @@ pacaur -S code-marketplace code-features
         - minikube inside docker
         - configuration for accessing local kubernetes
         - environments for a ton of languages under "show all" option
-- `remote containers: open workspace/folder/reopen` in a container opens a new project window for selected project and a creator for making a development container
-    - vscode installs a remote module in the container, similar to wsl, and executes plugins there
-    - if there's no devcontainer.json a creator is started in workspace dir
-    - the source code is passed to the dev container via a docker mount:
-        - `"workspaceMount": "source=${localWorkspaceFolder}/sub-folder,target=/workspace,type=bind,consistency=cached"`
-        - to make it work with docker in external container this need to be changed to point to
-- `remote containers: clone repository/clone PR in a container volume/try a container sample`
-    - sets up a project inside a docker volume instead of a disk
-    - projects can only be accessed by using the recent list by using recent list
-    - recent list can be accessed in .config/Code/storage.json
-    - you can copy the volume out using:
-        - `docker run --rm --mount type=bind,source=$(pwd),target=/dest -v vscode-remote-try-node-6789fd329eb29bc56aab44eb27506206:/src busybox cp -r /src /dest`
-        - remember that volume mounts will write to the container/host that actually runs docker
+- `remote containers: rebuild and reopen in container`:
+    - base functionality
+    - builds a container based on `devcontainer.json`
+    - attaches a volume `/vscode` on startup, `~/.vscode-server` contains links to that volume
+    - variants of the command:
+        - `remote containers: open workspace/folder` in a container opens a new project window for selected project and a creator for making a development container
+            - vscode installs a remote module in the container, similar to wsl, and executes plugins there
+            - if there's no devcontainer.json a creator is started in workspace dir
+            - the source code is passed to the dev container via a docker mount:
+                - `"workspaceMount": "source=${localWorkspaceFolder}/sub-folder,target=/workspace,type=bind,consistency=cached"`
+        - `remote containers: clone repository/clone PR in a container volume/try a container sample`
+            - sets up a project inside a docker volume instead of a disk
+            - projects can only be accessed by using the recent list by using recent list
+            - recent list can be accessed in .config/Code/storage.json
+            - you can copy the volume out using:
+                - `docker run --rm --mount type=bind,source=$(pwd),target=/dest -v vscode-remote-try-node-6789fd329eb29bc56aab44eb27506206:/src busybox cp -r /src /dest`
+                - remember that volume mounts will write to the container/host that actually runs docker
 - `remote containers: attach to running container`
-    - attaching to existing containers (devcointainer config file isn't needed, in fact it isn't used even if present)
-    - by default opens /home/username directory
+    - attaching to existing containers (`devcontainer.json` is ignored if present)
+    - by default opens /home/username directory, username determined from default container user?
     - <https://code.visualstudio.com/docs/remote/attach-container>
     - can attach to a kube pod with k8s extension
+    - different from the above commands because it attaches to a preexisting container instead of using a container build definition:
+        - doesn't attack a `/vscode` volume, copies files into the container's `~/.vscode-server` instead
     - a subset of devcontainer config can be saved/restored using "attached container config files"
         - <https://code.visualstudio.com/docs/remote/devcontainerjson-reference#_attached-container-configuration-reference>
     - will disconnect once container shuts down
@@ -417,11 +423,16 @@ pacaur -S code-marketplace code-features
 - see [kubernetes/okteto](./kubernetes.md) for setup of okteto and starting a container
 - no vscode remote extension is needed for file editing (since they're synced), but one can be used to have remote debugging support
 - install `remote ssh extension` to connect to okteto
-    - use `.vscode/` directory to configure project specific settings that will be configured in the container:
+    - use opened worspace's `.vscode/` directory to configure project specific settings that will be configured in the container:
         - `settings.json` - setting files for workspace (sadly, can't have "remote.SSH.defaultExtensions")
         - `extensions.json` - a list of default plugins for workspace, will install them when prompted
     - use `remote ssh connect to host` command to connect to the host entry added by okteto, then select project directory
     - `add ssh connection` command looks like it'd accept any custom command, but it doesn't it just uses the command to generate a config file and drops the given command
+    - run `remote ssh show log` for diagnostics
+    - remote ssh extension env probing (PATH):
+        - not from the shell it logs into
+        - not from the user's declared login shell script
+        - either from running bash login noninteractive, or from just sourcing /etc/profile (looks like the latter)
     - vscode installs the vscode server inside `~/.vscode-server` (includes remote-specific settings) can be made into a volume to persist extensions and settings
     - remote ssh tips: <https://code.visualstudio.com/docs/remote/troubleshooting#_ssh-tips>
     - documentation: <https://code.visualstudio.com/docs/remote/ssh>
@@ -447,52 +458,8 @@ pacaur -S code-marketplace code-features
     - hopper-build-container - works! - override the vscode-server launch script to use nix-shell 
         - connect with vscode to install server inside the container
         - run a script that overrides `./vscode-server/bin/x/start.sh` with a variant that wraps it in nix-shell
-```bash
-#!/bin/bash
-
-set -eou pipefail
-
-PROGRAM_DIR="$( cd "$( dirname "$0" )" && pwd)"
-
-if [ ! -f $PROGRAM_DIR/app/shell.nix ]; then
-    echo "missing $PROGRAM_DIR/app/shell.nix file, aborting"
-    exit 1
-fi
-
-echo "initializing nix-shell"
-cd $PROGRAM_DIR/app
-touch shell.nix
-cached-nix-shell --run "nix shell initialized" || true
-
-echo "patching vscode server binaries to start in nix-shell"
-for server_dir in $PROGRAM_DIR/.vscode-server/bin/*/; do
-    if [ ! -f $server_dir/wrapped-server.sh ]; then
-        mv $server_dir/server.sh $server_dir/wrapped-server.sh
-    fi
-    if [ ! -f $server_dir/server.sh ]; then
-cat <<'EOF' > $server_dir/server.sh
-#!/bin/bash
-PROGRAM_DIR="$( cd "$( dirname "$0" )" && pwd)"
-cd /home/user/app
-COMMAND_ARGS="$@"
-START_COMMAND="cached-nix-shell --run '$PROGRAM_DIR/wrapped-server.sh $COMMAND_ARGS'"
-eval $START_COMMAND
-EOF
-        chmod a+x $server_dir/server.sh
-        echo "patched $server_dir"
-    fi
-done
-nohup bash $PROGRAM_DIR/vscode-server-shutdown.sh >/dev/null 2>&1 &
-```
-        - restart window with vscode, with killing the server
-```bash
-echo "shutting down vscode server"
-kill -9 `ps ax | grep "remoteExtensionHostAgent.js" | grep -v grep | awk '{print $1}'`
-kill -9 `ps ax | grep "watcherService" | grep -v grep | awk '{print $1}'`
-kill -9 `ps ax | grep ".vscode-server/bin/[0-9a-z]*/node"  | grep -v grep | awk '{print $1}'`
-kill -9 `ps ax | grep ".vscode-server/bin/[0-9a-z]*/server.sh"  | grep -v grep | awk '{print $1}'`
-echo "vscode shut down"
-```
+        - disable userEnvProbe in the container configuration
+        - for details, see the [repository](https://github.com/ChorusOne/hopper-build-container)
     - alternatives (they don't work very well)
         - <https://github.com/zimbatm/vscode-devcontainer-nix>
             - container definition: <https://github.com/nix-community/docker-nixpkgs/tree/master/images/devcontainer>

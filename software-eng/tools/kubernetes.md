@@ -146,17 +146,6 @@ echo "http://$(minikube ip):$(kubectl get service -n ingress-nginx ingress-nginx
 
 ## devcontainers in k8s - okteto
 
-- swaps the deployed k8s image for a devcontainer, provides file sync to the container and a shell to run commands in the k8s container
-- [container examples and source](https://github.com/okteto/devenv)
-    - looks like the containers don't need ANY addtional setup (other than devtools so that you can actually run commands)
-- [rust full project example](https://github.com/okteto/rust-getting-started)
-- how it works:
-    - okteto sets up an ssh server using https://github.com/okteto/remote
-        - searches for first bash/sh https://github.com/okteto/remote/blob/main/pkg/os/os.go
-        - https://github.com/okteto/remote/blob/99de42c0414824ace9f8f93b99ac7dd35f212fb2/pkg/ssh/ssh.go#L325
-    - okteto sets up standard ssh client configuration pointing at the server
-    - okteto forwards ports using k8s port forwarding
-
 ### setup
 
 ```
@@ -196,16 +185,51 @@ volumes:  # make these directories persist between okteto up/down runs
 #  - nix-pvc:/nix
 ```
 
+### how it works
+
+- swaps the deployed k8s image for a devcontainer, provides file sync to the container and a shell to run commands in the k8s container
+- okteto sets up a custom ssh server called [remote](https://github.com/okteto/remote)
+    - searches for first in the path bash/sh <https://github.com/okteto/remote/blob/main/pkg/os/os.go>
+    - ssh command execution <https://github.com/okteto/remote/blob/99de42c0414824ace9f8f93b99ac7dd35f212fb2/pkg/ssh/ssh.go#L325>
+- each connecting ssh process spawns bash (or sh if bash not found)
+    - the spawned bash processes inherit the okteto remote's environment - that's how .rc files are pulled in
+    - because it executes bash with no flags on ssh connection, setting env `BASH_ENV=/path.sh` can be used as a .rc script that's executed for every ssh connection
+    - okteto's `command` doesn't have ANY influence on remote's environment (and also, it's probably started after the ssh server)
+    - there are okteto-specific env variables set in the container:
+      - OKTETO_NAME, OKTETO_NAMESPACE, as well as kubernetes specific variables
+    - options for replacing the shell environment (for nix-shell compatibility for example)
+      - BASH_ENV override - add condition to current BASH_ENV script (chaning BASH_ENV doesn't work because for some reason bash sees old value of the variable, but adding a new variable works just fine)
+```bash
+# load nix shell if specifically requested using BASH_ENV_LOAD_NIX_SHELL and the shell isn't used to launch another command
+if [ -n $BASH_ENV_LOAD_NIX_SHELL ] && [ -z $IN_NIX_SHELL ] ; then
+  unset BASH_ENV_LOAD_NIX_SHELL
+  if [ -z $BASH_EXECUTION_STRING ] ; then
+    exec cached-nix-shell /home/user/app/shell.nix
+  else
+    exec cached-nix-shell /home/user/app/shell.nix --command "$BASH_EXECUTION_STRING"
+  fi
+fi
+```
+  - wrapper script for okteto's `./server.sh` -   
+  - somehow pointing okteto at a different bash (it searches in PATH, so modifying PATH would work)
+- okteto up creates a standard ssh client configuration pointing at the server
+- okteto forwards ports using k8s port forwarding, which are then exposed to ssh
+
 ### okteto usage
 
 ```
-kubectl apply -f app.yml # deploy app
+kubectl apply -f app.yml # deploy app as normal
 okteto init # create manifest
-okteto up # deploy the image from the manifest to current kubectl connection
-okteto down -v # undeploy the image, -v removes the volumes for full cleanup
+okteto up # deploy the image from the manifest to current kubectl connection; then start ssh server, synchronize the files and finally run the given `command`
+# exit in the okteto up shell: shuts down the container
+okteto down # delete the container, bring back the old manifest
+okteto down -v # delete the image including the persistent volumes - full cleanup
 ```
 - files changed locally will be uploaded, unless added to .stignore
     - okteto up -l debug to see upload debugging
     - upload issues are usually caused by weird/big directories, remove unnecessary dirs and try again
 - ports defined in manifest will be forwarded to local machine
 - see [okteto in vscode](./vscode.md) to debug from inside a container instead of using port forwarding, as well as using container build env and others
+- [container examples and source](https://github.com/okteto/devenv)
+    - looks like the containers don't need ANY addtional setup (other than devtools so that you can actually run commands)
+- [rust full project example](https://github.com/okteto/rust-getting-started)

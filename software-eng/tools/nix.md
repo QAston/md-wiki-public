@@ -75,6 +75,9 @@
 * <https://github.com/nix-community/lorri> - nix-shell env outside of nix shell
 * <https://github.com/nix-community/nix-direnv> - alternative to lorri, but without a daemon
 * <https://github.com/numtide/devshell> - nix-shell alternative?
+* cached-nix-shell
+  * stored cached env values in ~/.cache/cached-nix-shell
+  * use latest .env file to reload the environment
 
 #### nix garbage and updates
 
@@ -434,7 +437,8 @@ pkgs = import nixpkgs {
 curl -L https://nixos.org/nix/install | sh
 # set up configuration
 mkdir -p ~/.config/nix
-echo "require-sigs = false" > ~/.config/nix/nix.conf
+echo "require-sigs = false" >> ~/.config/nix/nix.conf
+echo "max-jobs = auto" >> ~/.config/nix/nix.conf
 # initialize channel
 nix-channel --update nixpkgs
 ```
