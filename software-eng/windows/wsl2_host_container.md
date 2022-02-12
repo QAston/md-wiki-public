@@ -54,7 +54,14 @@ sudo gpasswd -a dariusza docker-linux
 mkdir -p /home/dariusza/docker-bin/
 ln -s /mnt/wsl/host-arch/root/bin/docker /home/dariusza/docker-bin/docker
 ln -s /mnt/wsl/host-arch/root/bin/kubectl /home/dariusza/docker-bin/kubectl
+cat << 'EOF' | tee /home/dariusza/docker-bin/minikube > /dev/null
+#!/bin/bash
+
+export MINIKUBE_HOME=/mnt/wsl/host-arch/root/home/dariusza/.minikube/
+exec /mnt/wsl/host-arch/root/usr/sbin/minikube "$@"
+EOF
 ```
+chmod a+x /home/dariusza/docker-bin/minikube
 5. set up mounts for usage from the guest system
 ```
 cat << 'EOF' | sudo tee /etc/systemd/system/mnt-wsl-host\\x2darch-root.mount > /dev/null
@@ -258,6 +265,9 @@ fi
 if [ -f  /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/docker ]; then
   source /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/docker
 fi
+if [ -f  /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/minikube ]; then
+  source /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/minikube
+fi
 ```
 
 #### switching between integration with docker-host container and docker-for-windows
@@ -268,3 +278,7 @@ rm -rf ~/.kube
 rm -rf ~/.docker
 sudo systemctl enable/disable docker-client-socket.service
 ```
+
+#### mounting minikube in the guest container
+
+- todo: it's possible to make minikube executable in the guest container talk to the host container (see <https://github.com/microsoft/vscode-dev-containers/blob/main/containers/kubernetes-helm/.devcontainer/copy-kube-config.sh>)

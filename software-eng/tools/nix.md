@@ -350,6 +350,8 @@ output - /nix/store/2xwdcfnf4157fqxcf7bnjsbdr6pfc2v3-simple.drv
 * Structure
     * The `all-packages.nix` is then the file that composes all the packages. 
     * `pkgs/` dir with package functions or expressions (if file is a function, it’ll be evaluated with default params)
+* installing a package with pinned nixpkgs:
+    * `nix-env -if https://github.com/xzfc/cached-nix-shell/archive/refs/tags/v0.1.5.tar.gz --arg pkgs 'import ./cached/nix/packages.nix {}'`
 
 #### Nix packaging patterns
 
@@ -448,7 +450,6 @@ nix-channel --update nixpkgs
 if [ -f /home/dariusza/.nix-profile/etc/profile.d/nix.sh ]; then
     source /home/dariusza/.nix-profile/etc/profile.d/nix.sh
 fi
-export NIX_BUILD_SHELL=/bin/bash # by default nix runs it's own bash which doesn't seem to work well with my configs, running system bash fixes the issues
 ```
 
 ### Rust
@@ -461,12 +462,12 @@ packages.nix:
 , pkgs ? import sources.nixpkgs {
   overlays = [
     mozilla
-    (self: super: {
-      rustc = super.latest.rustChannels.nightly.rust;
-      rust-src = super.latest.rustChannels.nightly.rust-src;
-      cargo = super.latest.rustChannels.nightly.cargo;
+    (self: super: let pinned = (super.rustChannelOf { date = "2022-01-12"; channel = "nightly"; }) in {
+      rustc = pinned.rust; # todo: why not rustc?
+      rust-src = pinned.rust-src;
+      cargo = pinned.cargo;
     })
-    (import ./openapi.nix)
+    # todo: should include lldb as well for rust-lldb to find this, possibly other stuff
   ];
 }
 }: pkgs

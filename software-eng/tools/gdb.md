@@ -26,6 +26,7 @@
  - threat apply all bt full - backtrace of all threads
  - catch catch - break on all exceptions
  - catch syscall - break on syscalls
+ - `rust-gdb` - start gdb executable with rust-specific config
 
 ### building with better gdb info
 

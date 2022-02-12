@@ -22,7 +22,7 @@ git config --global core.excludesfile ~/.gitignore_global
 * other config
 ```
 # config
-git config --global mergetool.keepBackup false
+git config --global mergetool.keepbackup false
 git config --global push.default simple
 # aliases
 git config --global alias.st status

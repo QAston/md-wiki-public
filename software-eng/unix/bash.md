@@ -12,10 +12,10 @@
 * <https://mywiki.wooledge.org/BashWeaknesses>
 * <https://github.com/nojhan/liquidprompt>
 * interactive vs login shell
-    * login (interactive or not) runs /etc/profile, then first readable of ~/.bash_profile, ~/.bash_login, and ~/.profile
-        * often ~/.bash_profile imports ~/.bashrc if shell is interactive
+    * login (interactive or not) runs `/etc/profile`, then first readable of `~/.bash_profile`, `~/.bash_login`, and `~/.profile`
+        * often `~/.bash_profile` imports `~/.bashrc` if shell is interactive
         * bash invoked as `-bash` is set as a login shell
-    * interactive non-login shell runs /etc/bash.bashrc and ~/.bashrc on startup
+    * interactive non-login shell runs `/etc/bash.bashrc` and `~/.bashrc` on startup
     * noninteractive bash runs contents of $BASH_ENV on startup 
     * when run as `sh` it runs /etc/profile and contents of $ENV on startup (counts as noninteractive nonlogin)
 * [writing more reliable scripts](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
@@ -27,6 +27,13 @@
     * because bash tracks how you've got to current pwd, bash builtins will resolve symlink/.. to the directory where symlink is contained
 * [special bash variables](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html)
     * BASH_ARGC, BASH_ARGV, etc..
+* bash keybinding management [bind](https://ss64.com/bash/bind.html)
+    * can be used to bind shell functions to a key using `bind -x 'key:shellcommand'`    
+    * can be used to set vi mode keybinds which are [ignored when set from readline](https://unix.stackexchange.com/questions/112406/how-do-i-switch-to-vi-editing-mode-in-readline) using `bind 'key:readlinecommand`
+```
+bind -m emacs '"\e\C-j":vi-editing-mode'
+bind -m vi '"\C-e":emacs-editing-mode'
+```
 
 ### setup for linux
 

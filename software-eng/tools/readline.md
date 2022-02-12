@@ -56,19 +56,22 @@ alternatively you can press esc, then immediately k (on keyboards without alt on
         * a sequence of kills without any other commands in between (including movement) is all appended together to make a single killring item
         * a kill puts the new value to the front (top) of the buffer
         * so order of items in the ring is last to first (unless rotated)
-    * yanking copies items out of the killing
+    * yanking copies items out of the killring
         * C-y - yank top item
-        * M-y - replace last yanked item with the next one in the buffer and move the top of the buffer to that item
-        * once rotated, the ring states that way
+        * M-y - replace last yanked item with the next one in the buffer and move the top of the buffer to that item (i.e rotate)
+            * once rotated, the ring states that way
+            * multiple presses continue replacing the same yanked item
+            * does nothing if there's no yank
     * C-k - kill-line - from cursor to the end of the line
     * C-u - unix-line-discard - from cursor to beginning of the line (adds to killring)
     * Alt-d - kill-word
     * Alt-delete - backward kill word (doesn't work?)
     * Ctrl-w - backward kill word (space separated word)
-    * Alt-C-y - yank the 1st (nth with argument) argument of previous history entry
-        * todo: not sent properly by windows terminal?
-    * Alt-./Alt-, - yank the last (nth with argument) of previous hitory entry
-        * this one can be repeated to go backwards in history (numberic argument on repeated use specifies the direction) replacing previous press
+    * yanking from history instead of killring:
+        * Alt-C-y - yank the 1st (nth with argument) argument of previous history entry
+            * todo: not sent properly by windows terminal?
+        * Alt-./Alt-, - yank the last (nth with argument) of previous history entry
+            * this one can be repeated to go backwards in history (numberic argument on repeated use specifies the direction) replacing previous press
 * moving cursor
     * C-a - beginning of line
     * C-e - end of line
@@ -80,7 +83,9 @@ alternatively you can press esc, then immediately k (on keyboards without alt on
     * Alt-C-] then `<char>` - move cursor to prev occurance of char
 * misc
     * C-l - clear screen
-    * C-g - abort command
+    * C-g - abort command (search for example)
+* repetition or numeric argument
+    * `esc <number>` or `alt-<number>` (number can be negative) followed by any sequence of numbers - numeric arg (usually repetition)
 * "standard keybdings", some builtin some are custom:
     * left/right - move cursor a character
     * ctrl-left/right - move cursor a word
@@ -99,7 +104,11 @@ alternatively you can press esc, then immediately k (on keyboards without alt on
     - set vi-cmd-mode-string text
     - set vi-ins-mode-string text
 - switching the mode in vi switches the keymaps between vi-command and vi-insert
-- mode switching shortcuts won't work in bash, you need to use set -o vi instead
+- mode switching shortcuts won't work in bash, you need to use `set -o vi` instead, or make a bind configuration
+```
+bind -m emacs '"\e\C-j":vi-editing-mode'
+bind -m vi '"\C-e":emacs-editing-mode'
+```
 
 ### initrc
 
@@ -124,6 +133,7 @@ alternatively you can press esc, then immediately k (on keyboards without alt on
         - or go back to the end of history Alt+> to reset the search, sadly that doesn't work because moving history ends the search
     - the search term is displayed in the prompt
     - ESC and ctrl-J end the search
+    - the current state of the line is not included in the search it's just the starting position
 - configuration
     - consecutive duplicate entries are removed (in the usual config)
     - entries preceded by whitespace aren't added to history

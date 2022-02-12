@@ -276,6 +276,8 @@ pacaur -S rr
 - https://direnv.net/
 - https://github.com/andreafrancia/trash-cli
 - pbcopy/pbpaste
+- https://github.com/ms-jpq/isomorphic_copy
+- tt trash
 - xdg handlers for file types
 * https://github.com/cascadium/wsl-windows-toolbar-launcher
 * https://aur.archlinux.org/packages/broot/ https://dystroy.org/broot/ or XTree

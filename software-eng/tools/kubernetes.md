@@ -8,27 +8,20 @@
 
 ### management tools
 
-- ctlpl - yaml config for a cluster
+- ctlpl - yaml config for a cluster - can be used to install minikube
     - https://github.com/tilt-dev/ctlptl#features
     - pacaur -S ctlptl-bin
 - kustomize
     - make configuration variants declaratively without templates
     - can refer to files in other git repositories!
     - https://www.youtube.com/watch?v=1fCAwFGX38U
+    - filtering out: `kustomize build . | kubectl apply -l name=<name> -f -`
 - helm
     - package manager + horrible templating engine
     - `helm upgrade --install` - idempotent install command
     - `helm install -f <file>` - values file, individual values can be set using `--set`
     - `helm template` evaluate the template
-
-### automation
-
-- tilt - docker compose but for k8s - easy deploymetns and cleanup
-    - pacaur -S tilt-bin?
-    - has support for nix: https://github.com/tilt-dev/tilt-extensions/tree/master/nix
-    - extensions: https://github.com/tilt-dev/tilt-extensions
-    - has suport for kustomize
-    - has some live-reload capability: https://docs.tilt.dev/tutorial/5-live-update.html
+- k9s - curses ui for kubectl
 
 ### setup - docker-desktop (windows and wsl2)
 
@@ -233,3 +226,12 @@ okteto down -v # delete the image including the persistent volumes - full cleanu
 - [container examples and source](https://github.com/okteto/devenv)
     - looks like the containers don't need ANY addtional setup (other than devtools so that you can actually run commands)
 - [rust full project example](https://github.com/okteto/rust-getting-started)
+
+## tilt
+
+- tilt - docker compose but for k8s - easy deploymetns and cleanup
+    - `pacaur -S tilt-bin`?
+    - has support for nix: <https://github.com/tilt-dev/tilt-extensions/tree/master/nix>
+    - extensions: <https://github.com/tilt-dev/tilt-extensions>
+    - has suport for kustomize
+    - has some live-reload capability: <https://docs.tilt.dev/tutorial/5-live-update.html>

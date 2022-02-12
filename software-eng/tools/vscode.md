@@ -264,12 +264,6 @@ exec "/c/Users/qasto/AppData/Local/Programs/Microsoft VS Code/bin/code" "$@"
 - install [vscode-neovim](https://marketplace.visualstudio.com/items?itemName=asvetliakov.vscode-neovim)
     - disable scrolling past end
     - enable always starting with insert mode
-```vim
-if exists('g:vscode')
-" start in insert mode
-    au BufEnter * start
-endif
-```
     - disable insert mode keybindings which overlap with desired vscode keybinds
 ```json
     // disable keybinds that are duplicates of vscode binds or interfere with standard vscode keybinds
@@ -307,6 +301,22 @@ pacaur -S code-marketplace code-features
 
 ## interesting settings and extensions
 
+### optional extensions
+
+- multi-command - bind multiple commands to a single command name
+- differently colored windows for easy distinguishing: https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock
+- path autocomplete - alternative autocompletion for paths
+- view-in-browser - open file in the browser
+
+### utility extensions to install
+
+- path intellisense
+- workspace explorer - browsing workspaces
+- project manager - browsing individual projects
+- vscode-pdf - view pdf
+- hex editor - hex editor and viewer
+- bookmarks - jumpable bookmarks
+- yaml redhat - yaml support
 - settings sync allows syncing config files
     - each part of the config can be commented out and disabled on a machine: <https://github.com/shanalikhan/code-settings-sync/wiki/Sync-Pragmas>
 - settings cycler can be used to toggle a setting with a keybinding
@@ -316,9 +326,25 @@ pacaur -S code-marketplace code-features
      - could also change a ui setting, like colour of terminal or status bar
      - todo: make an extension fork that does these things and also adds a picker option for cycling?
   - the override workspace settings setting only overrides workspace entry if workspace has a config for the values already :(
-- multi-command - bind multiple commands to a single command name
 - commands - allows binding any command to status bar and to display custom text (sadly doesn't evaluate variables)
-- differently colored windows for easy distinguishing: https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock
+- windows
+    - powershell plugin
+    - windows explorer context menu
+
+### github integration to install
+
+- github pull requests - install - monitor issues and prs for repo
+- github repositories - open repo without further setup
+    - remote explorer -> github -> open repository/PR from github
+- open in github - open local branch file in github
+- code space - remote collaboration
+
+### git integration
+
+- gitignore - syntax support for .gitignore files - install
+- git history - view file history, to see remote branches run git fetch all - install
+- git lens - a ton of features, a bit noisy - don't install
+- git graph - shows graph of revisions, some overlap with git history
 
 ### developing using containers
 
@@ -444,7 +470,7 @@ pacaur -S code-marketplace code-features
 
 ### nix-shell integration
 
-- run `code .` from nix shell for easiest integration; sadly not always possible
+- run `code .` from nix shell for easiest integration; sadly doesn't work with devcontainers/ssh extensions
 - [nix-env-selector](https://marketplace.visualstudio.com/items?itemName=arrterian.nix-env-selector)
     - tries to edit vscode env to match a nix-shell environment; sadly doesn't always work (for example, for remote ssh)
     - `nix select env` command selects which shell to switch to, sets workspace setting `"nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix",`
@@ -559,6 +585,7 @@ npx vsce package
     - build tasks
 - rust analyzer
     - better than rust plugin, incompatible with it
+    - couldn't execute cargo watch usually means that the directory rustanalyzer-target doesn't have right ownership
     - if the analyzer build conflicts/blocks regular build, move it to a separate dir using local `.vscode/settings.json`:
 ```json
 {
@@ -567,10 +594,20 @@ npx vsce package
     "rust-analyzer.runnables.extraArgs": ["--target-dir", "rustanalyzer-target"],
 }
 ```
-- code lldb - debugger
-- rust doc viewer - view locally built docs
+- rust doc viewer - view locally built docs (build with cargo doc first)
 - crates - show/edit versions of dependencies from crates.io
 - cargo - don't install - runs cargo check (can be disabled), commands to add deps
+- even better toml - better toml support/validation
+- rust test lens - run a test from vscode
+- alternatively rust-test-explorer - menu to select and run tests from
+- code lldb - debugger (see next section)
+
+### code lldb
+
+- debugger for rust and c++
+- [extension user manual](https://github.com/vadimcn/vscode-lldb/blob/v1.6.10/MANUAL.md)
+- for rust support make sure the `launch.json` entry has "sourceLanguages": ["rust"], for rust pretty printing
+- [supports rr](https://github.com/vadimcn/vscode-lldb/blob/v1.6.10/MANUAL.md#reverse-debugging)
 
 ### Markdown
 
