@@ -467,7 +467,6 @@ packages.nix:
       rust-src = pinned.rust-src;
       cargo = pinned.cargo;
     })
-    # todo: should include lldb as well for rust-lldb to find this, possibly other stuff
   ];
 }
 }: pkgs

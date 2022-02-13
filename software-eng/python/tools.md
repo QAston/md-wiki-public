@@ -20,6 +20,20 @@ See <https://docs.python.org/3/library/venv.html> for details
    * `pip install -e .` installs a development version, which will reload changes, use when setup.py is present
    * `pip install -r requirements.txt` if requirements fileis present
 
+## Pip and python distributions
+
+- a python distro has builtin modules in form of shared librarires and python code in `Lib`
+   - these modules can be invoked using `python -m <modulename>`
+- pip is installed in the builtin modules directory (usually by default), it's bound to a particular python version
+- `pip install` installs modules in a python installation subdirectories, `site-packages` (libraries) and `Scripts` (executables pointing at libraries)
+   - the `site-packages` are visible to `python -m` (case needs to match) and are globally available for importing when running this python installation
+   - `Scripts` allow directly invoking the executables, but need to be added to $PATH for that to work
+   - `pip list` lists the site-packages but not the builtin modules
+
+## pip usage
+
+- `pip freeze` prints requirements.txt with all versions specified
+
 ### python's "autorun" using siteconfig.py for venv
 
 - <https://docs.python.org/3/library/site.html>
@@ -46,11 +60,30 @@ See <https://docs.python.org/3/library/venv.html> for details
 - msys build has readline enabled and working
 - native windows builds have readline disabled for some reason
 - python-editline package looks promising, but it's linux only
+- it looks like people don't care about builtin repl and use ipython instead (see ipython section below) or ptpython
 
+## ptpython
 
-## Pip
+- [documentation](https://github.com/prompt-toolkit/ptpython)
+```
+python -m pip install repl
+python -m ptpython # start repl
+python -m ptipython # start repl with ipython features
+```
 
-- `pip freeze` prints requirements.txt with all versions specified
+## ipython
+
+- ipython is a python repl, originally a project for scientific computing that morphed into jupyter, with ipython now just being the python-specific kernel of jupyter
+- [ipython repl extensions](https://ipython.readthedocs.io/en/stable/interactive/tutorial.html)
+- globally install ipython to use it as a default repl
+```
+python -m pip install ipython
+python -m IPython # start ipython repl
+```
+- ipython uses prompt-toolkit instead of readline
+   - [configuring ipython keybinds](https://ipython.readthedocs.io/en/stable/config/details.html#keyboard-shortcuts)
+   - [configuring prompt-toolkit](https://python-prompt-toolkit.readthedocs.io/en/latest/pages/asking_for_input.html#adding-custom-key-bindings)
+- [default keybindings](https://ipython.readthedocs.io/en/stable/config/shortcuts/index.html)
 
 ## conda
 

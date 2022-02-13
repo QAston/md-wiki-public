@@ -9,7 +9,7 @@
 2. Run the Arch executable to install and unpack
 3. Setup users (https://wsldl-pg.github.io/ArchW-docs/How-to-Setup/)
      * Configure root password
-     * Configure user: 
+     * Configure user:
      * `useradd -u1000 -m -U -G wheel,adm,log,audio,disk,floppy,input,kvm,optical,storage,video dariusza`
      * `passwd dariusza # set user password`
      * `passwd # set root password`
@@ -58,7 +58,7 @@ wt -p Arch -d \\wsl$\Arch\home\dariusza\
   * Uncomment en_GB.UTF-8 UTF-8 and other needed **[locales](https://wiki.archlinux.org/index.php/Locale)** in `/etc/locale.gen`, and generate them with:
   * `sudo locale-gen`
   * Add `export LANG=en_GB.UTF-8` to `/etc/profile.d/00_settings.sh`
-  * Set `/etc/locale.conf LANG=en_GB.UTF-8` 
+  * Set `/etc/locale.conf LANG=en_GB.UTF-8`
 cat <<'EOF' | sudo tee /etc/locale.conf > /dev/null
 LANG=en_GB.UTF-8
 EOF
@@ -78,7 +78,47 @@ cat <<'EOF' | sudo tee /etc/sysctl.conf > /dev/null
 fs.inotify.max_user_watches=524288
 EOF
 ```
-7. Remove services which don't work well with wsl
+7. Set up core dumps
+* use systemctl - this approach is broken - wsl kernel just doesn't seem to handle pipe-based coredumps at all, journalctl always logs a pipe error failure
+```
+sudo mkdir -p /etc/systemd/system.conf.d/
+cat <<'EOF' | sudo tee /etc/systemd/system.conf.d/00-core.conf > /dev/null
+[Manager]
+DefaultLimitCORE=infinity
+EOF
+sudo mkdir -p /etc/systemd/coredump.conf.d/
+cat <<'EOF' | sudo tee /etc/systemd/coredump.conf.d/00-core.conf > /dev/null
+[Coredump]
+KeepFree=0
+EOF
+# attempt 1
+cat <<'EOF' | sudo tee /etc/sysctl.d/00-core.conf > /dev/null
+kernel.core_pattern=|/usr/sbin/subsystemctl exec -- /usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
+kernel.core_pipe_limit=16
+kernel.core_uses_pid=1
+EOF
+# attempt 2
+cat <<'EOF' | sudo tee /root/coredump.sh > /dev/null
+#!/bin/subsystemctl-bash
+exec /usr/lib/systemd/systemd-coredump "$@"
+EOF
+sudo chmod a+x /root/coredump.sh
+cat <<'EOF' | sudo tee /etc/sysctl.d/00-core.conf > /dev/null
+kernel.core_pattern = |/root/coredump.sh %P %u %g %s %t %c %h
+kernel.core_pipe_limit = 16
+kernel.core_uses_pid = 1
+EOF
+```
+* use /tmp/core- approach
+```
+# set 70 to override default systemd file 50-coredump
+cat <<'EOF' | sudo tee /etc/sysctl.d/70-core.conf > /dev/null
+kernel.core_pattern=/tmp/core-%E!!!.%P.%t.sig%s.thrd%i,THRD%I.%h
+kernel.core_pipe_limit = 16
+kernel.core_uses_pid = 1
+EOF
+```
+8. Remove services which don't work well with wsl
 ```
 sudo mkdir -p /etc/systemd/wsl2-incompatible/user/sockets.target.wants/ /lib/systemd/wsl2-incompatible/system/sysinit.target.wants/ /usr/lib/systemd/wsl2-incompatible/system/
 # remove binfmt mounting done by systemd because it doesn't work and triggers 'too many simlinks error

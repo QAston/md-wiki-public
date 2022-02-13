@@ -4,6 +4,7 @@
 - <https://catonmat.net/ftp/bash-vi-editing-mode-cheat-sheet.pdf>
 - <https://catonmat.net/ftp/readline-emacs-editing-mode-cheat-sheet.pdf>
 - some applications have option to have readline but don't ship it by default (like python on windows for example)
+- [readline commands list](https://tiswww.case.edu/php/chet/readline/readline.html#IDX27)
 
 ### readline wrappers
 
@@ -106,8 +107,8 @@ alternatively you can press esc, then immediately k (on keyboards without alt on
 - switching the mode in vi switches the keymaps between vi-command and vi-insert
 - mode switching shortcuts won't work in bash, you need to use `set -o vi` instead, or make a bind configuration
 ```
-bind -m emacs '"\e\C-j":vi-editing-mode'
-bind -m vi '"\C-e":emacs-editing-mode'
+bind -m emacs '"\e\C-j":vi-editing-mode' # ctrl-alt-j switch to vi
+bind -m vi '"\C-e":emacs-editing-mode' # ctrl-e switch to emacs from command mode
 ```
 
 ### initrc
@@ -171,9 +172,13 @@ bind -m vi '"\C-e":emacs-editing-mode'
 - configuration file has a different format compared to readline: <https://manpages.debian.org/testing/libedit-dev/editrc.5.en.html>
 - documentation: <https://manpages.debian.org/testing/libedit2/editline.7edit.en.html>
 - requirements
-    - standard keybinds, configurable in a file - yes
+    - standard keybinds, configurable in a file - yes ~/editrc
     - possibility of integrating fzf - ?
         - registering custom commands - yes, EL_ADDFN, missing in mingweditline
+- [default keybindings](http://manpages.ubuntu.com/manpages/impish/man7/editline.7edit.html)
+    - <https://man.archlinux.org/man/editline.7.en>
+- [config documentation](http://manpages.ubuntu.com/manpages/bionic/man5/editrc.5.html)
+    - <https://man.archlinux.org/man/editrc.5.en>
 
 ## linenoise, now repl++
 
