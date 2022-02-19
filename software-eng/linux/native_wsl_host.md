@@ -302,6 +302,55 @@ sudo systemctl start mnt-wsl-arch-root.mount
 ```
 - [configure the host to mimic the wsl2 container host](../windows/wsl2_host_container.md)
 
+#### optionally, replace mounting vhdx by copy (for laptops nbd has issues waking up from suspension)
+
+- copy `Arch/ext4.vhdx` to `wsl2-ntfs/Arch/ext4.vhdx`
+- copy over the vhdx to `wsl2-vhd`
+```
+cat <<'EOF' > /home/dariusza/copy-wsl2.sh
+#!/bin/bash
+
+set -e
+
+VHDX_IMG="/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx"
+MOUNT_POINT="/home/dariusza/wsl2-tmp"
+NBD_DEVICE="/dev/nbd1/"
+
+function unmount_device {
+  qemu-nbd -d $NBD_DEVICE
+  echo "cleanup done"
+}
+
+function unmount_partition {
+  umount "$MOUNT_POINT"
+}
+
+function unmount_all {
+  echo "unmount_all"
+  unmount_partition
+  unmount_device
+}
+
+# mount block device
+qemu-nbd --detect-zeroes=off -c $NBD_DEVICE --image-opts driver=vhdx,file.filename=$VHDX_IMG
+
+trap unmount_device EXIT
+
+# reload partition table
+partprobe $NBD_DEVICE
+
+mkdir -p "$MOUNT_POINT"
+
+# mount partition
+mount -o rw,nouser $NBD_DEVICE "$MOUNT_POINT"
+trap unmount_all EXIT
+
+cp -ar $MOUNT_POINT/* /home/dariusza/wsl2-vhd
+EOF
+chmod a+x /home/dariusza/copy-wsl2.sh
+sudo /home/dariusza/copy-wsl2.sh
+```
+
 #### configure the host system
 
 - make a distro id
