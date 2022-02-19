@@ -22,6 +22,11 @@ sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.ssh  /home/dariusza/.ssh
 sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.gnupg  /home/dariusza/.gnupg
 sudo cp /mnt/wsl/arch/root/etc/locale.conf  /etc/locale.conf
 sudo cp /mnt/wsl/arch/root/etc/locale.gen  /etc/locale.gen
+cd /home/dariusza
+git clone git@github.com:QAston/wslconfig.git
+ln -s /home/dariusza/wslconfig/home/bin/ bin
+cd wslconfig
+./install.bash wsl
 ```
 2. Add a windows startup script (wsl host only)
 * docker_arch.bat:
