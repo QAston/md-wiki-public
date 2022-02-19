@@ -244,7 +244,7 @@ After=systemd-modules-load.service
 
 [Service]
 Type=notify
-ExecStart=/home/dariusza/mount-wsl2.sh "${WSL_DISTRO_PATH}" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" wsl2-vhd  --bind=/mnt/wsl/arch/root:/mnt/wsl/arch/root --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/host-arch/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/host-arch/root ${WSL_INIT_SCRIPT}
+ExecStart=/home/dariusza/mount-wsl2.sh "${WSL_DISTRO_PATH}" "/home/dariusza/wsl2-vhd/" "/dev/nbd1" wsl2-vhd  --bind=${DOCKER_FS_PATH}home/dariusza/docker-bin:/mnt/wsl/host-arch/bin --bind=${DOCKER_FS_PATH}:/mnt/wsl/host-arch/root ${WSL_INIT_SCRIPT}
 Restart=no
 
 [Install]
@@ -266,10 +266,28 @@ EOF
 sudo chown root /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
 sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
 ```
+- make guest filesystem visible on the host using the standard wsl paths
+```
+cat << 'EOF' | sudo tee /etc/systemd/system/mnt-wsl-arch-root.mount > /dev/null
+[Unit]
+Description=Bindmount for /mnt/wsl/arch/root to guest system
+
+[Mount]
+What=/home/dariusza/wsl2-vhd
+Where=/mnt/wsl/arch/root
+Type=none
+Options=bind,uid=1000,gid=1000
+
+[Install]
+WantedBy=local-fs.target
+EOF
+sudo systemctl enable mnt-wsl-arch-root.mount
+```
 - start the created services (or reboot)
 ```
 sudo mount ~/wsl2-ntfs
 sudo subsystemctl start mount-wsl2.service
+sudo systemctl start mnt-wsl-arch-root.mount
 ```
 - [configure the host to mimic the wsl2 container host](../windows/wsl2_host_container.md)
 
