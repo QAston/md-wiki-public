@@ -355,19 +355,13 @@ code --disable-extensions --verbose --log trace
         - (typing manager)
 - patterns
     - to "debounce" means to replace multiple sequential calls which would potentially cause the ui to change state repeatedly in a short time, with a single call
-- insert mode patch
-    - problem - switching files while in insert mode triggers an update from neovim that contains obsolete cursor positon
-    - ideas:
-        - always send cursor position so that the positon neovim sends back isn't out of date
-        - don't update the cursor position when switching files
-        - don't trigger the update from neovim when switching while in insert mode
-            - sounds most sensible because the plugin seems to be able to recover
-            - it can't recover on it's own if the layout (buffer_manager) is desynced, how do we sync back?
-                - we try to sync whenever there's a change in the mode
 - packaging
 ```
 npx vsce package
 ```
+- better binding generation
+    - run nvim's init script, then ask what's bound to what key and generate vscode bindings based on that?
+- somehow use nvim in insert mode too, and simply propagate changes made in nvim to vscode (like scroll and things)
 - todo: frankenvim?
     - merge vscode-neovim's integration with vscodevim's insert mode?
 - todo: vscode-backend - new plugin
@@ -377,9 +371,10 @@ npx vsce package
             - what can't be forwarded should be blocked or immediately reverted
         - forward text/editor changes to neovim
             - what can't be forwarded needs to be emulated or just reverted/disabled by extension
-- better binding generation
-    - run nvim's init script, then ask what's bound to what key and generate vscode bindings based on that?
-- somehow use nvim in insert mode too, and simply propagate changes made in nvim to vscode (like scroll and things)
+        - when it makes sense, make integration optional (marks in vim vs bookmarks in vscode)
+        - see how applications with vim as backend are made (preferably with web frontends)
+    - add a new mode: host (vscode) which would be used for integration with editors
+- todo: neovim-js - fork neovim to make it build with emscripten
 
 ### c++
 
@@ -481,6 +476,8 @@ Preview: RMB -> open in preview
 
 ## keybinds
 
+- neovim integration
+    - ctrl+i in visual mode copies the selection to vscode and exits visual mode
 - file explorer
     - preview mode
         - enabled using `workbench.editor.enablePreview*` setting
@@ -515,6 +512,7 @@ Preview: RMB -> open in preview
         - ctrl+shift+l - multiple cursors to all occurences of selection
         - ctrl+d - add cursor to next occurence of selection (can be pressed multiple times)
         - shift+alt+mouse - select column block of text, adds multiple cursors to the end of the line
+        - shift+alt+i - add multiple cursors to multiline selecion
         - middle mouse drag - multiple cursors selection
     - manipulate line
         - shift+alt+up/down - copy current line to above/below
@@ -661,50 +659,11 @@ Preview: RMB -> open in preview
     - ctr+shift+f - find
     - ctrl+shift+q - quick open view (switch between panes)
     - ctrl+k ctrl+k - ctrl+k
+    - ctrl+tab/ctrl+shift+tab - switch terminals next/previous
 
-- integrated terminal keybindings (intercept terminal input):
-      - global keybinds (anywhere including terminal)
-         - ctrl-shift-p - command pane
-         - f11 - fullscreen
-         - debug shortcuts: alt+f5, shift+alt+f5, ctrl+shift+f5, ctrl+f5, f5, shift+f11, f10, shift+f5, f6, f2
-         - ctrl-shift-w - close window
-         - ctrl-shift-n - new window
-         - f6, shift-f6 - focus to next/previous "part"(ui area)
-         - ctrl-<1-8> - focus to (or create) nth editor group
-         - ctrl-0 - focus on side bar
-         - ctrl-9 - focus to last editor (in tab order) of the current group
-         - alt-pgup/pgdown - next/prev editor in the tab order
-         - ctrl+(shift)+tab - switch editors in mru order in current group, or next/previous terminal
-         - ctrl-shift-q - quick open view (go backwards in the list on repeated press)
-         - ctrl+shift+t - focus to terminal/open new terminal
-         - ctrl+shift+r - focus on the active editor
-         - ctrl-shift-d(debug)/e(explorer)/x(extensions)/g(source control)/u(output pane)/m(problems pane)/y(debug console)/t(terminal) - focus switch
-         - ctrl-shift-b - build task
-         - ctrl-shift-plus - enable tab focus change
-     - terminal
-         - alt+down/up/left/right - pane focus control
-         - standard terminal scroll:
-               scrollDown - "ctrl+down"
-               scrollDownPage - "ctrl+pgdn"
-               scrollUp - "ctrl+up"
-               scrollUpPage - "ctrl+pgup"
-               scrollToTop - "ctrl+home"
-               scrollToBottom - "ctrl+end"
-         - alt-shift-d - duplicate pane
-         - ctrl-shift-c/v - copy-paste
-         - shift-alt-c - copy current cwd of the terminal
-         - (shift-)f3 - (backward)-find next
-         - escape (clear selection)
-         - ctrl+shift+t - new terminal
-         - ctr+shift+f - find
-         - ctrl+shift+q - quick open view (switch between panes)
-         - ctrl+k ctrl+k - ctrl+k
-         - alt+shift+d - split terminal
-         - ctrl+shift+f - find in terminal
-         - ctrl+tab/ctrl+shift+tab - switch terminals next/previous
+
 - other keybinds
     - ctrl-. - quickfix
-    - shift+alt+f - format file
     - ctrl+pgup/down - scroll editor
     - ctrl+tab/ctrl+shift+tab - switch editors next/previous
     - ctrl+shift+o - go to symbol
@@ -720,6 +679,7 @@ Preview: RMB -> open in preview
     - ctrl+k v - markdown preview window
     - ctrl+home/end - beginning/end of file
     - ctrl+shift+\ - jump to matching bracket
+    - ctrl+k v - synchronized markdown preview
 - gestures:
     - alt+lclick - add multiple cursors
         - shift+esc to cancel multiple cursors

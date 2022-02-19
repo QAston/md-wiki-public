@@ -29,6 +29,9 @@ git config --global alias.st status
 git config --global alias.unstage 'reset HEAD --'
 git config --global alias.lg "log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr %an)%Creset' --abbrev-commit --date=relative"
 ```
+* setup kdiff3 (windows and linux)
+    * kdiff3 ignores git's keepbackup setting
+    * to disable .orig files open `kdiff3` -> settings -> configure -> directory -> disable `keep backup` option
 
 ## usage
 

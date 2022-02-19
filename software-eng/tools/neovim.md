@@ -108,6 +108,11 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
 :PlugInstall
 ```
 
+sync linux to windows
+```
+cp ~/.config/nvim/init.vim  "/mnt/c/Users/qasto/AppData/Local/nvim/init.vim"
+unix2dos "/mnt/c/Users/qasto/AppData/Local/nvim/init.vim"
+```
 
 ### usage
 
@@ -141,7 +146,7 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
             - use `set clipboard+=unnamedplus` to make + the default register for all ops which have optional register arg
             - neovim uses "clipboard privders" for these, by default `xclip` on linux when `$DISPLAY` is set, which only works if windows x server is running
 
-        
+
 #### config files
 
 - by default nvim stores config files in `~/AppData/Local/nvim` and user data in `~/AppData/Local/nvim-data` (see :h standard-path)
@@ -160,15 +165,17 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
 #### keybinds
 
 - normal
-    - leader key - configured to be space  
+    - leader key - configured to be space
     - window/tab management
         - `Ctrl+w T` - move current window into a tab
-        - `gt` - next tab
-        - `gT` - previous tab
+        - `gt`/`:tabn` - next tab
+        - `gT`/`:tabp` - previous tab
+        - `<num>gt` - go to tab num
         - `:tabs` - display status of all tabs
         - `:tabonly` - close all other tabs
         - `:tabclose` - close current tab and contained windows
         - `:tabnew <file>` - open file in new tab
+        - `:tabedit <file>` - edit file in new tab
         - `:tab ball` - edit all buffers as tabs
         - `:tabdo <command>` - run command in all tabs
         - `:buffers`/`:ls` - display status of buffers
@@ -204,14 +211,118 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
         - `:q` - quit (fails if there are unsaved changes)
         - `:q!` or `ZQ` - quit and throw away unsaved changes
         - `:wqa` - write (save) and quit on all tabs
-    - `K` - open help page for word under cursor 
-    - motions
+    - navigating to files
+        - `K` - open help page for word under cursor
+        - `gf` - go to file under cursor
+    - motions (commands for cursor positioning)
         - b/w/e/B/W/E - beginning of previous word/ beginning next word/ end of current word
             - CAPITAL moves WORDS (whitespace separated), while lowercase moves words(operator separated)
+        - `ge`/`gE` - end of next word/WORD
+        - `g_` - last non-blank character of the line
+        - `gg` - go to beginning of file
+        - `G` - go to end of file (jump)
+        - `<num>G` - go to line (jump)
+        - `|` - go to 0th column
+        - `<num>|` go to nth column
+        - `h/j/k/l` - move left/down/up/right
+        - `f<char>`(f/F/t/T) - find character after cursor in line and move to it (F finds in reverse, t/T move just before the result), doesn't move if already on it
+            - `;` repeats f/F/t/T
+            - `,` repeats f/F/t/T in opposite direction
+        - `^` - to first non-whitespace character of line
+        - `-` - to first non-whitespace character of previous line
+        - `+` - to first non-whitespace character of next line
+        - `$` - to end of line
+        - `H/M/L` - screen based motions(jump):
+            - H - top left
+            - M - medium left
+            - L - bottom left
+        - `%` - if on one of `[,],(,),{,}` move to the matching one, otherwise find first paren to the right if there's one on the same line, otherwise nothing
+            - won't move if the paren doesn't have a valid match
+            - works across multiple lines (jump)
+            - `<>` are not considered parens (at least in default config, if they're configured to be, equivalent bindings are added to above)
+        - `[(`/`[{` and `]}`/`])` - move to the next unmatched paren in a direction
+            - skips currently selected paren
+            - "unmatched" is counted between cursor and paren, so matches on the opposite side of the cursor don't count
+            - `[#`/`]#` - c preprocessor directives instead of parens
+        - `[m`/`]m` - move to previous/next start of a method/class
+        - `[M`/`]M` - move to previous/next end of a method/class
+        - `[*`/`]*` - move to previous/next end of a c-style comment
+        - `(/)` - move to previous/next sentence (jump)
+        - `{/}` - move to previous/next paragraph (jump)
+        - targeting marks (see editing/marks):
+            - character or line targets:
+                - \` (backtick) target - moves to the line and cursor position (exlusive motion, current position is ignored in considered targets)
+                - `'` target - moves to the line
+            - `'<a-z>` - jump to mark in the current file
+            - `'<A-Z>` - jump to mark potentially across files
+            - `'<0-9>` - jump to last (or 1-9 before last) cursor locations when vim was last closed
+            - `''` - jump to where position before latest jump, or where last mark was set
+            - `]'`/`['` - jump to next/previous `<a-z>` marked position in the file
+
+    - window motions:
+        - `z<enter>`/`zt` - scroll window so current cursor is at the top
+        - `z.`/`zz` - scroll window so current cursor is at the middle of window
+        - `z-`/`zb` - scroll window so current cursor is at the bottom of window
+        - ctrl+l - refresh screen
+        - ctrl+y/e - scroll up/down by line
+        - ctrl+b/f - scroll up/down by screen
+        - ctrl+d/u - scroll up/down by 1/2 screen
+        - / search forward (jump)
+        - ? search backward (jump)
+        - n repeat last search (jump)
+        - N repeat search in opposite direction (jump)
+        - `*` - next occurance of word under cursor
+        - `#` - previous occurance of word under cursor
+    - editing
+        - `u` - undo
+        - `ctrl+r` - redo
+        - `U` - restores line to state when cursor was moved into it (undo line changes)
+        - `J` - join line below to the current one with one space in between contents
+        - `gJ` - join line below to the current one with no space
+        - `"<buffer>p` - paste after cursor
+        - `"<buffer>P` - paste before cursor
+        - `"<buffer>]p` - paste and indent to current indentation (doesn't work in vscode?)
+        - `P/p/]p` - with no buffer will paste from system clipboard (my configuration)
+        - `.` - repeat last text changing command
+        - `ZZ` - quick save and exit
+        - `x` - delete under cursor
+        - `ZQ` - quick exit
+        - `r<newchar>` - replace character at cursor
+        - jumps
+            - `:jumps` prints the list of jumps
+            - commands marked (jump) count as jump if they change the line of the cursor
+            - commands which open a file count as jumps
+            - the jump list is deduplicated by line (only 1 occurance of given line in the list)
+            - ctrl+o - jump backward
+            - ctrl+i or `<tab>` - jump forward (tab should probably be unbound)
+        - change-jumps
+            - `:changes` prints the list of positions where changes were made
+            - one position is remembered for every change that can be undone, unless it is close to a previous change
+            - list is not deduplicated
+            - `g;` - go to previous position in change list
+            - `g,` - go to next position in change list
+        - marks
+            - `m<a-z>` - set a mark valid in a file
+            - `m<A-Z>` - set a mark valid between files
+            - `m<0-9>` - set a mark valid for all editors with shada
+            - `:marks` - list marks
+            - `:delmark` - delete mark
+    - normal mode operators
+        - using operators in normal mode:
+            - `[opt-repeat]<operator>[opt-repeat]<motion>` - apply operator to the text range between current cursor and motion target
+            - `[opt-repeat]<operator>[opt-repeat]<operator>` - repeating operator usually applies it to current line
+            - `[opt-repeat]<operator>[opt-repeat]<text-object>` - apply operator to a text object
+        - visual mode operators work as normal as long as they bindings don't conflict
+        - conflicting bindings are prefixed by g:
+            - `g~` - swap case
+            - `gU` - upper case
+            - `gu` - lower case
     - modes
         - i/a - to insert mode (before/after) cursor
-        - I/A - to insert mode at (beginning/end) of the line
+        - I/A - to insert mode at (beginning non whitespace/end) of the line
         - o/O - add a line (below/above) the current one and go to insert mode
+        - s/S - substitute (character/line) - delete (character/line) and enters insert mode
+        - C - change line - delete until eol and insert
         - v - visual mode
         - ctrl+v - visual block mode
         - shift+v - line visual mode
@@ -227,9 +338,9 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
         - see :help text-objects for full details
         - `<a/i>w` - a word
         - `<a/i>W` - a WORD
-        - `<a/i>b` - a block with ()
-        - `<a/i>B` - a block with {}
-        - `<a/i>t` - a block with <> tags
+        - `<a/i>b` - a block with () or []
+        - `<a/i>B` - a block with {} or []
+        - `<a/i>t` - a block with `<tag></tag>` tags
         - `<a/i>s` - a sentence
         - `<a/i>p` - a paragraph
         - `<a/i>'` - a '-quoted string
@@ -239,22 +350,23 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
         - `<a/i>(` - text between ( brackets
         - `<a/i><` - text between < brackets
         - `<a/i>{` - text between { brackets
-    - operators - act on selection and move back to normal mode
-        `>` - shift text right
-        `<` - shift text left
-        `y` - yank (copy) marked text
-        `d` - delete marked text
-        `~` - switch case
-        `u` - change marked text to lowercase
-        `U` - change marked text to uppercase
-        `=` - format
-        `c` - change
-        `!` - execute shell command on selection
-        `:` - execute Ex command on the selection
+    - operators - act on selection and move back to normal mode, also works in normal mode but needs to be followed by a motion command to select which text is affected
+        - `>` - shift text right
+        - `<` - shift text left
+        - `y` - yank (copy) marked text
+        - `d` - delete marked text
+        - `~` - switch case
+        - `u` - change marked text to lowercase
+        - `U` - change marked text to uppercase
+        - `=` - format
+        - `c` - change
+        - `!` - execute shell command on selection and replace selection with results of the command
+        - `:` - execute Ex command on the selection
+        - `gw` - reflow
     - motions select the area between the cursor and motion target
 - insert
     - `ctrl+r <regname>` - paste register
-    - `ctrl+a ` - paste last insert
+    - `ctrl+a ` - paste last insert (what was typed in insert before last return to normal)
     - `ctrl+x ctrl+<many keys>` - completion keys
         - `ctrl+f` - autocomplete/insert filename
         - `ctrl+o` - guess type of item in front of the cursor and find first match
@@ -265,13 +377,13 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
         - see :help complete-functions
         - <https://vim.fandom.com/wiki/Any_word_completion>
     - `ctrl+v` - insert raw keypress/3 digit decimal number as a byte
-    - `ctrl+k <char1> <char2>` - enter a digraph 
+    - `ctrl+k <char1> <char2>` - enter a digraph
         - `:digraphs` shows available digraphs
     - `ctrl+o` - execute single normal-mode command and return to insert mode
     - `ctrl+]` - expand abbreviation under cursor (abbreviations are defined using :abbr command)
     - other ctrl commands are useless and can be ignored
     - todo: port standard keyboard mappings to insert mode?
-        - alt+left/right for jumplist
+        - alt+left/right for jumplist  ()
         - shift for selection instead of being dupe of ctrl
         - tab/shifttab for indent/deindent?
         - ctrl+space for completion?
@@ -295,12 +407,12 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
 
 - :h feature-list lists win32, wsl and unix, but not win32unix, which is what vim uses for msys/cygwin
     - neovim doesn't have an msys/cygwin build variant
-- looks like has('wsl') flag isn't really well supported: 
+- looks like has('wsl') flag isn't really well supported:
     - detection is compile time only <https://github.com/neovim/neovim/pull/7330>
     - and it doesn't work by default   <https://github.com/neovim/neovim/issues/12642>
-- a lot of plugins assume has(win32) means cmd shell and has(unix) means linux 
+- a lot of plugins assume has(win32) means cmd shell and has(unix) means linux
 
-#### shell support
+#### shell support on windows
 
 - run with `SHELL="" nvim` to run with cmd, otherwise it'll run the parent shell
 
@@ -344,7 +456,7 @@ cp ~/.config/nvim/init.vim ~/wslconfig/home/.config/nvim/init.vim
 ### ccls lsp - obsolete
 
 install pacman -S neovim
- 
+
 install vim plug https://github.com/junegunn/vim-plug/wiki/tutorial
 
 vim plug can be installed using aur
@@ -355,7 +467,7 @@ https://neovim.io/doc/user/lsp.html
 
 
 config
-``` 
+```
 call plug#begin('~/.config/nvim/plugged')
 Plug 'neovim/nvim-lsp'
 call plug#end()
@@ -370,7 +482,7 @@ nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
 nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
 nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
 ```
-
+p
 ccls -index . -v=2 --init='{"compilationDatabaseDirectory":"out"}' shouldn't crash!
 
 ### tools

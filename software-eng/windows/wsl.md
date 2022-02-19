@@ -17,15 +17,16 @@
          * "C:\portable\cygwin\bin\xwin.exe" -ac -multiwindow -nowgl -listen tcp
      * Vcxsrv - seems to have window cleanup problems in multiwindow mode
          * Install <https://sourceforge.net/projects/vcxsrv/>
-         * create a file called `multiwin.xlaunch` 
+         * create a file called `multiwin.xlaunch`
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <XLaunch WindowMode="MultiWindow" ClientMode="NoClient" LocalClient="False" Display="-1" LocalProgram="xcalc" RemoteProgram="xterm" RemotePassword="" PrivateKey="" RemoteHost="" RemoteUser="" XDMCPHost="" XDMCPBroadcast="False" XDMCPIndirect="False" Clipboard="True" ClipboardPrimary="False" ExtraParams="-multiwindow -ac -nowgl -reset -background none -xkblayout gb -xkbmodel kinesis" Wgl="False" DisableAC="True" XDMCPTerminate="False"/>
 ```
          * You can run in a single window mode to prevent the window cleanup glitch, or just restart the server
+         * edit the C:\Program Files\VcXsrv\xkbdata\symbols\gb and comment out `include "level3(ralt_switch_multikey)"` in the default layout to disable alt-gr
 4. Run the shortcut anytime you want gui access
 5. Window managers - you can use linux window manager instead of multiwindow x server
-     * "xserver" -ac -nowgl -screen 0 
+     * "xserver" -ac -nowgl -screen 0
      * pacman -S kwin openbox
      * `openbox`/`kwin_x11`
      * add `-rootless` to run in rootless mode - don't display root window for winmgr - x windows can overlap with regular windows
@@ -72,7 +73,7 @@ load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;172.16.0.0/12
 # in /etc/pulse/daemon.conf set
 daemonize = yes
 use-pid-file = no
-exit-idle-time = -1 
+exit-idle-time = -1
 ```
 3. add a script to start pulseaudio daemon:
 ```
@@ -96,7 +97,7 @@ export PULSE_SERVER=tcp:$(ip route | awk '/^default/{print $3; exit}')
 3. test
 ```
 # test, should output noise on the speakers
-pacat < /dev/urandom 
+pacat < /dev/urandom
 ```
 
 ### setup wslu and windows browser
@@ -152,7 +153,7 @@ taskkill  /IM "Docker Desktop.exe"  /T /F
     * `export GDK_DPI_SCALE=1 # 2 for cygwin xwin`
 
 ### Setup kde applications
- * sudo pacman -S qt5ct qt5-xmlpatterns qt5-svg breeze breeze-icons qt5-svg 
+ * sudo pacman -S qt5ct qt5-xmlpatterns qt5-svg breeze breeze-icons qt5-svg
  * Set `export QT_QPA_PLATFORMTHEME="qt5ct"` in .bashrc
  * Choose fushion style and breeze icons in qt5ct and apply
  * Breeze style has some widgets broken (scrolling ones)
@@ -292,7 +293,7 @@ pacaur -S rr
 
 ## usage
 
-### vhdx 
+### vhdx
 
 * wsl vhdx files use a partitionless drive, to create one in hyperv:
     * use new vhdx disk creator, select fixed or dynamic
@@ -322,7 +323,7 @@ crossDistro=true # allow directories, mounts and links created by this distro in
 ```
 * start it up using following script
 ```
-wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind /home/dariusza "/mnt/wsl/drive" 
+wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind /home/dariusza "/mnt/wsl/drive"
 ```
 * add the above to the wsl bat startup scripts of distros that want this
 
@@ -343,7 +344,7 @@ wsl.exe -d DriveArch -u root -e mkdir -p /mnt/wsl/drive && mount --bind /home/da
         * [api introduction](https://docs.microsoft.com/en-us/virtualization/community/team-blog/2017/20170127-introducing-the-host-compute-service-hcs)
         * [rust api](https://github.com/rafawo/hcs-rs/blob/c8d70a431eed24ccc53b4119975cc11fc8972d6a/src/schema/virtual_machines/resources/compute/mod.rs)
         * hcsdiag.exe can list the hcs resources
-    * what needs to be done for amd performance counters to work? looks like not supported 
+    * what needs to be done for amd performance counters to work? looks like not supported
 * apparently amd uprof [doesn't work when hyperv is enabled](https://community.amd.com/t5/server-gurus-discussions/amd-uprof-not-showing-performance-counters/td-p/438368), this includes in and out of wsl2
 
 ### tips
