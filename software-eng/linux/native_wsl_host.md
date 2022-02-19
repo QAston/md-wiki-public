@@ -302,6 +302,7 @@ if ! [ -n "$WSL_DISTRO_NAME" ]; then
 fi
 EOF
 ```
+- setup [nvim](../tools/neovim.md)
 - copy configuration from wsl
 ```
 cp -ar ~/wsl2-vhd/home/dariusza/.ssh/ .
@@ -309,14 +310,13 @@ cp -r ~/wsl2-vhd/home/dariusza/.git* ~
 git clone git@github.com:QAston/wslconfig.git
 ln -s /home/dariusza/wslconfig/home/bin/ bin
 cd ~/wslconfig
-./native-host-install.bash
+./install.bash native-host
 sudo pacman -S broot fzf bash-completion
 ```
-- set up host sysctl config from host.conf
+- setup [pacaur](./arch_custom_packages.md)
+- setup packages which don't work in wsl, like rr
 ```
-# arch-only:
-sudo cp /home/dariusza/wsl2-vhd/etc/sysctl.conf /etc/sysctl.d/60-wslhost.conf
-sudo sysctl -p /etc/sysctl.d/60-wslhost.conf
+pacaur -S rr
 ```
 - configure konsole and yakuake
   - change appearance to use breeze-silver scheme
