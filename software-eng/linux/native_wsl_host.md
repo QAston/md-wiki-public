@@ -108,6 +108,7 @@ EOF
     - set PLASMA_USE_QT_SCALING=1 in /etc/profile.d/host.sh
     - set GRUB_GFXMODE=1024x768x32 and GRUB_GFXPAYLOAD_LINUX=keep in /etc/default/grub
     - run grub-mkconfig -o /boot/grub/grub.cfg
+    - for booting to windows use uefi instead of grub, to not have to reset encryption key
 - install packages
 ```
 sudo pacman -S neovim xclip base-devel
