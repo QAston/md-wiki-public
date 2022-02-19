@@ -104,8 +104,10 @@ EOF
   - laptop
     - open source drivers (video-linux)
     - display settings -> scale -> 2.0
-    - edit /etc/sddm.conf -> enablehidpi for wayland and x11; add -dpi 192 flag to ServerArguments
+    - edit /etc/sddm.conf -> enablehidpi=true for wayland and x11; add -dpi 192 flag to ServerArguments
     - set PLASMA_USE_QT_SCALING=1 in /etc/profile.d/host.sh
+    - set GRUB_GFXMODE=1024x768x32 and GRUB_GFXPAYLOAD_LINUX=keep in /etc/default/grub
+    - run grub-mkconfig -o /boot/grub/grub.cfg
 - install packages
 ```
 sudo pacman -S neovim xclip base-devel
