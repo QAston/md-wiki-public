@@ -91,16 +91,23 @@ EOF
 ### setup manjaro (native host system)
 
 - install manjaro from a usb drive
-    - gb keyboard settings
-    - gb language and timezone
-    - propertiary drivers
+  - gb keyboard settings
+  - gb language and timezone
+  - kinesis keyboard
+  - propertiary drivers
 - update packages
-- configure display settings for 2 monitors
+- machine specific settings
+  - pc
+    - propertiary drivers
+    - configure display settings for 2 monitors
     - search for display settings/manager
+  - laptop
+    - open source drivers (video-linux)
+    - display settings -> scale -> 2.0
+    - arch wiki ->sddm -> enable hidpi
 - install packages
 ```
-sudo pacman -S neovim xclip base-devel noto-fonts-emoji
-pacaur -S noto-color-emoji-fontconfig
+sudo pacman -S neovim xclip base-devel
 ```
 - set up mounting tools for vhd
 ```
