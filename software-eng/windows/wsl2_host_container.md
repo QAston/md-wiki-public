@@ -17,12 +17,13 @@
     * before installing, rename Arch.exe to DockerArch.exe to install a new distro instead of override and existing one
     * can copy some files over for arch instead of building them locally, run after "publish the guest filesytem to the host"
 ```
+# wsl host only
 sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.ssh  /home/dariusza/.ssh
 sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.gnupg  /home/dariusza/.gnupg
-sudo cp /mnt/wsl/arch/root/etc/locale.conf  /etc/locale.conf # wsl only
-sudo cp /mnt/wsl/arch/root/etc/locale.gen  /etc/locale.gen # wsl only
+sudo cp /mnt/wsl/arch/root/etc/locale.conf  /etc/locale.conf
+sudo cp /mnt/wsl/arch/root/etc/locale.gen  /etc/locale.gen
 ```
-2. Add a windows startup script (wsl containers)
+2. Add a windows startup script (wsl host only)
 * docker_arch.bat:
 ```
 wsl.exe -d DockerArch -u root -e subsystemctl start
@@ -34,7 +35,7 @@ wsl.exe -d DockerArch -u root -e subsystemctl start
 1. setup sshd for logging in from the guest container
 ```
 sudo pacman -S openssh
-echo "AcceptEnv FOO WSL_DISTRO_NAME" | sudo tee -a /etc/ssh/sshd_config
+echo "AcceptEnv FOO WSL_DISTRO_NAME" | sudo tee -a /etc/ssh/sshd_config # wsl host only
 sudo systemctl enable sshd
 sudo systemctl start sshd
 ```
