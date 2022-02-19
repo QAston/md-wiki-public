@@ -15,14 +15,12 @@
 
 1. create a new [wsl2 arch container](./wsl2_arch.md) to run the host
     * before installing, rename Arch.exe to DockerArch.exe to install a new distro instead of override and existing one
-    * can copy some files over for arch instead of building them locally
+    * can copy some files over for arch instead of building them locally, run after "publish the guest filesytem to the host"
 ```
-sudo cp -r /mnt/wsl/arch/root/home/dariusza/portable/ .
-sudo cp -afr /mnt/wsl/arch/root/bin/subsystemctl* /usr/bin
-sudo sed -i 's|:/bin/bash|:/bin/subsystemctl-bash|g' /etc/passwd
-sudo cp /mnt/wsl/arch/root/etc/locale.conf  /etc/locale.conf
-sudo cp /mnt/wsl/arch/root/etc/locale.gen  /etc/locale.gen
 sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.ssh  /home/dariusza/.ssh
+sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.gnupg  /home/dariusza/.gnupg
+sudo cp /mnt/wsl/arch/root/etc/locale.conf  /etc/locale.conf # wsl only
+sudo cp /mnt/wsl/arch/root/etc/locale.gen  /etc/locale.gen # wsl only
 ```
 2. Add a windows startup script (wsl containers)
 * docker_arch.bat:
@@ -60,8 +58,9 @@ cat << 'EOF' | tee /home/dariusza/docker-bin/minikube > /dev/null
 export MINIKUBE_HOME=/mnt/wsl/host-arch/root/home/dariusza/.minikube/
 exec /mnt/wsl/host-arch/root/usr/sbin/minikube "$@"
 EOF
-```
 chmod a+x /home/dariusza/docker-bin/minikube
+```
+
 5. set up mounts for usage from the guest system
 ```
 cat << 'EOF' | sudo tee /etc/systemd/system/mnt-wsl-host\\x2darch-root.mount > /dev/null
@@ -136,6 +135,13 @@ EOF
 cd /home/dariusza/
 ln -s -T /mnt/wsl/arch/root/home/dariusza/workspace workspace
 ```
+9. Set up host directories to mount
+```
+sudo chown -R dariusza /nix
+sh <(curl -L https://nixos.org/nix/install) --no-daemon (see nix)
+sudo chown -R dariusza /home/dariusza/.cargo
+```
+
 
 ### configure host integration in the guest container
 
@@ -211,7 +217,7 @@ sudo systemctl start mnt-wsl-arch-root.mount
 cat ~/.ssh/id_rsa.pub | /mnt/wsl/host-arch/root/home/dariusza/.ssh/authorized_keys
 ```
 
-#### configure docker host integration - need to also do these on host if you want to use docker from host
+#### configure docker host integration on the guest system
 
 1. set up users
 ```
@@ -220,7 +226,7 @@ sudo gpasswd -a dariusza docker-linux
 ```
 2. disable potentially conflicting packages on host distros by adding to IgnorePkg pacman.conf:
   * docker kubectl
-3. set up the docker socket on the client system (some applicatons are bugged with doc)
+3. set up the docker socket on the client system (some applicatons are bugged with DOCKER_HOST)
 ```
 # arch - add a service to configure the socket
 cat << 'EOF' | sudo tee /root/docker_client_socket.sh > /dev/null
@@ -252,12 +258,6 @@ sudo systemctl start docker-client-socket.service
 ```
 if [ -e /mnt/wsl/host-arch/docker/docker.sock ]; then
   export DOCKER_HOST="unix:///mnt/wsl/host-arch/docker/docker.sock"
-fi
-```
-4. update .bash_profile
-```
-if [ -d /mnt/wsl/host-arch/bin ]; then 
-PATH="$PATH:/mnt/wsl/host-arch/bin"
 fi
 ```
 5. update .bashrc
