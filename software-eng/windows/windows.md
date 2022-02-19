@@ -93,7 +93,7 @@
         * win-shift-down - demaximize then minimize and deselect
         * win-left/right - snap current window to left/right half of monitor and move between and monitors
             * after snapping the other side will show a selection for the second window to snap (snap assist)
-            * this can be configured in the settings -> multitasking and sometimes breaks, which is fixed by restarting explorer 
+            * this can be configured in the settings -> multitasking and sometimes breaks, which is fixed by restarting explorer
         * win-shift-left/right - move to another monitor
         * window dragging
             * drag to left/right side of monitor - snap window
@@ -135,7 +135,7 @@
             * with ctrl-shift - open as admin
             * with alt - show the app's "jump list", same as right click
         * windows-T - cycle through taskbar apps and taskbars
-        * right click -> toolbars -> new toolbar 
+        * right click -> toolbars -> new toolbar
             * adds a menu from which you can start applications which are in the specified custom directory
             * also you can right click -> open directory
     * start menu
@@ -180,7 +180,7 @@
 ### generic windows shortcuts
 * text editing
     * ctrl-left - move to beginning of prev word
-    * ctrl-right - move to beginning of next word
+    * ctrl-right - move to end of next word
     * ctrl-backspace - delete prev word
     * ctrl-delete - delete next word
     * ctrl-up - move to beginning of a paragraph
@@ -196,16 +196,16 @@
     * ctrl-z - undo
     * ctrl-y - redo (sometimes ctrl+shift+z)
 * browsers
-    * 
+    *
 
 ### ntfs links
 
-- hardlink 
+- hardlink
     - single drive only point to the same data file
     - visible and treated as a regular file from rest of the system
     - if the file data changes through one hard link, the other is changed too
     - `mklink /h`
-- softlink 
+- softlink
     - can span any scope
     - a path to another file
     - breaks if the target is no longer there
