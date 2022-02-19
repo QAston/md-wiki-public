@@ -314,7 +314,8 @@ set -e
 
 VHDX_IMG="/home/dariusza/wsl2-ntfs/Arch/ext4.vhdx"
 MOUNT_POINT="/home/dariusza/wsl2-tmp"
-NBD_DEVICE="/dev/nbd1/"
+NBD_DEVICE="/dev/nbd1"
+TARGET="/home/dariusza/wsl2-vhd"
 
 function unmount_device {
   qemu-nbd -d $NBD_DEVICE
@@ -331,10 +332,10 @@ function unmount_all {
   unmount_device
 }
 
+trap unmount_device EXIT
+
 # mount block device
 qemu-nbd --detect-zeroes=off -c $NBD_DEVICE --image-opts driver=vhdx,file.filename=$VHDX_IMG
-
-trap unmount_device EXIT
 
 # reload partition table
 partprobe $NBD_DEVICE
@@ -345,11 +346,16 @@ mkdir -p "$MOUNT_POINT"
 mount -o rw,nouser $NBD_DEVICE "$MOUNT_POINT"
 trap unmount_all EXIT
 
-cp -ar $MOUNT_POINT/* /home/dariusza/wsl2-vhd
+rm -rf $TARGET
+mkdir -p $TARGET
+chown dariusza $TARGET
+
+cp -ar $MOUNT_POINT/* $TARGET
 EOF
 chmod a+x /home/dariusza/copy-wsl2.sh
 sudo /home/dariusza/copy-wsl2.sh
 ```
+- comment out vhdx-mounting parts of mount-wsl2.sh
 
 #### configure the host system
 
