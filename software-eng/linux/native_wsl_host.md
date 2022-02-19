@@ -372,11 +372,12 @@ EOF
 - setup [nvim](../tools/neovim.md)
 - copy configuration from wsl
 ```
-cp -ar ~/wsl2-vhd/home/dariusza/.ssh/ .
-cp -r ~/wsl2-vhd/home/dariusza/.git* ~
+sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.ssh  /home/dariusza/.ssh
+sudo cp -ar /mnt/wsl/arch/root/home/dariusza/.gnupg  /home/dariusza/.gnupg
+cd /home/dariusza
 git clone git@github.com:QAston/wslconfig.git
 ln -s /home/dariusza/wslconfig/home/bin/ bin
-cd ~/wslconfig
+cd wslconfig
 ./install.bash native-host
 sudo pacman -S broot fzf bash-completion
 ```
