@@ -223,7 +223,7 @@ trap shutdown_all EXIT
 # SYSTEMD_NSPAWN_API_VFS_WRITABLE=1 - make kernel filesystems writeable - needed for docker in a container
 # SYSTEMD_SECCOMP=0 - disable capability checks
 # SYSTEMD_NSPAWN_USE_CGNS=0 - https://wiki.archlinux.org/title/systemd-nspawn#Run_docker_in_systemd-nspawn
-SYSTEMD_SECCOMP=0 systemd-nspawn -M "$MACHINECTL_SERVICE" -D "$MOUNT_POINT" --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind-ro=/tmp/.X11-unix --capability=all "$@"
+SYSTEMD_SECCOMP=0 systemd-nspawn -M "$MACHINECTL_SERVICE" -D "$MOUNT_POINT" --bind=/mnt/wsl:/mnt/wsl --bind=/:/mnt/host --bind=/mnt/wsl/arch/root:/mnt/wsl/arch/root --bind-ro=/tmp/.X11-unix --capability=all "$@"
 
 # --resolv-conf=bind-host - binds too early before the file is populated by network manager
 EOF
