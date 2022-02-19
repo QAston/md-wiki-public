@@ -104,7 +104,7 @@ EOF
   - laptop
     - open source drivers (video-linux)
     - display settings -> scale -> 2.0
-    - arch wiki ->sddm -> enable hidpi
+    - edit /etc/sddm.conf -> enablehidpi for wayland and x11
 - install packages
 ```
 sudo pacman -S neovim xclip base-devel
