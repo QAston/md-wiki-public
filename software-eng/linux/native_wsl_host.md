@@ -197,6 +197,7 @@ function unmount_device {
 }
 
 function unmount_partition {
+  echo "unmount_partition"
   umount "$MOUNT_POINT"
 }
 
@@ -221,7 +222,7 @@ trap unmount_device EXIT
 partprobe $NBD_DEVICE
 
 # mount partition
-mount -o rw,nouser $NBD_DEVICE "$MOUNT_POINT"
+mount -o rw,nouser,noatime $NBD_DEVICE "$MOUNT_POINT"
 trap unmount_all EXIT
 
 mkdir -p /mnt/wsl
@@ -297,7 +298,7 @@ sudo systemctl enable mnt-wsl-arch-root.mount
 - start the created services (or reboot)
 ```
 sudo mount ~/wsl2-ntfs
-sudo subsystemctl start mount-wsl2.service
+sudo systemctl start mount-wsl2.service
 sudo systemctl start mnt-wsl-arch-root.mount
 ```
 - [configure the host to mimic the wsl2 container host](../windows/wsl2_host_container.md)
