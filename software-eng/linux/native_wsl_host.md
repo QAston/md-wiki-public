@@ -106,14 +106,14 @@ pacaur -S noto-color-emoji-fontconfig
 ```
 sudo pacman -S qemu-headless nbd
 ```
-- load nbd module on startup - run in su session:
+- load nbd module on startup:
 ```
-echo "nbd" > /etc/modules-load.d/nbd.conf
-echo "options nbd max_part=16" > /etc/modprobe.d/nbd.conf
+echo "nbd" | sudo tee /etc/modules-load.d/nbd.conf > /dev/null
+echo "options nbd max_part=16" | sudo tee /etc/modprobe.d/nbd.conf > /dev/null
 ```
 - load br_netfilter on startup
 ```
-echo "br_netfilter" > /etc/modules-load.d/br_netfilter.conf
+echo "br_netfilter" | sudo tee /etc/modules-load.d/br_netfilter.conf > /dev/null
 ```
 - configure nbd to not use sparse files
 ```
@@ -126,6 +126,7 @@ sparse_cow = false
 mkdir ~/wsl2-vhd/
 mkdir ~/wsl2-docker-vhd/
 ```
+- restart to load the kernel modules
 
 #### mount the ntfs drive
 
@@ -139,7 +140,7 @@ lsblk -f
 ```
 - add to fstab
 ```
-UID=AC481B43481B0BA8 /home/dariusza/wsl2-ntfs ntfs-3g auto,rw,defaults,uid=1000,gid=1000,umask=022,utf8 0 0
+UUID=<uuid from lsblk> /home/dariusza/wsl2-ntfs ntfs-3g auto,rw,defaults,noatime,uid=1000,gid=1000,umask=022,utf8 0 0
 ```
 
 #### set up audio/video support
@@ -155,7 +156,7 @@ ServerArguments=-nolisten tcp +iglx
 ```
 - allow connecting to the x server from the container
 ```
-echo "xhost +local:" > /etc/profile.d/03_x11wsl.sh
+echo "xhost +local:" | sudo tee /etc/profile.d/03_x11wsl.sh > /dev/null
 ```
 - configure pulseaudio - in `sudo nvim /etc/pulse/default.pa`
 ```
@@ -264,6 +265,11 @@ int main(int argc, char** argv) {
 EOF
 sudo chown root /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
 sudo chmod u+sw,a+rx /home/dariusza/bash-wsl2${DOCKER_SUFFIX}.sh
+```
+- start the created services (or reboot)
+```
+sudo mount ~/wsl2-ntfs
+sudo subsystemctl start mount-wsl2.service
 ```
 - [configure the host to mimic the wsl2 container host](../windows/wsl2_host_container.md)
 
