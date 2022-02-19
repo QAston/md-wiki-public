@@ -142,12 +142,11 @@ cd /home/dariusza/
 ln -s -T /mnt/wsl/arch/root/home/dariusza/workspace workspace
 ```
 9. Set up host directories to mount
+- setup [nix](../tools/nix.md)
 ```
-sudo chown -R dariusza /nix
-sh <(curl -L https://nixos.org/nix/install) --no-daemon (see nix)
+mkdir -p /home/dariusza/.cargo
 sudo chown -R dariusza /home/dariusza/.cargo
 ```
-
 
 ### configure host integration in the guest container
 
@@ -266,7 +265,13 @@ if [ -e /mnt/wsl/host-arch/docker/docker.sock ]; then
   export DOCKER_HOST="unix:///mnt/wsl/host-arch/docker/docker.sock"
 fi
 ```
-5. update .bashrc
+4. update .bash_profile
+```
+if [ -d /mnt/wsl/host-arch/bin ]; then 
+   export PATH="$PATH:/mnt/wsl/host-arch/bin" # this is exported bin directory, not entire root/bin directory
+fi 
+```
+6. update .bashrc
 ```
 if [ -f  /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/docker ]; then
   source /mnt/wsl/host-arch/root/usr/share/bash-completion/completions/docker
