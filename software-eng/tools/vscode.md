@@ -124,6 +124,10 @@ rm -rf *
 code --disable-extensions --verbose --log trace
 ```
 
+### developing extensions
+
+<https://code.visualstudio.com/api>
+
 ## interesting settings and extensions
 
 - extensions can be disabled per workspace if needed
@@ -359,22 +363,43 @@ code --disable-extensions --verbose --log trace
 ```
 npx vsce package
 ```
+- fixing warnings
+```
+node .\node_modules\eslint\bin\eslint.js -c .eslintrc.js  --ext .ts --fix .
+```
+- todos:
+    - mouse selection in visual mode is still broken - produces normal vscode selection on subsequent clicks
+    - VscodeNotifyRange doesn't select square selections properly
+        - square selection should be converted into multiple selections forming a square
+        - line selection uses 99999, but perhaps it should be selecting the end of line and have a cursor at the beginning of next line
+    - insert visual mode doesn't behave like insert mode, but it should
 - better binding generation
     - run nvim's init script, then ask what's bound to what key and generate vscode bindings based on that?
 - somehow use nvim in insert mode too, and simply propagate changes made in nvim to vscode (like scroll and things)
-- todo: frankenvim?
-    - merge vscode-neovim's integration with vscodevim's insert mode?
-- todo: vscode-backend - new plugin
-    - integrate with new neovim apis:
-        - use headless nvim
-        - forward all drawing events to vscode that can be forwarded
-            - what can't be forwarded should be blocked or immediately reverted
-        - forward text/editor changes to neovim
-            - what can't be forwarded needs to be emulated or just reverted/disabled by extension
-        - when it makes sense, make integration optional (marks in vim vs bookmarks in vscode)
-        - see how applications with vim as backend are made (preferably with web frontends)
-    - add a new mode: host (vscode) which would be used for integration with editors
-- todo: neovim-js - fork neovim to make it build with emscripten
+- alternative plugin designs - todo
+    - frankenvim?
+        - merge vscode-neovim's integration with vscodevim's insert mode?
+    - "neovim-backend" or "neovim-integration"
+        - integrate with new neovim apis:
+            - use headless nvim
+            - forward all drawing events to vscode that can be forwarded
+                - what can't be forwarded should be blocked or immediately reverted
+            - forward text/editor changes to neovim
+                - what can't be forwarded needs to be emulated or just reverted/disabled by extension
+            - when it makes sense, make integration optional (marks in vim vs bookmarks in vscode, same for jumplist, etc)
+            - see how applications with vim as backend are made (preferably with web frontends)
+            - display floating windows, possibly display the entire neovim editing window?
+                - perhaps use terminal emulation window to make sure fixed width chars are properly handled
+        - add a new mode: host (vscode) which would be used for integration with editors
+    - "neovim-terminal"
+        - opens a neovim terminal frontend for the currently edited file
+        - synchronizes changes made inside neovim with ones made inside vscode
+        - neovim command handlers to bring control back to window:
+            - switch back to editor
+            - selection
+            - changes to the file
+            - commands?
+    - neovim-js - fork neovim to make it build with emscripten
 
 ### c++
 

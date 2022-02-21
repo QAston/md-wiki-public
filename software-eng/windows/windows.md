@@ -38,6 +38,7 @@
     - path editor will switch to path mode if it finds semicolons and path-looking things
     - setx sets variables in windows registry
     - you can set the variables with name `=name` and they won't show up in `env` prints, and are accessible through winapi, but can't be set from cmd.exe, some people call these "hidden variables"
+* [windows cmd parsing](https://nullprogram.com/blog/2022/02/18/)
 
 
 ### posix api implementations
@@ -117,7 +118,9 @@
         * ctrl-alt-tab - menu to bring a window to front with arrows
             * arrows or tab(next) or shift tab(previous) to choose, esc to cancel, enter to select, delete to close the window
             * alt-tab - press to activate the menu and move 1 pos forward, releasing alt is selects the window, otherwise standard controls
+                * 1 press moves to most recently used window, next press to next most recently used, etc
             * alt-shift-tab - press to activate the menu and move 1 pos backward, releasing alt is selects the window, otherwise standard controls
+                * 1 press moves to least recently used window
         * alt-esc - cycle through windows in order of opening
     * taskbar
         * right click shows an app specific list of options ("jump list")
@@ -196,7 +199,7 @@
     * ctrl-z - undo
     * ctrl-y - redo (sometimes ctrl+shift+z)
 * browsers
-    *
+    * alt+left/right - back/forward in history
 
 ### ntfs links
 

@@ -216,9 +216,6 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
         - `U` - restores line to state when cursor was moved into it (undo line changes)
         - `J` - join line below to the current one with one space in between contents
         - `gJ` - join line below to the current one with no space
-        - `"<buffer>p` - paste after cursor
-        - `"<buffer>P` - paste before cursor
-        - `"<buffer>]p` - paste and indent to current indentation (doesn't work in vscode?)
         - `P/p/]p` - with no buffer will paste from system clipboard (my configuration)
         - `.` - repeat last text changing command
         - `ZZ` - quick save and exit
@@ -244,6 +241,30 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
             - `m<0-9>` - set a mark valid for all editors with shada
             - `:marks` - list marks
             - `:delmark` - delete mark
+        - buffer operators
+            - `"<buffer>p` - paste after cursor
+            - `"<buffer>P` - paste before cursor
+            - `"<buffer>]p` - paste and indent to current indentation (doesn't work in vscode?)
+            - `"<buffer>9yy` - yank into a buffer
+            - `"<buffer>9dd` - delete into a buffer
+        - ex commands `:`
+            - address definitions
+                - `.` - current line
+                - `<line number>`
+                - `.+<offset from current line>`
+                - `$` - last line
+                - `%` - entire file
+                - `<addr1>,<addr2>` - range
+                - `'<markname>` - refer to marked address
+            - `:s` - substitute
+                - `:[<address>]s/<pattern>/<new_text>/<flags>` - replace first occurance
+                - flags: `g` - replace
+            - `:g` - globally execute command on lines matching pattern
+                - `:[<address>]g/<pattern>/<cmd>`
+                - <https://vim.fandom.com/wiki/Power_of_g>
+            - `:v,:g!` - globally execute command on lines not matching pattern
+            - `:vim` - runs internal grep to find in files
+            - `:grep` - runs external grep to find in files
     - normal mode operators
         - using operators in normal mode:
             - `[opt-repeat]<operator>[opt-repeat]<motion>` - apply operator to the text range between current cursor and motion target
