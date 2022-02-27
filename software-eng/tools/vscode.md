@@ -82,25 +82,7 @@ exec "/c/Users/qasto/AppData/Local/Programs/Microsoft VS Code/bin/code" "$@"
     - disable scrolling past end
     - enable always starting with insert mode
     - disable insert mode keybindings which overlap with desired vscode keybinds
-```json
- disable keybinds that are duplicates of vscode binds or interfere with standard vscode keybinds
-    { "key": "ctrl+c",                "command": "-vscode-neovim.escape" },
-    { "key": "ctrl+oem_4" ,                "command": "-vscode-neovim.escape" },
-    { "key": "f1",                    "command": "-vscode-neovim.send" },
-    { "key": "shift+win+p",           "command": "-vscode-neovim.send"},
-    { "key": "shift+win+o",           "command": "vscode-neovim.send"},
 
-    { "key": "ctrl+j",                "command": "-editor.action.insertLineAfter"}, // this one overrides toggle panel, so it's fine?, but then ctrl+enter is very easy to type too
-    { "key": "ctrl+d",                "command": "-editor.action.outdentLines"},
-    { "key": "ctrl+t",                "command": "-editor.action.indentLines"},
-    { "key": "ctrl+h",                "command": "-deleteLeft"},
-    { "key": "ctrl+w",                "command": "-deleteWordLeft"},
-    { "key": "ctrl+u",                "command": "-deleteAllLeft"},
- rebind vscode keybindings that conflict with useful neovim insert keybinds
-    { "key": "ctrl+shift+a",                "command": "editor.action.selectAll"}, // conficted with ctrl+a
-    { "key": "ctrl+r ctrl+r",              "command": "workbench.action.openRecent", // conflicted with ctrl+r global binding
-        "when": "editorTextFocus && neovim.ctrlKeysInsert && !neovim.recording && neovim.mode == 'insert'"},
-```
 - todo: some templates for workspace configuration
 - todo: fuzzyfind? https://github.com/rlivings39/vscode-fzf-quick-open
 
@@ -116,6 +98,13 @@ pacman -S code
 pacaur -S code-marketplace code-features
 ```
 
+## usage
+
+- tasks.json are shortcuts for plugin provided and custom commands for building (ctrl+shift+b) and testing (ctrl+alt+b) projects
+    - options: dependency on other tasks
+- launch.json are shortcuts for debugging and running applications
+- docker plugin provides tasks/launch configs for buinding docker images and running and debugging the containerizer applications
+
 ### debugging vscode
 
 ```
@@ -126,7 +115,8 @@ code --disable-extensions --verbose --log trace
 
 ### developing extensions
 
-<https://code.visualstudio.com/api>
+- [docs](https://code.visualstudio.com/api)
+-
 
 ## interesting settings and extensions
 

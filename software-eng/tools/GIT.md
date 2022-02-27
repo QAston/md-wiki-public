@@ -2,9 +2,11 @@
 
 ## setup
 
-* windows only - set up crlf handling to cooperate well with linux users
+* windows only - set up crlf handling to use cooperate well with linux users by using lf unless using a windows-specific file that requires crlf
 ```
-git config --global core.autocrlf false
+git config --global core.autocrlf false # disable checkout conversions from/to LF on pull/push, git will convert attribute text files to core.eol on commit
+git config --global core.eol lf # configure eol for text and text=auto files to have this encoding on commit when core.autocrlf=false (use lf because windows supports it anyways)
+git config --global core.safecrlf true
 
 touch ~/.gitattributes_global
 git config --global core.attributesFile ~/.gitattributes_global
